@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAZDA Sync | Real-time Organizational Alignment System</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .sidebar-item:hover { background: rgba(37, 99, 235, 0.1); color: #2563eb; }
+        .active-sidebar { background: rgba(37, 99, 235, 0.1); color: #2563eb; border-right: 4px solid #2563eb; }
+        .animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .7; } }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Mock Database (Loaded from our markdown files)
+        const INITIAL_DATA = {
+            strategy: {
+                title: "マツダ再興：全社上位方針",
+                goals: ["2025年 H2 営業利益の黒字化", "固定費の構造的削減（1,000億円規模）"],
+                pillars: ["R&D効率化 (Speed & Lean)", "価値見極め (WTP Focus)"]
+            },
+            dept_strategy: {
+                title: "商品戦略部：2026年度 モデル価値向上",
+                mission: ["リセールバリュー 5% 向上", "値引き 30% 削減"]
+            },
+            tasks: [
+                { id: "010", title: "現場ヒアリング（佐藤工場長）", dept: "ワークスタイル改革", status: "In Progress", align: 92 },
+                { id: "006", title: "意思決定同期AI開発", dept: "ディシジョン・シンクロ", status: "In Progress", align: 88 },
+                { id: "002", title: "AIデザイン評価ツール", dept: "ナレッジ・アクセラレーション", status: "Done", align: 95 }
+            ],
+            knowledge_base: [
+                { title: "2023_不具合対策書_A.pdf", tags: ["不具合", "図面", "検索"] },
+                { title: "CX-60 開発ロス報告書.pdf", tags: ["R&D", "効率化"] }
+            ]
+        };
+
+        function App() {
+            const [activeTab, setActiveTab] = useState('dashboard');
+            const [workLog, setWorkLog] = useState('');
+            const [syncResult, setSyncResult] = useState(null);
+            const [isSyncing, setIsSyncing] = useState(false);
+
+            const handleSync = () => {
+                if (!workLog) return;
+                setIsSyncing(true);
+                
+                // Simulate AI Processing
+                setTimeout(() => {
+                    const keywords = ["リセール", "図面", "効率", "削減", "工場", "顧客"];
+                    const foundKeywords = keywords.filter(k => workLog.includes(k));
+                    const score = 70 + (foundKeywords.length * 5);
+                    
+                    setSyncResult({
+                        score: Math.min(score, 98),
+                        summary: `本日の作業は「${workLog.substring(0, 20)}...」として記録されました。上位方針「R&D効率化」に合致しており、特に現場課題の具体化に寄与しています。`,
+                        recommendations: foundKeywords.length > 0 ? ["過去の図面DB構造図.dwg", "佐藤工場長インタビュー記録_2025.docx"] : []
+                    });
+                    setIsSyncing(false);
+                }, 1500);
+            };
+
+            return (
+                <div class="flex h-screen overflow-hidden">
+                    {/* Sidebar */}
+                    <div class="w-64 glass border-r flex flex-col">
+                        <div class="p-6">
+                            <h1 class="text-2xl font-black tracking-tighter text-gray-900">MAZDA <span class="text-blue-600">SYNC</span></h1>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 text-center">Organizational OS</p>
+                        </div>
+                        <nav class="flex-1 mt-4">
+                            <div onClick={() => setActiveTab('dashboard')} class={`sidebar-item px-6 py-4 cursor-pointer flex items-center space-x-3 transition-all ${activeTab === 'dashboard' ? 'active-sidebar' : 'text-gray-500'}`}>
+                                <i class="fas fa-chart-line"></i>
+                                <span class="text-sm font-semibold">ダッシュボード</span>
+                            </div>
+                            <div onClick={() => setActiveTab('tasks')} class={`sidebar-item px-6 py-4 cursor-pointer flex items-center space-x-3 transition-all ${activeTab === 'tasks' ? 'active-sidebar' : 'text-gray-500'}`}>
+                                <i class="fas fa-tasks"></i>
+                                <span class="text-sm font-semibold">案件・タスク</span>
+                            </div>
+                            <div onClick={() => setActiveTab('strategy')} class={`sidebar-item px-6 py-4 cursor-pointer flex items-center space-x-3 transition-all ${activeTab === 'strategy' ? 'active-sidebar' : 'text-gray-500'}`}>
+                                <i class="fas fa-bullseye"></i>
+                                <span class="text-sm font-semibold">経営・部門方針</span>
+                            </div>
+                        </nav>
+                        <div class="p-4 border-t text-[10px] text-gray-400 text-center">
+                            Logged in as: <b>daiki</b>
+                        </div>
+                    </div>
+
+                    {/* Main Content */}
+                    <div class="flex-1 overflow-y-auto p-8">
+                        {activeTab === 'dashboard' && (
+                            <div class="animate-in fade-in duration-500">
+                                <header class="mb-8">
+                                    <h2 class="text-3xl font-bold text-gray-900">Dashboard</h2>
+                                    <p class="text-gray-500">今日の「マツダとの同期」を始めましょう。</p>
+                                </header>
+
+                                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                    {/* Work Logger */}
+                                    <div class="lg:col-span-2 space-y-6">
+                                        <div class="card p-6 bg-white shadow-sm border rounded-xl">
+                                            <h3 class="text-sm font-bold text-gray-400 uppercase mb-4">作業ログの入力</h3>
+                                            <textarea 
+                                                value={workLog}
+                                                onChange={(e) => setWorkLog(e.target.value)}
+                                                class="w-full p-4 bg-gray-50 border border-gray-100 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                                                rows="5" 
+                                                placeholder="今日取り組んだこと、気づいたこと、直面した課題を自由に入力してください..."
+                                            ></textarea>
+                                            <div class="flex justify-between items-center mt-4">
+                                                <p class="text-[10px] text-gray-400 italic">※AIが自動的に戦略との整合性を判定し、日報を作成します。</p>
+                                                <button 
+                                                    onClick={handleSync}
+                                                    disabled={isSyncing || !workLog}
+                                                    class={`px-6 py-2 bg-blue-600 text-white rounded-lg font-bold text-sm shadow-lg hover:bg-blue-700 transition-all ${isSyncing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                >
+                                                    {isSyncing ? <i class="fas fa-sync fa-spin mr-2"></i> : <i class="fas fa-bolt mr-2"></i>}
+                                                    戦略と同期する
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {syncResult && (
+                                            <div class="card p-6 bg-blue-600 text-white shadow-xl rounded-xl animate-in slide-in-from-bottom-4 duration-300">
+                                                <div class="flex justify-between items-start mb-4">
+                                                    <h3 class="font-bold">AI 同期レポート</h3>
+                                                    <div class="text-2xl font-black">{syncResult.score}% <span class="text-[10px] font-normal block">Alignment</span></div>
+                                                </div>
+                                                <p class="text-sm mb-6 leading-relaxed opacity-90">{syncResult.summary}</p>
+                                                
+                                                {syncResult.recommendations.length > 0 && (
+                                                    <div class="bg-blue-700 p-4 rounded-lg">
+                                                        <h4 class="text-xs font-bold mb-2 text-blue-200">AI推奨のナレッジ:</h4>
+                                                        <ul class="text-xs space-y-1">
+                                                            {syncResult.recommendations.map(r => (
+                                                                <li key={r} class="flex items-center space-x-2">
+                                                                    <i class="fas fa-file-alt"></i>
+                                                                    <span class="underline cursor-pointer">{r}</span>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                )}
+                                                <button class="mt-4 w-full py-2 bg-white text-blue-600 rounded-lg text-xs font-bold shadow-inner">
+                                                    このまま日報として送信する
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Stats & Info */}
+                                    <div class="space-y-6">
+                                        <div class="card p-6 bg-white shadow-sm border rounded-xl">
+                                            <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">現在の最重要目標</h3>
+                                            <p class="text-sm font-bold text-gray-800 leading-tight">R&D固定費 180億円削減</p>
+                                            <div class="w-full bg-gray-100 h-2 rounded-full mt-3 overflow-hidden">
+                                                <div class="bg-green-500 h-full" style={{width: '35%'}}></div>
+                                            </div>
+                                            <p class="text-[10px] text-gray-400 mt-2 text-right">進捗: 35% (見込み)</p>
+                                        </div>
+
+                                        <div class="card p-6 bg-gray-900 text-white shadow-sm rounded-xl overflow-hidden relative">
+                                            <div class="absolute -right-8 -bottom-8 text-8xl text-gray-800 opacity-20"><i class="fas fa-lightbulb"></i></div>
+                                            <h3 class="text-xs font-bold text-blue-400 uppercase mb-2">今日のヒント</h3>
+                                            <p class="text-xs leading-relaxed">佐藤工場長とのヒアリングが進行中です。「不具合対策書」の検索不備について深掘りすると、さらなる効率化が見込めます。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'tasks' && (
+                            <div class="animate-in fade-in duration-500">
+                                <header class="mb-8">
+                                    <h2 class="text-3xl font-bold text-gray-900">Task Management</h2>
+                                    <p class="text-gray-500">あなたが支えている組織の歯車です。</p>
+                                </header>
+                                <div class="space-y-4">
+                                    {INITIAL_DATA.tasks.map(task => (
+                                        <div key={task.id} class="p-6 bg-white border rounded-xl flex items-center justify-between hover:shadow-md transition-all">
+                                            <div>
+                                                <div class="flex items-center space-x-2 mb-1">
+                                                    <span class="text-[10px] font-bold text-gray-400">#{task.id}</span>
+                                                    <h4 class="font-bold text-gray-800">{task.title}</h4>
+                                                </div>
+                                                <p class="text-xs text-gray-400">{task.dept}</p>
+                                            </div>
+                                            <div class="text-right flex items-center space-x-8">
+                                                <div>
+                                                    <p class="text-[10px] text-gray-400 uppercase font-bold">Alignment</p>
+                                                    <p class={`text-sm font-bold ${task.align > 90 ? 'text-green-500' : 'text-blue-500'}`}>{task.align}%</p>
+                                                </div>
+                                                <span class={`px-3 py-1 rounded-full text-[10px] font-bold ${task.status === 'Done' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                                    {task.status}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'strategy' && (
+                            <div class="animate-in fade-in duration-500">
+                                <header class="mb-8">
+                                    <h2 class="text-3xl font-bold text-gray-900">Strategy & Mission</h2>
+                                    <p class="text-gray-500">迷ったときは、ここに戻ってきてください。</p>
+                                </header>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div class="card p-8 bg-white border-l-8 border-gray-900 shadow-sm">
+                                        <h3 class="text-xl font-bold mb-6">全社上位方針</h3>
+                                        <div class="space-y-4">
+                                            {INITIAL_DATA.strategy.goals.map(g => (
+                                                <div key={g} class="p-4 bg-gray-50 rounded-lg text-sm font-semibold text-gray-700 flex items-center space-x-3">
+                                                    <i class="fas fa-check-circle text-gray-300"></i>
+                                                    <span>{g}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div class="card p-8 bg-white border-l-8 border-blue-600 shadow-sm">
+                                        <h3 class="text-xl font-bold mb-6">商品戦略部ミッション</h3>
+                                        <div class="space-y-4">
+                                            {INITIAL_DATA.dept_strategy.mission.map(m => (
+                                                <div key={m} class="p-4 bg-blue-50 rounded-lg text-sm font-semibold text-blue-800 flex items-center space-x-3">
+                                                    <i class="fas fa-star text-blue-200"></i>
+                                                    <span>{m}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
