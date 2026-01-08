@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAZDA Sync | Brand Strategy Tree</title>
+    <title>MAZDA Sync | Dept. Strategy Navigator</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -11,12 +11,14 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
-        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-        .tree-container { padding: 40px; }
-        .logic-line { width: 2px; background: #cbd5e1; margin: 0 auto; height: 30px; }
-        .node-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .node-card:hover { transform: scale(1.02); }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); }
+        .tree-container { padding: 80px 40px; }
+        .logic-line { width: 3px; background: #e2e8f0; margin: 0 auto; height: 40px; transition: all 0.3s; }
+        .node-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
+        .node-card:hover { transform: translateY(-8px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); }
+        .sidebar-item:hover { background: rgba(59, 130, 246, 0.05); color: #2563eb; }
+        .active-sidebar { background: #eff6ff; color: #2563eb; border-right: 4px solid #2563eb; }
     </style>
 </head>
 <body>
@@ -25,8 +27,8 @@
     <script type="text/babel">
         const { useState } = React;
 
-        const BRAND_STRATEGY = {
-            id: "G1", title: "マツダのブランド価値（プレミアム・バリュー）の最大化", level: "大目標 (Goal)", type: "goal",
+        const DEPT_STRATEGY = {
+            id: "D1", title: "マツダのブランド価値を向上させる", level: "大目標 (Goal)", type: "goal", department: "ブランド体験創造部",
             children: [
                 {
                     id: "M1", title: "A. 感性品質の極致化 (作る価値)", level: "中項目 (Strategy)", type: "strategy",
@@ -34,14 +36,8 @@
                         {
                             id: "S1-1", title: "音響システム（原音再生の追求）", level: "小項目 (Category)", type: "category",
                             children: [
-                                { id: "T1", title: "スピーカー配置のAI最適化", level: "タスク (Task)", type: "task", owner: "@akira" },
-                                { id: "T2", title: "車内静粛性向上のための新素材検証", level: "タスク (Task)", type: "task", owner: "@kenji" }
-                            ]
-                        },
-                        {
-                            id: "S1-2", title: "デザインフィニッシュの向上", level: "小項目 (Category)", type: "category",
-                            children: [
-                                { id: "T3", title: "匠塗（TAKUMINURI）の量産化精度向上", level: "タスク (Task)", type: "task", owner: "@yoko" }
+                                { id: "T1", title: "スピーカー配置のAI最適化", level: "タスク (Task)", type: "task", owner: "@akira", status: "In Progress" },
+                                { id: "T2", title: "車内静粛性向上のための新素材検証", level: "タスク (Task)", type: "task", owner: "@kenji", status: "Backlog" }
                             ]
                         }
                     ]
@@ -52,8 +48,7 @@
                         {
                             id: "S2-1", title: "リセール価値（残価率）の防衛", level: "小項目 (Category)", type: "category",
                             children: [
-                                { id: "T4", title: "中古車価格予測AIの実装", level: "タスク (Task)", type: "task", owner: "@daiki" },
-                                { id: "T5", title: "認定中古車ブランド規定の刷新", level: "タスク (Task)", type: "task", owner: "@mika" }
+                                { id: "T4", title: "中古車価格予測AIの実装", level: "タスク (Task)", type: "task", owner: "@daiki", status: "In Progress" }
                             ]
                         }
                     ]
@@ -64,7 +59,7 @@
                         {
                             id: "S3-1", title: "ロータリーエンジン（発電機）の資産化", level: "小項目 (Category)", type: "category",
                             children: [
-                                { id: "T6", title: "マルチソリューション戦略の広報DX", level: "タスク (Task)", type: "task", owner: "@satoshi" }
+                                { id: "T6", title: "マルチソリューション戦略の広報DX", level: "タスク (Task)", type: "task", owner: "@satoshi", status: "Backlog" }
                             ]
                         }
                     ]
@@ -76,35 +71,44 @@
             const [isExpanded, setIsExpanded] = useState(true);
             const hasChildren = node.children && node.children.length > 0;
 
+            const getBorderColor = () => {
+                if (node.type === 'goal') return 'border-blue-700 bg-blue-50/50';
+                if (node.type === 'strategy') return 'border-indigo-500 bg-white';
+                if (node.type === 'category') return 'border-emerald-500 bg-white';
+                return 'border-slate-300 bg-slate-50';
+            };
+
             return (
-                <div className="flex flex-col items-center w-full">
-                    <div className={`node-card p-6 rounded-3xl shadow-xl border-t-8 max-w-md w-full mb-2 bg-white ${
-                        node.type === 'goal' ? 'border-black' : 
-                        node.type === 'strategy' ? 'border-blue-600' : 
-                        node.type === 'category' ? 'border-emerald-500' : 'border-slate-400'
-                    }`}>
-                        <div className="flex justify-between items-start mb-2">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{node.level}</span>
+                <div className="flex flex-col items-center w-full min-w-[300px]">
+                    <div className={`node-card p-8 rounded-[2.5rem] shadow-xl border-t-[10px] w-full mb-2 ${getBorderColor()}`}>
+                        <div className="flex justify-between items-start mb-3">
+                            <div>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 block mb-1">{node.level}</span>
+                                {node.department && <span className="bg-blue-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter italic">{node.department}</span>}
+                            </div>
                             {hasChildren && (
-                                <button onClick={() => setIsExpanded(!isExpanded)} className="text-slate-300 hover:text-blue-600 transition-colors">
-                                    <i className={`fas ${isExpanded ? 'fa-minus-square' : 'fa-plus-square'} text-lg`}></i>
+                                <button onClick={() => setIsExpanded(!isExpanded)} className="text-slate-300 hover:text-blue-600 transition-all">
+                                    <i className={`fas ${isExpanded ? 'fa-minus-circle' : 'fa-plus-circle'} text-xl`}></i>
                                 </button>
                             )}
                         </div>
-                        <h4 className={`font-black italic uppercase leading-tight ${node.type === 'goal' ? 'text-2xl' : 'text-lg'}`}>
+                        <h4 className={`font-black italic uppercase leading-tight tracking-tighter ${node.type === 'goal' ? 'text-3xl' : 'text-xl'}`}>
                             {node.title}
                         </h4>
-                        {node.owner && (
-                            <div className="mt-4 flex items-center space-x-2">
-                                <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-black">{node.owner[1].toUpperCase()}</div>
-                                <span className="text-xs font-bold text-slate-500">{node.owner}</span>
+                        {(node.owner || node.status) && (
+                            <div className="mt-6 flex items-center justify-between">
+                                <div className="flex items-center space-x-2">
+                                    <div className="w-8 h-8 rounded-2xl bg-slate-900 flex items-center justify-center text-white text-xs font-black italic shadow-lg">{node.owner ? node.owner[1].toUpperCase() : "?"}</div>
+                                    <span className="text-sm font-black italic text-slate-600">{node.owner}</span>
+                                </div>
+                                {node.status && <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 border border-slate-200 px-3 py-1 rounded-full">{node.status}</span>}
                             </div>
                         )}
                     </div>
                     {isExpanded && hasChildren && (
                         <div className="w-full">
                             <div className="logic-line"></div>
-                            <div className="flex justify-center items-start space-x-8 px-4">
+                            <div className="flex justify-center items-start space-x-12 px-6">
                                 {node.children.map(child => <StrategyNode key={child.id} node={child} />)}
                             </div>
                         </div>
@@ -114,26 +118,40 @@
         };
 
         function App() {
-            const [view, setView] = useState('brand');
-
             return (
-                <div className="min-h-screen p-12 bg-[#f8fafc]">
-                    <header className="mb-20 text-center max-w-4xl mx-auto">
-                        <div className="inline-block bg-black text-white px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest mb-6">Strategy Engine</div>
-                        <h1 className="text-6xl font-black text-slate-900 tracking-tighter italic uppercase mb-6 leading-none">Brand Strategy<br/>Navigator</h1>
-                        <p className="text-xl font-medium text-slate-500 leading-relaxed">
-                            大目標を「ブランド価値向上」に据えた論理分解。全ての現場タスクは、マツダのプレミアム化のために存在する。
-                        </p>
-                    </header>
-
-                    <div className="tree-container flex justify-center">
-                        <StrategyNode node={BRAND_STRATEGY} />
+                <div className="flex h-screen overflow-hidden">
+                    {/* Sidebar */}
+                    <div className="w-80 glass border-r border-slate-200 flex flex-col z-20 shadow-2xl">
+                        <div className="p-10 text-center">
+                            <h1 className="text-3xl font-black italic tracking-tighter text-slate-900 leading-none">MAZDA<br/><span className="text-blue-600 uppercase text-4xl">SYNC</span></h1>
+                            <p className="text-[10px] font-black text-slate-400 tracking-[0.3em] mt-3 uppercase">Brand Experience Hub</p>
+                        </div>
+                        <nav className="flex-1 px-4 py-8 space-y-3">
+                            <div className="active-sidebar px-8 py-5 rounded-[2rem] flex items-center space-x-5 shadow-lg shadow-blue-100">
+                                <i className="fas fa-bullseye text-xl"></i>
+                                <span className="font-black text-sm uppercase italic tracking-widest">Strategy Navigator</span>
+                            </div>
+                            <div className="sidebar-item px-8 py-5 rounded-[2rem] flex items-center space-x-5 text-slate-400">
+                                <i className="fas fa-tasks text-xl"></i>
+                                <span className="font-black text-sm uppercase italic tracking-widest">Tasks Board</span>
+                            </div>
+                        </nav>
+                        <div className="p-10 border-t border-slate-100 bg-slate-50/50">
+                            <div className="flex items-center space-x-4">
+                                <div className="w-14 h-14 rounded-[1.5rem] bg-slate-900 flex items-center justify-center text-white text-2xl font-black italic shadow-xl">D</div>
+                                <div>
+                                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mb-1">Brand Strategist</p>
+                                    <p className="text-base font-black italic text-slate-900">daiki</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="fixed bottom-10 right-10 flex space-x-4">
-                        <button className="bg-white border-2 border-slate-200 p-4 rounded-2xl shadow-lg hover:border-blue-600 transition-all text-slate-400 hover:text-blue-600">
-                            <i className="fas fa-compress-arrows-alt"></i>
-                        </button>
+                    {/* Main Content */}
+                    <div className="flex-1 overflow-auto bg-[#fdfdfd] relative scroll-smooth">
+                        <div className="tree-container flex justify-center">
+                            <StrategyNode node={DEPT_STRATEGY} />
+                        </div>
                     </div>
                 </div>
             );
