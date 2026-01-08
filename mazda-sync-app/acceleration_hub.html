@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>MAZDA Sync | Coaching & Acceleration Hub</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-50 text-slate-900 p-8">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        function App() {
+            return (
+                <div class="max-w-4xl mx-auto space-y-10">
+                    <header class="flex justify-between items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 rounded-full bg-slate-900 flex items-center justify-center text-white">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div>
+                                <h1 class="text-xl font-black italic">Acceleration Hub</h1>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase">あなたの役割： 伴走者（Coach）</p>
+                            </div>
+                        </div>
+                        <div class="text-right px-4 py-2 bg-blue-50 rounded-xl">
+                            <p class="text-[10px] font-black text-blue-500 uppercase">Team Performance</p>
+                            <p class="text-lg font-black text-blue-700 leading-none">88% <span class="text-[8px] font-normal uppercase tracking-tighter">Alignment</span></p>
+                        </div>
+                    </header>
+
+                    {/* Member Activities (No Approval Required) */}
+                    <div class="space-y-6">
+                        <h2 class="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center">
+                            <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                            Live Feedback Loop
+                        </h2>
+
+                        <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 relative group transition-all hover:border-blue-200">
+                            <div class="flex justify-between items-start mb-6">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-600">K</div>
+                                    <div>
+                                        <h3 class="font-black text-slate-800 italic">ケンジ</h3>
+                                        <p class="text-[10px] text-slate-400">10分前：作業完了・即時同期済み</p>
+                                    </div>
+                                </div>
+                                <div class="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-bold rounded-full">✓ 自動同期済み</div>
+                            </div>
+
+                            <div class="mb-6 p-4 bg-slate-50 rounded-2xl border-l-4 border-slate-900">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Task Result:</p>
+                                <p class="text-sm font-medium leading-relaxed">
+                                    「佐藤工場長へのヒアリング実施。図面検索における紙図面とデジタルの乖離要因を特定。Issue #001 の解決に寄与。」
+                                </p>
+                            </div>
+
+                            {/* Coach's Acceleration Box */}
+                            <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100">
+                                <label class="block text-[10px] font-black text-blue-500 uppercase tracking-widest mb-3 italic">
+                                    <i class="fas fa-bolt mr-1"></i> あなたの伴走（加速アドバイス）
+                                </label>
+                                <textarea 
+                                    class="w-full p-4 bg-white border-0 rounded-xl text-xs leading-relaxed outline-none ring-2 ring-transparent focus:ring-blue-200 transition-all h-20"
+                                    placeholder="ケンジさんの作業を加速させるための知見やアドバイスを、ここに..."
+                                ></textarea>
+                                <div class="mt-4 flex justify-between items-center">
+                                    <div class="flex items-center space-x-2">
+                                        <button class="text-blue-600 hover:scale-110 transition-transform"><i class="fas fa-thumbs-up"></i></button>
+                                        <span class="text-[10px] font-bold text-blue-400 uppercase">AI推奨のナレッジを共有する</span>
+                                    </div>
+                                    <button class="bg-blue-600 text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg hover:bg-blue-700 transition-all">
+                                        アドバイスを送信
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer class="text-center py-10 border-t">
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.5em]">
+                            Empowering Mazda's Future with Shared Vision
+                        </p>
+                    </footer>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
