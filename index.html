@@ -10,8 +10,8 @@
         body { background-color: #f3f4f6; }
         .card { background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .logic-header { border-left: 8px solid #1e3a8a; padding-left: 1rem; }
-        .profit-node { fill: #dbeafe !important; stroke: #1e3a8a !important; stroke-width: 3px !important; }
-        .focus-node { fill: #fff3e0 !important; stroke: #ff9800 !important; stroke-width: 2px !important; }
+        .profit-node > rect, .profit-node > circle, .profit-node > ellipse { fill: #dbeafe !important; stroke: #1e3a8a !important; stroke-width: 3px !important; }
+        .focus-node > rect, .focus-node > circle, .focus-node > ellipse { fill: #fff3e0 !important; stroke: #ff9800 !important; stroke-width: 2px !important; }
         .past-version { border-top: 2px dashed #ccc; padding-top: 2rem; margin-top: 4rem; }
     </style>
 </head>
@@ -19,7 +19,7 @@
     <div class="max-w-6xl mx-auto">
         <header class="mb-12 text-center">
             <h1 class="text-4xl font-bold mb-4">マツダ再興・戦略ダッシュボード</h1>
-            <p class="text-xl text-blue-800 font-bold italic">Version 3.0: MECE Financial Logic Strategy</p>
+            <p class="text-xl text-blue-800 font-bold italic">Version 3.1: MECE Financial Logic Strategy (Fixed for Mermaid v11)</p>
         </header>
 
         <!-- セクション1: プロフェッショナル論理分解 -->
@@ -30,7 +30,7 @@
             </div>
             
             <div class="mermaid flex justify-center overflow-x-auto">
-                graph TD
+                flowchart TD
                     ROOT(("<b>マツダ再興<br/>(営業利益の最大化)</b>"))
                     
                     ROOT --> PRICE["<b>1. 単価向上<br/>(Premiumization)</b>"]
@@ -38,17 +38,17 @@
                     ROOT --> COST["<b>3. コスト・固定費削減<br/>(Efficiency)</b>"]
                     
                     %% 1. 単価向上
-                    PRICE --> P1[ブランド価値による価格支配力]
-                    PRICE --> P2[高付加価値ミックスへの移行]
+                    PRICE --> P1["ブランド価値による価格支配力"]
+                    PRICE --> P2["高付加価値ミックスへの移行"]
                     P1 --> FOCUS_ART("<b>AIアート・感性価値による<br/>ブランド再定義</b>")
                     
                     %% 2. 数量維持
-                    VOLUME --> V1[既存ファンの維持(LTV)]
-                    VOLUME --> V2[販売チャネルのデジタル変革]
+                    VOLUME --> V1["既存ファンの維持(LTV)"]
+                    VOLUME --> V2["販売チャネルのデジタル変革"]
                     V1 --> FOCUS_COMM("<b>AIによるファンコミュニティ<br/>エンゲージメント強化</b>")
                     
                     %% 3. コスト・固定費削減
-                    COST --> C1[製造・調達コストの削減]
+                    COST --> C1["製造・調達コストの削減"]
                     COST --> C2["<b>R&D・組織ロスの削減</b>"]
                     C2 --> FOCUS_DRAWING("<b>図面検索AIによる<br/>設計工数 80% 削減</b>")
                     C2 --> FOCUS_SYNC("<b>AI意思決定同期による<br/>合意形成スピードの劇的向上</b>")
@@ -76,57 +76,54 @@
 
         <!-- セクション2: 接続レイヤー -->
         <section class="card p-8 mb-12">
-            <h2 class="text-2xl font-bold mb-8 text-center text-gray-800 underline">2. アクション・アライメント</h2>
-            <div class="flex flex-col space-y-4">
-                <div class="flex items-center p-4 bg-white border rounded shadow-sm">
-                    <div class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl mr-6">1</div>
-                    <div>
-                        <h4 class="font-bold text-blue-600 uppercase tracking-wider text-sm">Action: 最小単位の実証 (vs 佐藤さん)</h4>
-                        <p class="text-gray-700">コスト削減(C2)の証明。図面1枚から「組織の迷い」を消す技術と信頼を確立。</p>
-                    </div>
-                </div>
-                <div class="flex items-center p-4 bg-white border rounded shadow-sm">
-                    <div class="w-16 h-16 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-xl mr-6">2</div>
-                    <div>
-                        <h4 class="font-bold text-green-600 uppercase tracking-wider text-sm">Local: 社会的証明 (熊野町イベント)</h4>
-                        <p class="text-gray-700">単価向上(P1)とファン形成(V1)の証明。芸術×AIで「変革のリーダーシップ」を可視化。</p>
-                    </div>
-                </div>
-                <div class="flex items-center p-4 bg-white border rounded shadow-sm">
-                    <div class="w-16 h-16 bg-pink-600 text-white rounded-full flex items-center justify-center font-bold text-xl mr-6">3</div>
-                    <div>
-                        <h4 class="font-bold text-pink-600 uppercase tracking-wider text-sm">Mega: マツダ再興</h4>
-                        <p class="text-gray-700">利益改善方程式の全展開。元社員の知見をAIで増幅し、経営再建の立役者へ。</p>
-                    </div>
-                </div>
+            <h2 class="text-2xl font-bold mb-8 text-center text-gray-800 underline">2. アライメント・アクション</h2>
+            <div class="mermaid flex justify-center">
+                flowchart BT
+                    S1["図面検索AI成功"] -->|現場実績| E1["AI展示会"]
+                    S2["現場の抵抗突破"] -->|変革力証明| E2["ドキュメンタリー"]
+                    E1 & E2 -->|信頼獲得| M1["マツダへ提案"]
+                    M1 --> M2["システム導入"]
+                    M2 --> GOAL(("<b>マツダ再興</b>"))
+
+                    style GOAL fill:#e91e63,stroke:#fff,color:#fff
+                    style S1 fill:#2196f3,stroke:#fff,color:#fff
+                    style S2 fill:#2196f3,stroke:#fff,color:#fff
+                    style E2 fill:#4caf50,stroke:#fff,color:#fff
             </div>
         </section>
 
         <!-- アーカイブ -->
-        <div class="past-version bg-gray-200 p-8 rounded-lg">
+        <div class="past-version bg-gray-200 p-8 rounded-lg shadow-inner">
             <h2 class="text-2xl font-bold mb-8 text-gray-600 text-center">アーカイブ：思考の変遷 (Archives)</h2>
             
             <details class="mb-4">
-                <summary class="cursor-pointer font-bold text-gray-700 p-4 bg-gray-300 rounded hover:bg-gray-400 transition">Version 2: 収益・財務モデル (2026/01/08)</summary>
-                <div class="p-6 mt-2 bg-white rounded shadow-inner">
-                    <p class="text-xs text-gray-500 mb-4 italic">※売上とコストの単純分解期</p>
+                <summary class="cursor-pointer font-bold text-gray-700 p-4 bg-gray-300 rounded hover:bg-gray-400 transition shadow-sm">Version 2: 財務的論理分解モデル (2026/01/08)</summary>
+                <div class="p-6 mt-2 bg-white rounded shadow-sm">
+                    <p class="text-xs text-gray-500 mb-4 italic text-center">※収益改善を起点とした単純分解</p>
                     <div class="mermaid flex justify-center">
-                        graph TD
-                            V2ROOT((マツダ再興)) --> V2REVENUE[売上拡大]
-                            V2ROOT --> V2COST[コスト最適化]
-                            V2REVENUE --> V2R1[ブランド強化]
-                            V2COST --> V2C1[組織ロス削減]
+                        flowchart TD
+                            V2ROOT(("<b>マツダ再興<br/>(営業利益改善)</b>"))
+                            V2ROOT --> V2REVENUE["<b>売上の拡大</b>"]
+                            V2ROOT --> V2COST["<b>コストの最適化</b>"]
+                            V2REVENUE --> V2R1["ブランド力の強化"]
+                            V2COST --> V2C1["組織的ロスの削減"]
+                            class V2ROOT profit-node;
                     </div>
                 </div>
             </details>
 
             <details class="mb-4">
-                <summary class="cursor-pointer font-bold text-gray-700 p-4 bg-gray-300 rounded hover:bg-gray-400 transition">Version 1: バリューチェーン分解モデル</summary>
-                <div class="p-6 mt-2 bg-white rounded shadow-inner">
-                    <p class="text-xs text-gray-500 mb-4 italic">※製造プロセスの流れ（企画・製造・販売）に沿った分解期</p>
+                <summary class="cursor-pointer font-bold text-gray-700 p-4 bg-gray-300 rounded hover:bg-gray-400 transition shadow-sm">Version 1: バリューチェーン分解モデル</summary>
+                <div class="p-6 mt-2 bg-white rounded shadow-sm">
+                    <p class="text-xs text-gray-500 mb-4 italic text-center">※製造プロセスの流れ（企画・製造・販売）に沿った分解</p>
                     <div class="mermaid flex justify-center">
-                        graph TD
-                            V1VC1[R&D・企画] --> V1VC2[調達・製造] --> V1VC3[販売・マーケ]
+                        flowchart TD
+                            V1VC1["<b>R&D・商品企画</b>"] --> V1VC2["<b>調達・製造</b>"]
+                            V1VC2 --> V1VC3["<b>販売・マーケ</b>"]
+                            
+                            V1VC1 --> V1VC1A["過去の設計知見のデータ化"]
+                            V1VC2 --> V1VC2B["現場の暗黙知の形式知化"]
+                            V1VC3 --> V1VC3A["ファンコミュニティ活性化"]
                     </div>
                 </div>
             </details>
@@ -140,8 +137,12 @@
         mermaid.initialize({ 
             startOnLoad: true, 
             theme: 'default',
-            flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
-            securityLevel: 'loose'
+            securityLevel: 'loose',
+            flowchart: { 
+                useMaxWidth: true, 
+                htmlLabels: true,
+                curve: 'basis'
+            }
         });
     </script>
 </body>
