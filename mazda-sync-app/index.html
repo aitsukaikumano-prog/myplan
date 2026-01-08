@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAZDA Sync | Value Chain Strategy</title>
+    <title>MAZDA Sync | Direct Value Chain</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -14,7 +14,7 @@
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
         
-        .tree-container { min-width: 9000px; padding: 120px; transition: transform 0.2s ease-out; transform-origin: top center; }
+        .tree-container { min-width: 8000px; padding: 120px; transition: transform 0.2s ease-out; transform-origin: top center; }
         
         .tree ul {
             padding-top: 60px; position: relative;
@@ -62,7 +62,6 @@
         .zoom-btn:hover { border-color: #2563eb; color: #2563eb; transform: scale(1.1); }
         .zoom-level { background: #2563eb; color: white; font-size: 0.8rem; font-weight: 900; padding: 6px 12px; border-radius: 10px; text-align: center; }
 
-        /* Profit Indicators */
         .profit-tag-cost { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
         .profit-tag-revenue { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
     </style>
@@ -82,7 +81,7 @@
                         {
                             id: "L3-1", title: "商品コンセプト・要件定義", level: "Stage",
                             issues: [
-                                "RD-CON-01: WTPデータに基づくCX-80装備の優先順位付け [収益寄与]",
+                                "RD-CON-01: 顧客要望に基づくCX-80装備の優先順位付け [収益寄与]",
                                 "RD-CON-02: ターゲット顧客の感性価値(質感)の数値化 [価値向上]",
                                 "RD-CON-03: 競合他社比較による『あたりまえ品質』のコスト最適化 [コスト削]",
                                 "RD-CON-04: 商品企画段階でのリサイクル性評価ロジック構築",
@@ -112,28 +111,13 @@
                     ]
                 },
                 {
-                    id: "L2-sync", title: "Strategic Sync Engine (AI)", level: "Synchronization Layer", type: "engine",
-                    children: [
-                        {
-                            id: "L3-sync", title: "価値見極めAI (同期ハブ)", level: "Core Logic",
-                            issues: [
-                                "SYNC-01: 作る（評価結果）と売る（WTP）のリアルタイム紐付け",
-                                "SYNC-02: 部門間でのKPI（コストvs魅力）のトレードオフ可視化",
-                                "SYNC-03: 開発中の仕様変更がリセール価値に与える影響予測",
-                                "SYNC-04: 現場エンジニア向けの収益貢献度（スコアリング）計算",
-                                "SYNC-05: 経営陣向け全社ロス（未同期率）のダッシュボード化"
-                            ]
-                        }
-                    ]
-                },
-                {
                     id: "L2-2", title: "B. Value Delivery: 商品を売る (販社/リセール)", level: "Strategic Wing", type: "wing-sell",
                     children: [
                         {
                             id: "L3-4", title: "マーケティング・販促", level: "Stage",
                             issues: [
                                 "M-STR-01: 特徴的価値(カラー等)への広告費集中投下 [収益向上]",
-                                "M-STR-02: デジタル接点でのWTPデータの逆引き・収集 [ナレッジ]",
+                                "M-STR-02: デジタル接点での顧客ニーズの収集・共有 [ナレッジ]",
                                 "M-STR-03: 値引きなしでも売れる『ファン層』の特定とエンゲージメント",
                                 "M-STR-04: 地域別インセンティブの動的価格設定モデルの導入 [収益向上]",
                                 "M-STR-05: 店頭試乗体験の満足度と成約率の相関分析"
@@ -171,7 +155,6 @@
             const getWingStyle = () => {
                 if (node.type === 'wing-make') return 'border-red-600 bg-red-50/10';
                 if (node.type === 'wing-sell') return 'border-green-600 bg-green-50/10';
-                if (node.type === 'engine') return 'border-blue-700 bg-blue-50/10';
                 return '';
             };
 
@@ -218,11 +201,11 @@
         };
 
         function App() {
-            const [zoom, setZoom] = useState(0.4);
+            const [zoom, setZoom] = useState(0.5);
 
             const zoomIn = () => setZoom(prev => Math.min(prev + 0.1, 2.0));
             const zoomOut = () => setZoom(prev => Math.max(prev - 0.1, 0.1));
-            const resetZoom = () => setZoom(0.4);
+            const resetZoom = () => setZoom(0.5);
 
             return (
                 <div className="flex h-screen text-slate-800 bg-[#f8fafc] overflow-hidden">
@@ -265,7 +248,7 @@
                             <div className="pointer-events-auto bg-white/10 backdrop-blur-sm p-6 rounded-3xl inline-block">
                                 <h2 className="text-8xl font-black text-slate-900 tracking-tighter italic uppercase mb-6 drop-shadow-xl">Value Chain Navigator</h2>
                                 <p className="text-3xl font-medium text-slate-500 max-w-5xl leading-relaxed">
-                                    「作る」と「売る」の同期による収益改善。全ての現場タスクに財務指標を内包。
+                                    「作る」と「売る」を直結。全ての現場タスクに財務指標を内包し、組織の意志を同期。
                                 </p>
                             </div>
                         </div>
