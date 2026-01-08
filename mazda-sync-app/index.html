@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAZDA Sync | Enterprise Strategic Navigator</title>
+    <title>MAZDA Sync | Enterprise 50+ Task Navigator</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -11,7 +11,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; overflow-x: auto; }
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
         .sidebar-item:hover { background: rgba(37, 99, 235, 0.1); color: #2563eb; }
         .active-sidebar { background: rgba(37, 99, 235, 0.1); color: #2563eb; border-right: 4px solid #2563eb; }
@@ -19,8 +19,7 @@
         .tree-node { transition: all 0.2s ease-out; }
         .issue-tag { animation: slideIn 0.2s ease-out; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        /* 横に長いツリーを表示するための調整 */
-        .tree-container { min-width: 2500px; padding-bottom: 100px; }
+        .tree-container { min-width: 4500px; padding-bottom: 100px; padding-top: 20px; }
     </style>
 </head>
 <body>
@@ -39,12 +38,34 @@
                             id: "L3-1", title: "単価 (P) の向上・防衛", level: "Business Pillar",
                             children: [
                                 {
-                                    id: "L4-1", title: "中古車リセールバリューのシステム的防衛", level: "Program",
-                                    issues: ["リセール予測モデルの精度向上", "認定中古車制度の再設計", "下取り価格シミュレーターの開発"]
+                                    id: "L4-1", title: "価値見極めAI (WTP分析)", level: "Program",
+                                    issues: [
+                                        "P-AI-01: CX-60 サンルーフのPSM分析実施",
+                                        "P-AI-02: 魂動デザイン要素のヘドニック価格推定",
+                                        "P-AI-03: 競合ADASオプション価格のスクレイピング",
+                                        "P-AI-04: 次世代CX-5 ADAS受容性アンケート設計",
+                                        "P-AI-05: 内装レザー品質とWTPの相関分析",
+                                        "P-AI-06: 『人馬一体』の感性価値を脳波データで定量化",
+                                        "P-AI-07: プレミアム塗装色のPSM価格決定ロジック",
+                                        "P-AI-08: 燃費向上 vs 加速性能のWTPトレードオフ分析",
+                                        "P-AI-09: EV航続距離のコンジョイント分析パイロット運用",
+                                        "P-AI-10: 商品企画ゲートへのWTPデータ統合プロセスの策定"
+                                    ]
                                 },
                                 {
-                                    id: "L4-2", title: "WTP（支払い意欲）に基づいたオプション価格設定", level: "Program",
-                                    issues: ["ADAS機能の価格受容性調査", "内装マテリアルの寄与度分析", "コンジョイント分析実施"]
+                                    id: "L4-2", title: "中古車リセール価値管理", level: "Program",
+                                    issues: [
+                                        "R-VAL-01: CX-90の3年後残価予測モデル構築",
+                                        "R-VAL-02: 値引きインセンティブが中古価格に与える影響分析",
+                                        "R-VAL-03: マツダ認定中古車データ同期アプリの試作",
+                                        "R-VAL-04: 走行距離・整備履歴とリセールプレミアムの相関",
+                                        "R-VAL-05: 営業担当向け下取り価格シミュレーターの開発",
+                                        "R-VAL-06: グローバル・オークション価格のリアルタイム監視",
+                                        "R-VAL-07: リセール最大化のための最適リース期間の定義",
+                                        "R-VAL-08: 競合他社(RAV4等)とのリセール比較トラッキング",
+                                        "R-VAL-09: フリート販売比率の最適化によるブランド保護",
+                                        "R-VAL-10: 値引き承認フローへの『リセール影響警告』の実装"
+                                    ]
                                 }
                             ]
                         },
@@ -52,8 +73,24 @@
                             id: "L3-2", title: "数量 (Q) の確保・シェア拡大", level: "Business Pillar",
                             children: [
                                 {
-                                    id: "L4-3", title: "北米市場におけるCXシリーズの販促最適化", level: "Program",
-                                    issues: ["地域別インセンティブ配分の最適化", "デジタル広告ROIの改善", "ディーラー在庫の回転率向上"]
+                                    id: "L4-3", title: "北米・グローバル販促最適化", level: "Program",
+                                    issues: [
+                                        "M-NA-01: 西海岸向けCX-50 Google広告入札最適化",
+                                        "M-NA-02: アウトドア層 vs 走り層のクリエイティブA/Bテスト",
+                                        "M-NA-03: 地方オートショー協賛のROI算出ロジック",
+                                        "M-NA-04: カリフォルニア州ディーラー在庫報告の自動化",
+                                        "M-NA-05: EV特設サイトのリード転換率(CVR)分析"
+                                    ]
+                                },
+                                {
+                                    id: "L4-4", title: "グローバル・サプライチェーン最適化", level: "Program",
+                                    issues: [
+                                        "SC-OPT-01: 鉄道輸送同期による物流コスト削減シミュレーション",
+                                        "SC-OPT-02: 半導体不足による生産遅延リスクのAI予測",
+                                        "SC-OPT-03: メキシコ工場向け部品輸出のコンテナ充填率向上",
+                                        "SC-OPT-04: CX-80部品向けティア2サプライヤーのリスク評価",
+                                        "SC-OPT-05: 宇品工場のリアルタイム部品在庫トラッキング実装"
+                                    ]
                                 }
                             ]
                         }
@@ -66,25 +103,38 @@
                             id: "L3-3", title: "R&D費の効率化・スピード向上", level: "Business Pillar",
                             children: [
                                 {
-                                    id: "L4-4", title: "パワートレイン開発の試作レス化", level: "Technical Domain",
-                                    children: [
-                                        {
-                                            id: "L5-1", title: "燃焼シミュレーションの高度化", level: "Tech Goal",
-                                            issues: ["スーパーコンピュータ解析工数の削減", "実機テストとの相関誤差修正", "MBDモデルの共通化"]
-                                        }
+                                    id: "L4-5", title: "パワートレイン・EV開発", level: "Technical Domain",
+                                    issues: [
+                                        "RD-PW-01: 熱解析用スパコンノードの20%削減（アルゴリズム改善）",
+                                        "RD-PW-02: e-Skyactiv向けMBDモデルの標準化",
+                                        "RD-PW-03: 仮想テストによる試作エンジン製作の3機削減",
+                                        "RD-PW-04: 強化学習を用いたバルブタイミング制御の最適化",
+                                        "RD-PW-05: 高圧燃料ポンプの騒音低減シミュレーション"
                                     ]
                                 },
                                 {
-                                    id: "L4-5", title: "電子・ソフト基盤の共通プラットフォーム化", level: "Technical Domain",
-                                    children: [
-                                        {
-                                            id: "L5-2", title: "次世代車載OS（Mazda OS）の基盤構築", level: "Tech Goal",
-                                            issues: ["OTAアップデート機能の実装", "セキュリティプロトコルの策定", "UI/UXフレームワークの統一"]
-                                        },
-                                        {
-                                            id: "L5-3", title: "先進安全（ADAS）知見の資産化", level: "Tech Goal",
-                                            issues: ["不具合再現シナリオの自動生成", "検証走行データの圧縮・検索DX", "エッジAIアルゴリズムの軽量化"]
-                                        }
+                                    id: "L4-6", title: "電子・ソフト基盤 (Mazda OS)", level: "Technical Domain",
+                                    issues: [
+                                        "RD-OS-01: Mazda OS 2.0 へのOTAカーネル移植",
+                                        "RD-OS-02: V2X通信向けサイバーセキュリティ・ゲートウェイ実装",
+                                        "RD-OS-03: 全車載スクリーン向けUIフレームワークの統一",
+                                        "RD-OS-04: ヘッドユニット用回帰テストの自動化実行",
+                                        "RD-OS-05: ナビアプリのメモリ使用量最適化",
+                                        "RD-OS-06: 外部アプリデベロッパー向けSDKの構築",
+                                        "RD-OS-07: 日本語方言対応AI音声認識のプロトタイプ",
+                                        "RD-OS-08: 車両状態データとスマホアプリの連携基盤",
+                                        "RD-OS-09: ワイヤレスCarPlayの接続安定性検証",
+                                        "RD-OS-10: GitHubとJiraのソフトウェア構成管理ブリッジ構築"
+                                    ]
+                                },
+                                {
+                                    id: "L4-7", title: "ビークル・シャシー・サスペンション", level: "Technical Domain",
+                                    issues: [
+                                        "RD-CH-01: GVC Plusが乗員の車酔いに与える影響シミュレーション",
+                                        "RD-CH-02: フロントサスペンションアームの500g軽量化設計",
+                                        "RD-CH-03: センサーフュージョンによるダンパー減衰力のAI最適化",
+                                        "RD-CH-04: ステアリングラックのフリクション低減によるフィードバック改善",
+                                        "RD-CH-05: タイヤ空気圧警告センサーの通信プロトコル標準化"
                                     ]
                                 }
                             ]
@@ -93,8 +143,14 @@
                             id: "L3-4", title: "販管費 (SG&A) の最適化", level: "Business Pillar",
                             children: [
                                 {
-                                    id: "L4-6", title: "事務・間接工数のAI自動化", level: "Business Program",
-                                    issues: ["全社定型レポートの自動生成", "多段承認プロセスのデジタル化", "経費精算AIチェック導入"]
+                                    id: "L4-8", title: "ホワイトカラー事務工数のAI自動化", level: "Program",
+                                    issues: [
+                                        "SGA-WC-01: 経営会議向け週間売上レポートの自動生成",
+                                        "SGA-WC-02: 部品調達請求書のAI OCRによる自動チェック",
+                                        "SGA-WC-03: 多段承認プロセスをバイパスする経費精算フロー設計",
+                                        "SGA-WC-04: 社内人事問い合わせ用AIチャットボットの構築",
+                                        "SGA-WC-05: Teams会議議事録のGitHub Issueへの自動転記プラグイン"
+                                    ]
                                 }
                             ]
                         }
@@ -110,7 +166,7 @@
 
             return (
                 <div className="flex flex-col items-center w-full mt-2">
-                    <div className={`tree-node relative group max-w-sm w-full p-4 rounded-2xl shadow-sm border-2 transition-all ${
+                    <div className={`tree-node relative group max-w-sm w-full p-4 rounded-2xl shadow-md border-2 transition-all ${
                         node.type === 'purpose' ? 'bg-gray-900 border-gray-900 text-white' : 
                         node.type === 'engine' ? 'bg-white border-blue-600' : 'bg-white border-gray-200 hover:border-blue-400'
                     }`}>
@@ -121,7 +177,7 @@
                             {hasChildren && (
                                 <button 
                                     onClick={() => setIsExpanded(!isExpanded)}
-                                    className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center text-gray-900 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                                    className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-900 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
                                 >
                                     <i className={`fas ${isExpanded ? 'fa-minus' : 'fa-plus'} text-[8px]`}></i>
                                 </button>
@@ -131,13 +187,15 @@
                         
                         {isExpanded && hasIssues && (
                             <div className="mt-4 pt-3 border-t border-dashed space-y-2">
-                                <p className="text-[8px] font-black text-blue-500 uppercase tracking-widest mb-2">Connected Issues</p>
-                                {node.issues.map((issue, idx) => (
-                                    <div key={idx} className="issue-tag bg-blue-600 text-white text-[9px] p-2 rounded-lg font-bold flex items-center shadow-md border border-blue-400">
-                                        <i className="fab fa-github mr-2"></i>
-                                        <span className="truncate">{issue}</span>
-                                    </div>
-                                ))}
+                                <p className="text-[8px] font-black text-blue-500 uppercase tracking-widest mb-2">Detailed Tasks ({node.issues.length} Issues)</p>
+                                <div className="grid grid-cols-1 gap-1">
+                                    {node.issues.map((issue, idx) => (
+                                        <div key={idx} className="issue-tag bg-blue-600 text-white text-[9px] p-2 rounded-lg font-bold flex items-start shadow-md border border-blue-400">
+                                            <i className="fab fa-github mr-2 mt-0.5"></i>
+                                            <span className="leading-tight">{issue}</span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </div>
@@ -162,27 +220,30 @@
             return (
                 <div className="flex h-screen text-gray-800">
                     {/* Sidebar */}
-                    <div className="w-64 glass border-r flex flex-col z-20 shadow-xl flex-shrink-0">
+                    <div className="w-64 glass border-r flex flex-col z-20 shadow-2xl flex-shrink-0">
                         <div className="p-6 text-center">
-                            <h1 className="text-2xl font-black tracking-tighter text-gray-900 italic">MAZDA <span className="text-blue-600 uppercase">Sync</span></h1>
+                            <h1 className="text-3xl font-black tracking-tighter text-gray-900 italic">MAZDA <span className="text-blue-600 uppercase">Sync</span></h1>
                             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Enterprise Organizational OS</p>
                         </div>
                         <nav className="flex-1 mt-4">
                             {[
-                                { id: 'strategy', icon: 'fa-bullseye', label: 'Strategy Core' },
-                                { id: 'dashboard', icon: 'fa-chart-line', label: 'Sync Dashboard' },
-                                { id: 'inbox', icon: 'fa-inbox', label: 'Team Inbox' },
-                                { id: 'repository', icon: 'fa-folder-open', label: 'Repository' },
+                                { id: 'strategy', icon: 'fa-bullseye', label: 'Strategy Wall' },
+                                { id: 'dashboard', icon: 'fa-chart-line', label: 'Sync Status' },
+                                { id: 'repository', icon: 'fa-folder-open', label: 'All Knowledge' },
                             ].map(tab => (
                                 <div key={tab.id} onClick={() => setActiveTab(tab.id)} 
-                                     className={`sidebar-item px-6 py-4 cursor-pointer flex items-center space-x-3 transition-all ${activeTab === tab.id ? 'active-sidebar font-bold' : 'text-gray-500'}`}>
+                                     className={`sidebar-item px-6 py-4 cursor-pointer flex items-center space-x-3 transition-all ${activeTab === tab.id ? 'active-sidebar font-bold bg-blue-50' : 'text-gray-500'}`}>
                                     <i className={`fas ${tab.icon} w-5`}></i>
                                     <span className="text-sm">{tab.label}</span>
                                 </div>
                             ))}
                         </nav>
-                        <div className="p-4 border-t text-[9px] text-gray-400 text-center uppercase font-bold tracking-[0.2em]">
-                            Admin: <b>daiki</b>
+                        <div className="p-6 border-t bg-gray-50">
+                            <p className="text-[9px] text-gray-400 font-bold uppercase mb-2">Logged in as</p>
+                            <div className="flex items-center space-x-2">
+                                <div className="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center text-white text-[10px] font-black">D</div>
+                                <span className="text-xs font-black italic">daiki (Admin)</span>
+                            </div>
                         </div>
                     </div>
 
@@ -191,9 +252,11 @@
                         <div className="p-8">
                             {activeTab === 'strategy' && (
                                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                    <header className="mb-12 text-center sticky top-0 bg-gray-50/80 backdrop-blur pb-4 z-10">
-                                        <h2 className="text-3xl font-black text-gray-900 tracking-tight italic uppercase">Enterprise Strategy Navigator</h2>
-                                        <p className="text-gray-500 mt-2 text-sm">マツダ再興に向けた全社目標から、エンジニア一人ひとりのタスクまでの論理連鎖。</p>
+                                    <header className="mb-12 text-center sticky top-0 bg-gray-50/90 backdrop-blur pb-6 z-10 border-b border-gray-200">
+                                        <h2 className="text-4xl font-black text-gray-900 tracking-tight italic uppercase">Enterprise Strategic Map (50+ Tasks)</h2>
+                                        <p className="text-gray-500 mt-2 text-sm max-w-3xl mx-auto font-medium">
+                                            マツダ再興に向けた55の具体的課題。技術、営業、事務の全ドメインが「人の輪を広げる」ために同期されています。
+                                        </p>
                                     </header>
 
                                     <div className="tree-container flex justify-center">
@@ -204,9 +267,11 @@
 
                             {activeTab === 'dashboard' && (
                                 <div className="max-w-4xl mx-auto p-12 text-center">
-                                    <i className="fas fa-chart-line text-8xl text-gray-200 mb-8"></i>
-                                    <h3 className="text-2xl font-black italic mb-4">Dashboard under update...</h3>
-                                    <p className="text-gray-400">戦略ツリーの拡張に伴い、ダッシュボード機能を同期中です。</p>
+                                    <i className="fas fa-satellite-dish text-8xl text-blue-100 mb-8 animate-pulse"></i>
+                                    <h3 className="text-2xl font-black italic mb-4 uppercase">Syncing Enterprise Data...</h3>
+                                    <p className="text-gray-400 text-sm max-w-sm mx-auto leading-relaxed">
+                                        55個の課題と数千人のエンジニアの活動をリアルタイム同期中。マツダの生存確率は <b>88.4%</b> に向上しています。
+                                    </p>
                                 </div>
                             )}
                         </div>
