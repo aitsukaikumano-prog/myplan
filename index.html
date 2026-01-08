@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マツダ再興ロードマップ | Strategic Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f3f4f6; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .mega { border-top: 8px solid #e91e63; }
+        .local { border-top: 8px solid #4caf50; }
+        .action { border-top: 8px solid #2196f3; }
+        .selected-route { background-color: #fffaf0; border: 2px dashed #ed8936; }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-5xl mx-auto">
+        <header class="mb-12 text-center">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">マツダ再興ロードマップ</h1>
+            <p class="text-xl text-gray-600">Strategic Alignment Dashboard</p>
+        </header>
+
+        <!-- セクション1: トップダウン戦略分解 -->
+        <section class="card p-6 mb-12">
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-700">1. 戦略的分解と選択 (Top-Down Analysis)</h2>
+            <p class="text-sm text-gray-500 mb-4 text-center">マツダ再興に必要な全要素から、daikiのリソース（スキル・経歴・立地）に最適なルートを選択</p>
+            <div class="mermaid flex justify-center">
+                graph TD
+                    ROOT((<b>マツダ再興</b>))
+                    
+                    ROOT --> C1[収益性向上]
+                    ROOT --> C2[ブランド価値向上]
+                    ROOT --> C3[組織実行力強化]
+                    
+                    C1 --> C1A[生産ライン自動化]
+                    C1 --> C1B[SCM最適化]
+                    
+                    C2 --> C2A[次世代EV体験]
+                    C2 --> C2B(<b>ファンの熱狂化</b>)
+                    
+                    C3 --> C3A(<b>意思決定の同期</b>)
+                    C3 --> C3B(<b>現場のDX・リテラシー</b>)
+                    
+                    %% 選択ルートの強調
+                    classDef selected fill:#fff3e0,stroke:#ff9800,stroke-width:2px;
+                    class C2B,C3A,C3B selected;
+
+                    %% アクションへの接続
+                    C3B --> ACTION[熊野町：図面DX実証]
+                    C2B --> ART[熊野町：AIアート展示]
+            </div>
+            <div class="mt-6 p-4 bg-orange-50 rounded-lg border border-orange-200">
+                <p class="text-sm text-orange-800 font-bold">【戦略的選択の論理】</p>
+                <p class="text-xs text-orange-700 mt-1">
+                    製造ラインの直接改修（C1A）などは莫大な資本が必要。対して、元社員としての知見を活かした「意思決定ロス（C3A）」や「現場DX（C3B）」の解決は、個人の知恵とAIスキルで勝負できる、最もレバレッジの効く領域である。
+                </p>
+            </div>
+        </section>
+
+        <!-- セクション2: 具体的な積み上げ -->
+        <div class="grid grid-cols-1 gap-8 mb-12">
+            <div class="card p-6 mega">
+                <span class="text-xs font-bold text-pink-600 uppercase tracking-widest">Target Layer</span>
+                <h3 class="text-2xl font-bold text-gray-800 mt-1">【Mega】マツダの救済・再興</h3>
+                <p class="text-gray-600 mt-2">組織の「迷い（意思決定ロス）」をAIで排除し、全社員の力を集結させる。</p>
+            </div>
+
+            <div class="card p-6 local">
+                <span class="text-xs font-bold text-green-600 uppercase tracking-widest">Proof Layer</span>
+                <h3 class="text-2xl font-bold text-gray-800 mt-1">【Local】熊野町：社会的証明</h3>
+                <p class="text-gray-600 mt-2">「頑固な現場」を動かし、数字を出した実績。これがマツダへの最強のパスポートになる。</p>
+            </div>
+
+            <div class="card p-6 action">
+                <span class="text-xs font-bold text-blue-600 uppercase tracking-widest">Action Layer</span>
+                <h3 class="text-2xl font-bold text-gray-800 mt-1">【Action】佐藤工場長：現場実証</h3>
+                <p class="text-gray-600 mt-2">すべての土台。「図面探し」という最小単位の迷いを消し、AIとの共生を証明する。</p>
+            </div>
+        </div>
+
+        <section class="card p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-700">2. ボトムアップ実行図 (Execution Flow)</h2>
+            <div class="mermaid flex justify-center">
+                graph BT
+                    S1[図面検索AI成功] -->|現場実績| E1[AI展示会]
+                    S2[現場の抵抗突破] -->|変革力証明| E2[ドキュメンタリー]
+                    E1 & E2 -->|信頼獲得| M1[マツダへ提案]
+                    M1 --> M2[システム導入]
+                    M2 --> GOAL((<b>マツダ再興</b>))
+
+                    style GOAL fill:#e91e63,stroke:#fff,color:#fff
+                    style S1 fill:#2196f3,stroke:#fff,color:#fff
+                    style S2 fill:#2196f3,stroke:#fff,color:#fff
+                    style E2 fill:#4caf50,stroke:#fff,color:#fff
+            </div>
+        </section>
+
+        <footer class="mt-12 text-center text-gray-500 pb-12">
+            <p>Strategic Map Created by AI Strategy Advisor for daiki</p>
+        </footer>
+    </div>
+    <script>
+        mermaid.initialize({ startOnLoad: true, flowchart: { useMaxWidth: true, htmlLabels: true } });
+    </script>
+</body>
+</html>
