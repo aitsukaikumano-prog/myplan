@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Value Quantization System | Hybrid Logic Architecture</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8fafc; color: #0f172a; }
+        .arch-card { background: white; border: 1px solid #e2e8f0; padding: 2.5rem; border-radius: 8px; }
+        .logic-gate { border-left: 4px solid #334155; padding-left: 1rem; margin-bottom: 2rem; }
+        .kano-must { color: #64748b; } /* 当たり前 */
+        .kano-performance { color: #0891b2; } /* 一元的 */
+        .kano-attractive { color: #be123c; } /* 魅力的 */
+    </style>
+</head>
+<body class="p-12 font-sans leading-relaxed">
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-16">
+            <h1 class="text-4xl font-black tracking-tight mb-4">Value Quantization System: 階層型意思決定ロジック</h1>
+            <p class="text-xl text-gray-600">カノ・モデルで「戦略の方向」を定め、財務理論で「投資額」を確定させる。</p>
+        </header>
+
+        <!-- ロジックの全体像 -->
+        <section class="arch-card mb-12 shadow-sm">
+            <div class="logic-gate">
+                <h2 class="text-2xl font-bold uppercase">Step 1: カノ・モデルによる機能の仕分け (Filter)</h2>
+                <p class="text-sm text-gray-500">エンジニアの全アイディアを、まず「投資の性質」で3分類する。</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <div class="p-6 border-t-4 border-gray-400 bg-gray-50">
+                    <h3 class="font-bold text-lg mb-2 kano-must text-gray-600">A. 当たり前品質</h3>
+                    <p class="text-xs leading-relaxed italic">
+                        例：エアコン、基本的なラジオ、塗装の耐久性。<br>
+                        <b>戦略：コスト最小化（F/V削減）</b><br>
+                        トヨタ等との共通化を最優先。こだわりを捨て、市場の「下限」を維持する。
+                    </p>
+                </div>
+                <div class="p-6 border-t-4 border-cyan-600 bg-cyan-50">
+                    <h3 class="font-bold text-lg mb-2 kano-performance text-cyan-700">B. 一元的品質</h3>
+                    <p class="text-xs leading-relaxed italic">
+                        例：燃費、ADASの検知距離、馬力、静粛性。<br>
+                        <b>戦略：投資効率の最適化（P/Q連動）</b><br>
+                        競合比較（Benchmarking）を行い、ヘドニック価格理論で「1単位あたりの時価」を算出し、投資額を決める。
+                    </p>
+                </div>
+                <div class="p-6 border-t-4 border-rose-600 bg-rose-50">
+                    <h3 class="font-bold text-lg mb-2 kano-attractive text-rose-700">C. 魅力的品質</h3>
+                    <p class="text-xs leading-relaxed italic">
+                        例：魂動デザイン、独自のハンドリング、匠塗。<br>
+                        <b>戦略：ブランド価値の最大化（Pの防衛）</b><br>
+                        コンジョイント分析で「熱狂度（WTP）」を測定。他社が真似できない領域にリソースを集中投下する。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 財務ロジックとの結合 -->
+        <section class="arch-card mb-12 shadow-sm">
+            <div class="logic-gate">
+                <h2 class="text-2xl font-bold uppercase">Step 2: 財務的時価の算出 (Measurement)</h2>
+            </div>
+            
+            <div class="mermaid flex justify-center">
+                flowchart TD
+                    FEAT["開発アイディア・機能"] --> KANO{"カノ・モデル分類"}
+                    
+                    KANO -->|当たり前| COMM["<b>共通化/安価な調達</b><br/>(トヨタ部品の積極採用)"]
+                    KANO -->|一元的/魅力的| HEDONIC["<b>ヘドニック価格分析</b><br/>中古市場の機能別価格を反映"]
+                    HEDONIC --> CONJOINT["<b>コンジョイント分析</b><br/>新車購入時のWTP(支払い意欲)を測定"]
+                    
+                    COMM & CONJOINT --> DECISION["<b>投資判断 (GO/NO-GO)</b><br/>投資額 < 推計利益インパクト"]
+                    
+                    DECISION --> SUCCESS["<b>利益の確定</b><br/>(値引きなしで完売)"]
+
+                    style KANO fill:#f1f5f9,stroke:#334155
+                    style SUCCESS fill:#111827,stroke:#111827,color:#fff
+            </div>
+        </section>
+
+        <!-- 具体例 -->
+        <section class="p-8 bg-blue-900 text-white rounded-lg">
+            <h3 class="text-xl font-bold mb-4">Case Study: 「10km遠くまで聞こえるラジオ」の判定</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
+                <div>
+                    <p class="font-bold border-b border-blue-400 mb-2">1. カノ・モデル分類</p>
+                    <p>ラジオは「当たり前品質」。聞こえることが大前提。感度向上は「一元的」にも見えるが、現代のユーザーにとって重要度は低い。</p>
+                </div>
+                <div>
+                    <p class="font-bold border-b border-blue-400 mb-2">2. 財務判定</p>
+                    <p>ヘドニック分析：中古市場でラジオ感度による価格差は「0円」。<br>結論：<b>「開発中止」</b>。標準品を採用し、浮いた工数を「デザイン（魅力的品質）」へ回す。</p>
+                </div>
+            </div>
+        </section>
+
+        <footer class="mt-20 text-center text-gray-400 text-xs uppercase tracking-widest">
+            Hybrid Decision Support System for Mazda R&D Optimization
+        </footer>
+    </div>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'neutral',
+            securityLevel: 'loose',
+            flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+        });
+    </script>
+</body>
+</html>

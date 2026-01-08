@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAZDA Strategic Analysis | Financial Target Identification</title>
+    <title>MAZDA Strategic Recovery | Financial Analysis & Organizational Transformation</title>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         body { background-color: #ffffff; color: #1a1a1a; }
         .card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 0px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .proposal-card { background: white; border-top: 6px solid #111827; padding: 3rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); margin-top: 2rem; }
         .logic-header { border-left: 5px solid #000000; padding-left: 1.5rem; }
         .logic-node > rect { fill: #f9fafb !important; stroke: #111827 !important; stroke-width: 2px !important; }
         .critical-node > rect { fill: #fef2f2 !important; stroke: #dc2626 !important; stroke-width: 2px !important; }
@@ -17,14 +18,20 @@
         .target-high { background-color: #fee2e2; color: #991b1b; font-weight: bold; }
         .target-mid { background-color: #fef3c7; color: #92400e; }
         .summary-box { border-top: 3px solid #111827; }
+        .contribution-box { background: #eff6ff; border-left: 4px solid #1e40af; }
     </style>
 </head>
 <body class="p-12 font-sans leading-relaxed">
     <div class="max-w-7xl mx-auto">
+        
+        <!-- ============================================================ -->
+        <!-- PART 1: index.html (現状の財務的課題の問題提起) -->
+        <!-- ============================================================ -->
+        
         <!-- 役員報告用ヘッダー -->
         <header class="mb-16 border-b-2 border-black pb-8 flex justify-between items-start">
             <div>
-                <h1 class="text-4xl font-extrabold tracking-tight">マツダ：財務データ分析に基づく「撃破目標」の特定</h1>
+                <h1 class="text-4xl font-extrabold tracking-tight text-red-600">マツダ：財務データ分析に基づく「撃破目標」の特定</h1>
                 <p class="text-sm text-gray-600 mt-2 uppercase tracking-widest font-semibold">Strictly Confidential | Financial Analysis & Target Identification</p>
             </div>
             <div class="text-right">
@@ -33,7 +40,7 @@
             </div>
         </header>
 
-        <!-- 1. 収益改善のマスターロジック（固定） -->
+        <!-- 1. 収益改善のマスターロジック -->
         <section class="card p-10 mb-12 summary-box">
             <div class="logic-header mb-8">
                 <h2 class="text-2xl font-bold uppercase tracking-tighter">1. 戦略の全体像 (Master Logic Tree)</h2>
@@ -50,6 +57,8 @@
                     
                     FC --> RD["R&D費の効率化"]
                     FC --> SG["販管費の最適化"]
+                    
+                    style FC fill:#fee2e2,stroke:#dc2626
             </div>
         </section>
 
@@ -131,49 +140,86 @@
                     </tbody>
                 </table>
             </div>
-
-            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="p-6 bg-red-50 border-l-4 border-red-600">
-                    <h4 class="font-bold text-red-900 mb-2">【撃破目標 A】肥大化したR&D・販管費</h4>
-                    <p class="text-xs text-red-800 leading-relaxed">
-                        売上高が大きく成長している一方で、販売台数は減少。つまり「1台あたりの固定費負担」が激増している。特にR&D費が4年で60%増、広告費が48%増となっており、売上の伸びを固定費が食い潰している。この「組織の贅肉」を叩くのが最優先。
-                    </p>
-                </div>
-                <div class="p-6 bg-yellow-50 border-l-4 border-yellow-600">
-                    <h4 class="font-bold text-yellow-900 mb-2">【撃破目標 B】急激な原価率の悪化</h4>
-                    <p class="text-xs text-yellow-800 leading-relaxed">
-                        直近（FY25）で原価率が急激に跳ね上がっている。これは原材料高もあるが、魅力不足による値引き（インセンティブ）の拡大が実質的な売上単価を下げ、相対的に原価率を押し上げている。
-                    </p>
-                </div>
-            </div>
         </section>
 
-        <!-- 3. 結論：どこを叩けばいいか？ -->
-        <section class="card p-10 mb-12">
+        <div class="border-b-4 border-dashed border-gray-300 my-16"></div>
+
+        <!-- ============================================================ -->
+        <!-- PART 2: proposal_v2_github_ops.html (具体的解決策) -->
+        <!-- ============================================================ -->
+
+        <header class="mb-12">
+            <h1 class="text-4xl font-black tracking-tighter uppercase text-blue-900">解決案：GitHub型「全社業務同期システム」による組織的ロスの解体</h1>
+            <p class="text-gray-600 mt-4 text-xl">財務上の最大課題である「固定費の硬直性」を、エンジニアリングの知恵で打破する。</p>
+        </header>
+
+        <!-- 1. コンセプト -->
+        <section class="proposal-card mb-12">
             <div class="logic-header mb-8">
-                <h2 class="text-2xl font-bold uppercase tracking-tighter">3. 結論：叩くべきは「固定費の硬直性」と「不透明な開発プロセス」</h2>
+                <h2 class="text-2xl font-bold uppercase">1. コンセプト：業務の「Git」化</h2>
+                <p class="text-gray-500 text-sm">ソフトウェア開発の成功モデルを、マツダのホワイトカラー業務（企画・R&D・管理）に移植する。</p>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="border p-6">
-                    <h3 class="font-black text-3xl mb-4">TARGET 01</h3>
-                    <p class="font-bold text-xl mb-2">R&Dプロセスの抜本的効率化</p>
-                    <p class="text-sm text-gray-600">
-                        年間1,800億円（予測）に達するR&D費。ここには「探し物」「やり直し」「合意形成待ち」という、付加価値を生まない**「死に時間」**が30%以上含まれているとの推計。ここを叩けば、年間数百億円規模の利益をノーコストで捻出できる。
-                    </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                <div class="p-6 border border-gray-200 rounded">
+                    <h3 class="font-bold text-lg mb-4 flex items-center text-gray-400">
+                        <span class="bg-gray-400 text-white px-2 py-1 rounded mr-2 text-sm">BEFORE</span> 縦割り・ブラックボックス
+                    </h3>
+                    <ul class="text-sm space-y-2 text-gray-500">
+                        <li>・上位方針が現場に届くまでに歪曲される</li>
+                        <li>・報告のための「パワポ作成」に週の3割を消費</li>
+                        <li>・「あの資料どこ？」という検索とメールの往復</li>
+                        <li>・評定が「上司の印象」に左右される</li>
+                    </ul>
                 </div>
-                <div class="border p-6 bg-black text-white">
-                    <h3 class="font-black text-3xl mb-4">TARGET 02</h3>
-                    <p class="font-bold text-xl mb-2">「魅力」の定量化による値引き抑制</p>
-                    <p class="text-sm text-gray-400">
-                        広告費を1,400億円かけても販売台数が減っている事実は、広告の質ではなく**「商品と市場のミスマッチ」**を示唆。開発の最上流で「顧客が対価を払うポイント」を確実に射抜くことで、1,000億円規模の値引き原資（インセンティブ）を最小化する。
-                    </p>
+                <div class="p-6 border-2 border-blue-900 rounded bg-blue-50">
+                    <h3 class="font-bold text-lg mb-4 flex items-center text-blue-900">
+                        <span class="bg-blue-900 text-white px-2 py-1 rounded mr-2 text-sm">AFTER</span> GitHub型リアルタイム同期
+                    </h3>
+                    <ul class="text-sm space-y-2 text-blue-900">
+                        <li>・<b>方針のMainブランチ化</b>：全社員が常に「最新の正解」を参照</li>
+                        <li>・<b>Issueベースのタスク管理</b>：報告は不要、進捗は自動可視化</li>
+                        <li>・<b>Markdownによる資産化</b>：資料作成時間を80%削減</li>
+                        <li>・<b>Commitログによる公正な評定</b>：実力の完全な可視化</li>
+                    </ul>
                 </div>
             </div>
         </section>
 
-        <footer class="mt-20 pt-8 border-t border-gray-200 text-center text-gray-400 text-xs">
-            <p>Data Source: Mazda Financial Reports (FY2021-2024 Actual, FY2025 Forecast based on H1 Trends)</p>
+        <!-- 2. 収益改善ロジックへの寄与 -->
+        <section class="proposal-card mb-12 border-red-900">
+            <div class="logic-header mb-8 border-red-600">
+                <h2 class="text-2xl font-bold uppercase text-red-900">2. 財務的インパクトの直接的創出</h2>
+            </div>
+
+            <div class="mermaid flex justify-center mb-8">
+                flowchart TD
+                    SYS["<b>GitHub型業務管理システム</b>"]
+                    
+                    SYS --> IMPACT_F["<b>固定費(F)・販管費(SG&A)の削減</b>"]
+                    SYS --> IMPACT_P["<b>単価(P)・市場適合性の向上</b>"]
+                    
+                    IMPACT_F --> F1["R&D/事務工数の30%削減<br/>(パワポ/検索/会議の消滅)"]
+                    IMPACT_F --> F2["多段承認プロセスのスリム化<br/>(中間管理職コストの最適化)"]
+                    
+                    IMPACT_P --> P1["上位方針との不一致の早期検知<br/>(独りよがりな開発の防止)"]
+                    IMPACT_P --> P2["ナレッジ共有による開発品質の安定<br/>(ブランドリセール毀損の抑制)"]
+                    
+                    F1 & F2 --> PROFIT_UP(("<b>営業利益の劇的改善</b>"))
+                    style SYS fill:#111827,stroke:#111827,color:#fff
+                    style PROFIT_UP fill:#dc2626,stroke:#dc2626,color:#fff
+            </div>
+
+            <div class="contribution-box p-6">
+                <h4 class="font-bold mb-2">試算：年間 1,000億円規模の潜在利益の回収</h4>
+                <p class="text-sm text-blue-900 leading-relaxed">
+                    マツダの販管費・R&D費（計5,000億円規模）の20%を「非付加価値作業の排除」で捻出できれば、現在の営業損失を補って余りある利益が生まれる。
+                </p>
+            </div>
+        </section>
+
+        <footer class="mt-20 pt-8 border-t border-gray-200 text-center text-gray-400 text-xs uppercase tracking-widest">
+            Mazda Strategic Recovery Roadmap | From Financial Crisis to Organizational Excellence
         </footer>
     </div>
     <script>

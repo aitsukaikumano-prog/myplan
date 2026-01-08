@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAZDA Deep Dive | Root Cause Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f9fafb; color: #111827; }
+        .logic-card { background: white; border: 1px solid #e5e7eb; padding: 2.5rem; }
+        .cause-header { border-bottom: 2px solid #111827; margin-bottom: 2rem; padding-bottom: 1rem; }
+        .why-node > rect { fill: #f3f4f6 !important; stroke: #111827 !important; stroke-width: 2px !important; }
+        .root-node > rect { fill: #fee2e2 !important; stroke: #dc2626 !important; stroke-width: 2px !important; }
+        .nav-link { color: #4b5563; font-size: 0.875rem; text-decoration: underline; }
+    </style>
+</head>
+<body class="p-12 font-sans">
+    <div class="max-w-6xl mx-auto">
+        <nav class="mb-8">
+            <a href="index_v1_financial_master.html" class="nav-link">← 前ページ：財務ロジック・マスター</a>
+        </nav>
+
+        <header class="mb-16">
+            <h1 class="text-4xl font-extrabold tracking-tight">Deep Dive: 「高コスト体質」と「値引き」の真因分析</h1>
+            <p class="text-gray-600 mt-4 text-lg">なぜR&D費が膨らみ、なぜ値引きなしで売れないのか？ 現場の「非効率」を論理的に解体する。</p>
+        </header>
+
+        <!-- 分析 1: R&D費用の高騰原因 -->
+        <section class="logic-card mb-12">
+            <div class="cause-header">
+                <h2 class="text-2xl font-bold uppercase">Analysis 01: R&D固定費（1,800億円）のブラックボックス</h2>
+            </div>
+            
+            <div class="mermaid flex justify-center mb-10">
+                flowchart TD
+                    RD_COST(["<b>R&D費用の高騰</b>"])
+                    
+                    RD_COST --> PROCESS["<b>1. プロセス・ロス<br/>(非付加価値時間)</b>"]
+                    RD_COST --> COMPLEXITY["<b>2. 開発複雑性の増大</b>"]
+                    RD_COST --> DECISION["<b>3. 意思決定の停滞</b>"]
+                    
+                    PROCESS --> P1["<b>検索・調査ロス</b><br/>過去の図面や知見への<br/>アクセスが困難"]
+                    PROCESS --> P2["<b>手戻り (Rework)</b><br/>部門間の情報乖離による<br/>後工程での設計変更"]
+                    
+                    COMPLEXITY --> C1["電動化・ADAS対応による<br/>検証工数の爆発"]
+                    COMPLEXITY --> C2["レガシー資産との<br/>整合性確認コスト"]
+                    
+                    DECISION --> D1["<b>合意形成コスト</b><br/>会議と資料作成による<br/>エンジニアの工数消費"]
+                    DECISION --> D2["<b>「待ち」の発生</b><br/>承認プロセスの多段化による<br/>開発リードタイムの延伸"]
+
+                    classDef why fill:#f9fafb,stroke:#111827,stroke-width:2px;
+                    classDef root fill:#fef2f2,stroke:#dc2626,stroke-width:2px;
+                    class RD_COST root;
+                    class PROCESS,COMPLEXITY,DECISION,P1,P2,C1,C2,D1,D2 why;
+            </div>
+
+            <div class="bg-gray-50 p-6 border-l-4 border-gray-800">
+                <h3 class="font-bold mb-2">考察：エンジニアは「開発」をしていない</h3>
+                <p class="text-sm text-gray-700 leading-relaxed">
+                    一般的に、伝統的な製造業のR&D工数の**30%〜40%は「情報の検索」と「調整」**に費やされている。1,800億円のうち、約600億円が「本来不要な事務的・調査的作業」に消えている可能性が高い。これが「好きな車を作っているが、時間がかかりすぎる」構造の正体。
+                </p>
+            </div>
+        </section>
+
+        <!-- 分析 2: 値引き原資（インセンティブ）の増大原因 -->
+        <section class="logic-card mb-12">
+            <div class="cause-header">
+                <h2 class="text-2xl font-bold uppercase">Analysis 02: 値引きなしで売れない「市場不適合」の構造</h2>
+            </div>
+            
+            <div class="mermaid flex justify-center mb-10">
+                flowchart TD
+                    INC_COST(["<b>値引き原資(インセンティブ)の増大</b>"])
+                    
+                    INC_COST --> PRODUCT["<b>1. プロダクト・ミスマッチ</b>"]
+                    INC_COST --> INVENTORY["<b>2. 在庫・供給の不整合</b>"]
+                    INC_COST --> BRAND["<b>3. ブランド知覚価値の限界</b>"]
+                    
+                    PRODUCT --> PR1["<b>過剰スペック</b><br/>顧客が対価を払わない<br/>エンジニアのこだわり"]
+                    PRODUCT --> PR2["<b>トレンド乖離</b><br/>市場の電動化・デジタル化<br/>要求への対応遅れ"]
+                    
+                    INVENTORY --> I1["<b>予測精度の欠如</b><br/>売れない仕様が生産され<br/>長期在庫化・値引き処分"]
+                    
+                    BRAND --> B1["<b>プレミアム戦略の空文化</b><br/>価格に見合う「体験」や<br/>「先進性」の提供不足"]
+
+                    classDef why fill:#f9fafb,stroke:#111827,stroke-width:2px;
+                    classDef root fill:#fef2f2,stroke:#dc2626,stroke-width:2px;
+                    class INC_COST root;
+                    class PRODUCT,INVENTORY,BRAND,PR1,PR2,I1,B1 why;
+            </div>
+
+            <div class="bg-gray-50 p-6 border-l-4 border-gray-800">
+                <h3 class="font-bold mb-2">考察：顧客ニーズの「読み間違い」が数千億の損失を生む</h3>
+                <p class="text-sm text-gray-700 leading-relaxed">
+                    「自分たちの好きな車」を作る情熱が、市場の「支払い意欲（Willingness to Pay）」と乖離した瞬間、その差分はすべて「値引き」として営業利益を削る。年間1,000億円以上のインセンティブは、開発段階での**「市場ニーズの定量化不足」**に対する罰金である。
+                </p>
+            </div>
+        </section>
+
+        <!-- まとめ -->
+        <section class="card p-10 bg-black text-white">
+            <h2 class="text-xl font-bold mb-6 uppercase tracking-widest">Deep Dive Summary</h2>
+            <p class="text-lg leading-relaxed">
+                マツダの収益悪化を招いているのは、単なる外部環境の変化ではない。
+                内部的には**「情報のサイロ化によるR&Dの非効率」**、外部的には**「開発と市場の同期不全による商品力の減退」**という、二つの大きな**「同期エラー」**が起きている。
+                <br><br>
+                この「同期エラー」を解消し、1,800億円のR&D費と1,000億円のインセンティブを適正化することこそが、マツダ再興の唯一の道である。
+            </p>
+        </section>
+
+        <footer class="mt-20 text-center text-gray-400 text-xs uppercase tracking-widest">
+            Logical Deep Dive Analysis | Mazda Strategic Recovery Project
+        </footer>
+    </div>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'neutral',
+            securityLevel: 'loose',
+            flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+        });
+    </script>
+</body>
+</html>
