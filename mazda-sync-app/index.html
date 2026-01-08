@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAZDA Sync | Strategy & Task Navigation</title>
+    <title>MAZDA Sync | Enterprise Strategic Navigator</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -11,64 +11,96 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; overflow-x: auto; }
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
         .sidebar-item:hover { background: rgba(37, 99, 235, 0.1); color: #2563eb; }
         .active-sidebar { background: rgba(37, 99, 235, 0.1); color: #2563eb; border-right: 4px solid #2563eb; }
         .logic-line { width: 2px; background: #cbd5e1; margin: 0 auto; height: 20px; }
-        .tree-node { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .issue-tag { animation: slideIn 0.3s ease-out; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .tree-node { transition: all 0.2s ease-out; }
+        .issue-tag { animation: slideIn 0.2s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        /* 横に長いツリーを表示するための調整 */
+        .tree-container { min-width: 2500px; padding-bottom: 100px; }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState } = React;
 
         const STRATEGY_DATA = {
             id: "root", title: "前向きに今日を生きる人の輪を広げる", level: "Purpose", type: "purpose",
             children: [
                 {
-                    id: "L2-1", title: "2. 固定費の構造改革", level: "Strategic Engine", type: "engine",
+                    id: "L2-1", title: "1. 限界利益の拡大 (+500億円)", level: "Strategic Engine", type: "engine",
                     children: [
                         {
-                            id: "L3-1", title: "R&D費の効率化", level: "Dept Strategy",
+                            id: "L3-1", title: "単価 (P) の向上・防衛", level: "Business Pillar",
                             children: [
                                 {
-                                    id: "L4-1", title: "図面検索・知見管理のDX", level: "Component",
-                                    issues: ["図面検索AIの開発", "過去の不具合知見の自動タグ付け", "佐藤工場長へのヒアリング実施"]
+                                    id: "L4-1", title: "中古車リセールバリューのシステム的防衛", level: "Program",
+                                    issues: ["リセール予測モデルの精度向上", "認定中古車制度の再設計", "下取り価格シミュレーターの開発"]
+                                },
+                                {
+                                    id: "L4-2", title: "WTP（支払い意欲）に基づいたオプション価格設定", level: "Program",
+                                    issues: ["ADAS機能の価格受容性調査", "内装マテリアルの寄与度分析", "コンジョイント分析実施"]
+                                }
+                            ]
+                        },
+                        {
+                            id: "L3-2", title: "数量 (Q) の確保・シェア拡大", level: "Business Pillar",
+                            children: [
+                                {
+                                    id: "L4-3", title: "北米市場におけるCXシリーズの販促最適化", level: "Program",
+                                    issues: ["地域別インセンティブ配分の最適化", "デジタル広告ROIの改善", "ディーラー在庫の回転率向上"]
                                 }
                             ]
                         }
                     ]
                 },
                 {
-                    id: "L2-2", title: "1. 限界利益の拡大", level: "Strategic Engine", type: "engine",
+                    id: "L2-2", title: "2. 固定費の構造改革 (-1,000億円)", level: "Strategic Engine", type: "engine",
                     children: [
                         {
-                            id: "L3-2", title: "感性価値の最大化（良いものを作る）", level: "Dept Strategy",
+                            id: "L3-3", title: "R&D費の効率化・スピード向上", level: "Business Pillar",
                             children: [
                                 {
-                                    id: "L4-2", title: "電気・電子・音響システム", level: "System",
+                                    id: "L4-4", title: "パワートレイン開発の試作レス化", level: "Technical Domain",
                                     children: [
                                         {
-                                            id: "L5-1", title: "原音再生の追求（音の純度）", level: "Tech Goal",
-                                            issues: ["スピーカー配置の最適化シミュレーション", "車内定在波除去アルゴリズムの実装"]
+                                            id: "L5-1", title: "燃焼シミュレーションの高度化", level: "Tech Goal",
+                                            issues: ["スーパーコンピュータ解析工数の削減", "実機テストとの相関誤差修正", "MBDモデルの共通化"]
                                         }
                                     ]
+                                },
+                                {
+                                    id: "L4-5", title: "電子・ソフト基盤の共通プラットフォーム化", level: "Technical Domain",
+                                    children: [
+                                        {
+                                            id: "L5-2", title: "次世代車載OS（Mazda OS）の基盤構築", level: "Tech Goal",
+                                            issues: ["OTAアップデート機能の実装", "セキュリティプロトコルの策定", "UI/UXフレームワークの統一"]
+                                        },
+                                        {
+                                            id: "L5-3", title: "先進安全（ADAS）知見の資産化", level: "Tech Goal",
+                                            issues: ["不具合再現シナリオの自動生成", "検証走行データの圧縮・検索DX", "エッジAIアルゴリズムの軽量化"]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            id: "L3-4", title: "販管費 (SG&A) の最適化", level: "Business Pillar",
+                            children: [
+                                {
+                                    id: "L4-6", title: "事務・間接工数のAI自動化", level: "Business Program",
+                                    issues: ["全社定型レポートの自動生成", "多段承認プロセスのデジタル化", "経費精算AIチェック導入"]
                                 }
                             ]
                         }
                     ]
                 }
             ]
-        };
-
-        const REPO_FILES = {
-            "STRATEGY.md": `# マツダ再興：戦略コア\n\n## 1. パーパス\n「前向きに今日を生きる人の輪を広げる」\n\n## 2. 戦略エンジン\n### 利益V字回復\n- 固定費削減 (-1,000億円)\n- 限界利益拡大 (+500億円)`,
-            "VISION_STORY.md": `# 変革ドキュメンタリー：意志が繋がった日\n**〜GitHub型同期システムが変えた、ある若手エンジニアの24時間〜**\n\n...（省略）`
         };
 
         const TreeNode = ({ node }) => {
@@ -89,19 +121,19 @@
                             {hasChildren && (
                                 <button 
                                     onClick={() => setIsExpanded(!isExpanded)}
-                                    className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center text-gray-900 hover:bg-blue-600 hover:text-white transition-all"
+                                    className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center text-gray-900 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
                                 >
                                     <i className={`fas ${isExpanded ? 'fa-minus' : 'fa-plus'} text-[8px]`}></i>
                                 </button>
                             )}
                         </div>
-                        <h4 className="text-xs font-black leading-tight italic">{node.title}</h4>
+                        <h4 className="text-[11px] font-black leading-tight italic">{node.title}</h4>
                         
                         {isExpanded && hasIssues && (
                             <div className="mt-4 pt-3 border-t border-dashed space-y-2">
-                                <p className="text-[8px] font-black text-blue-500 uppercase tracking-widest mb-2">Detailed Tasks (GitHub Issues)</p>
+                                <p className="text-[8px] font-black text-blue-500 uppercase tracking-widest mb-2">Connected Issues</p>
                                 {node.issues.map((issue, idx) => (
-                                    <div key={idx} className="issue-tag bg-blue-600 text-white text-[10px] p-2 rounded-lg font-bold flex items-center shadow-md">
+                                    <div key={idx} className="issue-tag bg-blue-600 text-white text-[9px] p-2 rounded-lg font-bold flex items-center shadow-md border border-blue-400">
                                         <i className="fab fa-github mr-2"></i>
                                         <span className="truncate">{issue}</span>
                                     </div>
@@ -113,7 +145,7 @@
                     {isExpanded && hasChildren && (
                         <div className="w-full">
                             <div className="logic-line"></div>
-                            <div className="flex justify-center space-x-6">
+                            <div className="flex justify-center space-x-4">
                                 {node.children.map(child => (
                                     <TreeNode key={child.id} node={child} />
                                 ))}
@@ -126,40 +158,14 @@
 
         function App() {
             const [activeTab, setActiveTab] = useState('strategy');
-            const [selectedFile, setSelectedFile] = useState('STRATEGY.md');
-            const [workLog, setWorkLog] = useState('');
-            const [syncResult, setSyncResult] = useState(null);
-            const [isSyncing, setIsSyncing] = useState(false);
-
-            const handleSync = () => {
-                if (!workLog) return;
-                setIsSyncing(true);
-                setTimeout(() => {
-                    setSyncResult({
-                        score: 85,
-                        summary: "上位方針「R&D効率化」との高い親和性を確認。現場の心を開くアプローチが評価されました。",
-                        recommendations: ["STRATEGY.md", "issues/001_drawing_search.md"]
-                    });
-                    setIsSyncing(false);
-                }, 1000);
-            };
-
-            const renderMarkdown = (text) => {
-                const lines = text.split('\n');
-                return lines.map((line, i) => {
-                    if (line.startsWith('# ')) return <h1 key={i}>{line.substring(2)}</h1>;
-                    if (line.startsWith('## ')) return <h2 key={i}>{line.substring(3)}</h2>;
-                    if (line.startsWith('- ')) return <li key={i}>{line.substring(2)}</li>;
-                    return <p key={i}>{line}</p>;
-                });
-            };
 
             return (
-                <div className="flex h-screen overflow-hidden text-gray-800">
-                    <div className="w-64 glass border-r flex flex-col z-20 shadow-xl">
-                        <div className="p-6">
-                            <h1 className="text-2xl font-black tracking-tighter text-gray-900 italic">MAZDA <span className="text-blue-600">SYNC</span></h1>
-                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 text-center">Organizational OS</p>
+                <div className="flex h-screen text-gray-800">
+                    {/* Sidebar */}
+                    <div className="w-64 glass border-r flex flex-col z-20 shadow-xl flex-shrink-0">
+                        <div className="p-6 text-center">
+                            <h1 className="text-2xl font-black tracking-tighter text-gray-900 italic">MAZDA <span className="text-blue-600 uppercase">Sync</span></h1>
+                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Enterprise Organizational OS</p>
                         </div>
                         <nav className="flex-1 mt-4">
                             {[
@@ -167,139 +173,40 @@
                                 { id: 'dashboard', icon: 'fa-chart-line', label: 'Sync Dashboard' },
                                 { id: 'inbox', icon: 'fa-inbox', label: 'Team Inbox' },
                                 { id: 'repository', icon: 'fa-folder-open', label: 'Repository' },
-                                { id: 'tasks', icon: 'fa-tasks', label: 'My Tasks' },
                             ].map(tab => (
                                 <div key={tab.id} onClick={() => setActiveTab(tab.id)} 
-                                     className={`sidebar-item px-6 py-4 cursor-pointer flex items-center justify-between transition-all ${activeTab === tab.id ? 'active-sidebar' : 'text-gray-500'}`}>
-                                    <div className="flex items-center space-x-3">
-                                        <i className={`fas ${tab.icon} w-5`}></i>
-                                        <span className="text-sm font-semibold">{tab.label}</span>
-                                    </div>
+                                     className={`sidebar-item px-6 py-4 cursor-pointer flex items-center space-x-3 transition-all ${activeTab === tab.id ? 'active-sidebar font-bold' : 'text-gray-500'}`}>
+                                    <i className={`fas ${tab.icon} w-5`}></i>
+                                    <span className="text-sm">{tab.label}</span>
                                 </div>
                             ))}
                         </nav>
-                        <div className="p-4 border-t text-[10px] text-gray-400 text-center uppercase font-bold tracking-widest">
-                            Logged in as: <b>daiki</b>
+                        <div className="p-4 border-t text-[9px] text-gray-400 text-center uppercase font-bold tracking-[0.2em]">
+                            Admin: <b>daiki</b>
                         </div>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto bg-gray-50 relative">
-                        <div className="p-8 max-w-[1600px] mx-auto">
+                    {/* Main Content */}
+                    <div className="flex-1 overflow-auto bg-gray-50 relative">
+                        <div className="p-8">
                             {activeTab === 'strategy' && (
                                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                    <header className="mb-12 text-center">
-                                        <h2 className="text-4xl font-black text-gray-900 tracking-tight italic uppercase">Strategic Navigator</h2>
-                                        <p className="text-gray-500 mt-2 font-medium">上位方針をクリックして、あなたの仕事が支えている「論理」を深掘りしてください。</p>
+                                    <header className="mb-12 text-center sticky top-0 bg-gray-50/80 backdrop-blur pb-4 z-10">
+                                        <h2 className="text-3xl font-black text-gray-900 tracking-tight italic uppercase">Enterprise Strategy Navigator</h2>
+                                        <p className="text-gray-500 mt-2 text-sm">マツダ再興に向けた全社目標から、エンジニア一人ひとりのタスクまでの論理連鎖。</p>
                                     </header>
 
-                                    <div className="w-full flex justify-center pb-20 overflow-x-auto">
+                                    <div className="tree-container flex justify-center">
                                         <TreeNode node={STRATEGY_DATA} />
                                     </div>
                                 </div>
                             )}
 
                             {activeTab === 'dashboard' && (
-                                <div className="animate-in fade-in duration-500">
-                                    <header className="mb-8">
-                                        <h2 className="text-4xl font-black text-gray-900 tracking-tight italic">Sync Dashboard</h2>
-                                        <p className="text-gray-500 mt-2">今日の活動を、マツダの生存ロジックと同期します。</p>
-                                    </header>
-
-                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                        <div className="lg:col-span-2 space-y-6">
-                                            <div className="card p-8 bg-white shadow-xl shadow-blue-100/50 border border-blue-50 rounded-2xl">
-                                                <h3 className="text-xs font-black text-blue-500 uppercase tracking-widest mb-6 flex items-center">
-                                                    <span className="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></span>
-                                                    Work Logger
-                                                </h3>
-                                                <textarea 
-                                                    value={workLog}
-                                                    onChange={(e) => setWorkLog(e.target.value)}
-                                                    className="w-full p-6 bg-gray-50 border-0 rounded-xl text-sm focus:ring-4 focus:ring-blue-100 outline-none transition-all min-h-[200px] leading-relaxed"
-                                                    placeholder="今日、どの戦略目標に貢献しましたか？"
-                                                ></textarea>
-                                                <div className="flex justify-between items-center mt-6">
-                                                    <p className="text-[10px] text-gray-400 font-medium italic">※AIが自動的に戦略との整合性を判定します。</p>
-                                                    <button 
-                                                        onClick={handleSync}
-                                                        disabled={isSyncing || !workLog}
-                                                        className={`px-8 py-3 bg-gray-900 text-white rounded-xl font-bold text-sm shadow-xl hover:bg-black transition-all transform hover:-translate-y-1 ${isSyncing ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                    >
-                                                        {isSyncing ? <i className="fas fa-sync fa-spin mr-2"></i> : <i className="fas fa-bolt mr-2 text-yellow-400"></i>}
-                                                        同期を開始
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            {syncResult && (
-                                                <div className="card p-8 bg-blue-600 text-white shadow-2xl shadow-blue-400/30 rounded-2xl animate-in slide-in-from-bottom-8 duration-500 text-center">
-                                                    <div className="flex justify-between items-center mb-6">
-                                                        <h3 className="font-black text-xl tracking-tight italic uppercase">Sync Result</h3>
-                                                        <div className="text-4xl font-black">{syncResult.score}%</div>
-                                                    </div>
-                                                    <p className="text-sm mb-8 leading-relaxed font-medium bg-blue-500/30 p-4 rounded-xl border border-blue-400/50">{syncResult.summary}</p>
-                                                    <button className="w-full py-4 bg-white text-blue-600 rounded-xl text-sm font-black shadow-lg hover:bg-blue-50 transition-all uppercase tracking-widest italic">
-                                                        Generate Report
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="space-y-6">
-                                            <div className="card p-6 bg-white shadow-lg border border-gray-100 rounded-2xl">
-                                                <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 italic">Core Financial Progress</h3>
-                                                <p className="text-xl font-black text-gray-900 leading-none mb-2 italic">Operating Profit</p>
-                                                <div className="w-full bg-gray-100 h-3 rounded-full mt-4 overflow-hidden shadow-inner">
-                                                    <div className="bg-gradient-to-r from-blue-500 to-green-400 h-full" style={{width: '35%'}}></div>
-                                                </div>
-                                                <div className="flex justify-between mt-2 font-bold text-[10px]">
-                                                    <span className="text-blue-500 italic">35% Recovery</span>
-                                                    <span className="text-gray-400 uppercase">Target: 1,500億円</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {activeTab === 'repository' && (
-                                <div className="animate-in fade-in duration-500 h-full">
-                                    <header className="mb-8">
-                                        <h2 className="text-4xl font-black text-gray-900 tracking-tight italic uppercase">Knowledge Repository</h2>
-                                        <p className="text-gray-500 mt-2">すべての戦略と知見はここに。 (`github_sim/`) </p>
-                                    </header>
-                                    
-                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8 h-[600px]">
-                                        <div className="bg-white border rounded-3xl p-6 overflow-y-auto shadow-sm">
-                                            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">Files</h3>
-                                            <div className="space-y-2">
-                                                {Object.keys(REPO_FILES).map(path => (
-                                                    <div 
-                                                        key={path} 
-                                                        onClick={() => setSelectedFile(path)}
-                                                        className={`px-3 py-2 rounded-xl text-xs font-bold cursor-pointer transition-all flex items-center space-x-2 ${selectedFile === path ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100'}`}
-                                                    >
-                                                        <i className={`fas ${path.includes('/') ? 'fa-file-code' : 'fa-file-alt'} opacity-70`}></i>
-                                                        <span className="truncate">{path}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        <div className="md:col-span-3 bg-white border rounded-3xl shadow-sm flex flex-col overflow-hidden">
-                                            <div className="px-8 py-4 border-b bg-gray-50 flex items-center justify-between">
-                                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{selectedFile}</span>
-                                                <div className="flex space-x-1">
-                                                    <div className="w-2 h-2 rounded-full bg-gray-200"></div>
-                                                    <div className="w-2 h-2 rounded-full bg-gray-200"></div>
-                                                    <div className="w-2 h-2 rounded-full bg-gray-200"></div>
-                                                </div>
-                                            </div>
-                                            <div className="p-10 overflow-y-auto markdown-content bg-white">
-                                                {renderMarkdown(REPO_FILES[selectedFile])}
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div className="max-w-4xl mx-auto p-12 text-center">
+                                    <i className="fas fa-chart-line text-8xl text-gray-200 mb-8"></i>
+                                    <h3 className="text-2xl font-black italic mb-4">Dashboard under update...</h3>
+                                    <p className="text-gray-400">戦略ツリーの拡張に伴い、ダッシュボード機能を同期中です。</p>
                                 </div>
                             )}
                         </div>
