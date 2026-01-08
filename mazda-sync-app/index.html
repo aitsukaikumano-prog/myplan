@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAZDA Sync | Strategic Navigator with Zoom</title>
+    <title>MAZDA Sync | Value Chain Strategy</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -11,15 +11,13 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
         
-        /* --- 完璧なツリーコネクタのCSS --- */
-        .tree-container { min-width: 7500px; padding: 100px; transition: transform 0.2s ease-out; transform-origin: top center; }
+        .tree-container { min-width: 9000px; padding: 120px; transition: transform 0.2s ease-out; transform-origin: top center; }
         
         .tree ul {
-            padding-top: 40px; position: relative;
-            transition: all 0.5s;
+            padding-top: 60px; position: relative;
             display: flex;
             justify-content: center;
         }
@@ -28,91 +26,45 @@
             float: left; text-align: center;
             list-style-type: none;
             position: relative;
-            padding: 40px 10px 0 10px;
-            transition: all 0.5s;
+            padding: 60px 20px 0 20px;
         }
 
-        /* 親から伸びる垂直線 */
         .tree li::before, .tree li::after {
             content: '';
             position: absolute; top: 0; right: 50%;
-            border-top: 3px solid #cbd5e1;
-            width: 50%; height: 40px;
+            border-top: 4px solid #cbd5e1;
+            width: 50%; height: 60px;
         }
         .tree li::after {
             right: auto; left: 50%;
-            border-left: 3px solid #cbd5e1;
+            border-left: 4px solid #cbd5e1;
         }
 
-        /* 兄弟がいない場合や端の処理 */
-        .tree li:only-child::after, .tree li:only-child::before {
-            display: none;
-        }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; }
         .tree li:only-child { padding-top: 0; }
-        .tree li:first-child::before, .tree li:last-child::after {
-            border: 0 none;
-        }
-        .tree li:last-child::before {
-            border-right: 3px solid #cbd5e1;
-            border-radius: 0 5px 0 0;
-        }
-        .tree li:first-child::after {
-            border-radius: 5px 0 0 0;
-        }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before { border-right: 4px solid #cbd5e1; border-radius: 0 10px 0 0; }
+        .tree li:first-child::after { border-radius: 10px 0 0 0; }
 
-        /* 子から親へ向かう線 */
         .tree ul ul::before {
             content: '';
             position: absolute; top: 0; left: 50%;
-            border-left: 3px solid #cbd5e1;
-            width: 0; height: 40px;
+            border-left: 4px solid #cbd5e1;
+            width: 0; height: 60px;
         }
-        /* --- コネクタCSS終了 --- */
 
-        .tree-node { min-width: 320px; transition: all 0.2s ease-out; }
-        .active-sidebar { background: rgba(37, 99, 235, 0.1); color: #2563eb; border-right: 4px solid #2563eb; }
+        .tree-node { min-width: 360px; }
         .issue-tag { animation: slideIn 0.3s ease-out; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Zoom Controls Overlay */
-        .zoom-controls {
-            position: fixed;
-            bottom: 40px;
-            right: 40px;
-            z-index: 50;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .zoom-btn {
-            width: 50px;
-            height: 50px;
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 15px;
-            display: flex;
-            items-center: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            color: #475569;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            transition: all 0.2s;
-        }
-        .zoom-btn:hover {
-            background: #f8fafc;
-            border-color: #2563eb;
-            color: #2563eb;
-            transform: translateY(-2px);
-        }
-        .zoom-level {
-            background: #2563eb;
-            color: white;
-            font-size: 0.75rem;
-            font-weight: 900;
-            padding: 4px 8px;
-            border-radius: 8px;
-            text-align: center;
-        }
+        .zoom-controls { position: fixed; bottom: 40px; right: 40px; z-index: 50; display: flex; flex-direction: column; gap: 10px; }
+        .zoom-btn { width: 60px; height: 60px; background: white; border: 2px solid #e2e8f0; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #475569; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); transition: all 0.2s; }
+        .zoom-btn:hover { border-color: #2563eb; color: #2563eb; transform: scale(1.1); }
+        .zoom-level { background: #2563eb; color: white; font-size: 0.8rem; font-weight: 900; padding: 6px 12px; border-radius: 10px; text-align: center; }
+
+        /* Profit Indicators */
+        .profit-tag-cost { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        .profit-tag-revenue { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
     </style>
 </head>
 <body>
@@ -122,129 +74,89 @@
         const { useState } = React;
 
         const STRATEGY_DATA = {
-            id: "root", title: "前向きに今日を生きる人の輪を広げる", level: "Purpose", type: "purpose",
+            id: "root", title: "前向きに今日を生きる人の輪を広げる", level: "Corporate Purpose", type: "purpose",
             children: [
                 {
-                    id: "L2-1", title: "1. 限界利益の拡大 (+500億円)", level: "Strategic Engine", type: "engine",
+                    id: "L2-1", title: "A. Value Creation: 商品を作る (R&D/生産)", level: "Strategic Wing", type: "wing-make",
                     children: [
                         {
-                            id: "L3-1", title: "単価 (P) の向上・防衛", level: "Business Pillar",
-                            children: [
-                                {
-                                    id: "L4-1", title: "価値見極めAI (WTP分析)", level: "Program",
-                                    issues: [
-                                        "P-AI-01: CX-60 サンルーフのPSM分析実施",
-                                        "P-AI-02: 魂動デザイン要素のヘドニック価格推定",
-                                        "P-AI-03: 競合ADASオプション価格のスクレイピング",
-                                        "P-AI-04: 次世代CX-5 ADAS受容性アンケート設計",
-                                        "P-AI-05: 内装レザー品質とWTPの相関分析",
-                                        "P-AI-06: 『人馬一体』の感性価値を脳波データで定量化",
-                                        "P-AI-07: プレミアム塗装色のPSM価格決定ロジック",
-                                        "P-AI-08: 燃費向上 vs 加速性能のWTPトレードオフ分析",
-                                        "P-AI-09: EV航続距離のコンジョイント分析パイロット運用",
-                                        "P-AI-10: 商品企画ゲートへのWTPデータ統合プロセスの策定"
-                                    ]
-                                },
-                                {
-                                    id: "L4-2", title: "中古車リセール価値管理", level: "Program",
-                                    issues: [
-                                        "R-VAL-01: CX-90の3年後残価予測モデル構築",
-                                        "R-VAL-02: 値引きインセンティブが中古価格に与える影響分析",
-                                        "R-VAL-03: マツダ認定中古車データ同期アプリの試作",
-                                        "R-VAL-04: 走行距離・整備履歴とリセールプレミアムの相関",
-                                        "R-VAL-05: 営業担当向け下取り価格シミュレーターの開発",
-                                        "R-VAL-06: グローバル・オークション価格のリアルタイム監視",
-                                        "R-VAL-07: リセール最大化のための最適リース期間の定義",
-                                        "R-VAL-08: 競合他社(RAV4等)とのリセール比較トラッキング",
-                                        "R-VAL-09: フリート販売比率の最適化によるブランド保護",
-                                        "R-VAL-10: 値引き承認フローへの『リセール影響警告』の実装"
-                                    ]
-                                }
+                            id: "L3-1", title: "商品コンセプト・要件定義", level: "Stage",
+                            issues: [
+                                "RD-CON-01: WTPデータに基づくCX-80装備の優先順位付け [収益寄与]",
+                                "RD-CON-02: ターゲット顧客の感性価値(質感)の数値化 [価値向上]",
+                                "RD-CON-03: 競合他社比較による『あたりまえ品質』のコスト最適化 [コスト削]",
+                                "RD-CON-04: 商品企画段階でのリサイクル性評価ロジック構築",
+                                "RD-CON-05: MBDモデルの初期段階での全社共有ルールの策定"
                             ]
                         },
                         {
-                            id: "L3-2", title: "数量 (Q) の確保・シェア拡大", level: "Business Pillar",
-                            children: [
-                                {
-                                    id: "L4-3", title: "北米・グローバル販促最適化", level: "Program",
-                                    issues: [
-                                        "M-NA-01: 西海岸向けCX-50 Google広告入札最適化",
-                                        "M-NA-02: アウトドア層 vs 走り層のクリエイティブA/Bテスト",
-                                        "M-NA-03: 地方オートショー協賛のROI算出ロジック",
-                                        "M-NA-04: カリフォルニア州ディーラー在庫報告の自動化",
-                                        "M-NA-05: EV特設サイトのリード転換率(CVR)分析"
-                                    ]
-                                },
-                                {
-                                    id: "L4-4", title: "グローバル・サプライチェーン最適化", level: "Program",
-                                    issues: [
-                                        "SC-OPT-01: 鉄道輸送同期による物流コスト削減シミュレーション",
-                                        "SC-OPT-02: 半導体不足による生産遅延リスクのAI予測",
-                                        "SC-OPT-03: メキシコ工場向け部品輸出のコンテナ充填率向上",
-                                        "SC-OPT-04: CX-80部品向けティア2サプライヤーのリスク評価",
-                                        "SC-OPT-05: 宇品工場のリアルタイム部品在庫トラッキング実装"
-                                    ]
-                                }
+                            id: "L3-2", title: "設計・エンジニアリング", level: "Stage",
+                            issues: [
+                                "RD-ENG-01: 樹脂部品の形状最適化による金型費の20%削減 [コスト削]",
+                                "RD-ENG-02: 次世代EV向けバッテリー冷却配管の共通化設計",
+                                "RD-ENG-03: ハーネス径の細分化による車両総重量の5kg軽量化 [価値向上]",
+                                "RD-ENG-04: 開発リードタイム短縮のための3D図面出図プロセスのDX",
+                                "RD-ENG-05: サプライヤー共同開発による部品単価の早期確定"
+                            ]
+                        },
+                        {
+                            id: "L3-3", title: "実車評価・テスト (信頼性/感性)", level: "Stage",
+                            issues: [
+                                "RD-EVA-01: 寒冷地テストの仮想化による海外輸送費の削減 [コスト削]",
+                                "RD-EVA-02: 官能評価（乗り心地）のAI自動スコアリング実装 [価値向上]",
+                                "RD-EVA-03: 衝突シミュレーションと実機相関の精度向上(誤差5%以内)",
+                                "RD-EVA-04: 長期信頼性テストでの不具合自動検知システムの導入",
+                                "RD-EVA-05: 排ガス認証試験の自動ログ作成による法規対応工数削減"
                             ]
                         }
                     ]
                 },
                 {
-                    id: "L2-2", title: "2. 固定費の構造改革 (-1,000億円)", level: "Strategic Engine", type: "engine",
+                    id: "L2-sync", title: "Strategic Sync Engine (AI)", level: "Synchronization Layer", type: "engine",
                     children: [
                         {
-                            id: "L3-3", title: "R&D費の効率化・スピード向上", level: "Business Pillar",
-                            children: [
-                                {
-                                    id: "L4-5", title: "パワートレイン・EV開発", level: "Technical Domain",
-                                    issues: [
-                                        "RD-PW-01: 熱解析用スパコンノードの20%削減（アルゴリズム改善）",
-                                        "RD-PW-02: e-Skyactiv向けMBDモデルの標準化",
-                                        "RD-PW-03: 仮想テストによる試作エンジン製作の3機削減",
-                                        "RD-PW-04: 強化学習を用いたバルブタイミング制御の最適化",
-                                        "RD-PW-05: 高圧燃料ポンプの騒音低減シミュレーション"
-                                    ]
-                                },
-                                {
-                                    id: "L4-6", title: "電子・ソフト基盤 (Mazda OS)", level: "Technical Domain",
-                                    issues: [
-                                        "RD-OS-01: Mazda OS 2.0 へのOTAカーネル移植",
-                                        "RD-OS-02: V2X通信向けサイバーセキュリティ・ゲートウェイ実装",
-                                        "RD-OS-03: 全車載スクリーン向けUIフレームワークの統一",
-                                        "RD-OS-04: ヘッドユニット用回帰テストの自動化実行",
-                                        "RD-OS-05: ナビアプリのメモリ使用量最適化",
-                                        "RD-OS-06: 外部アプリデベロッパー向けSDKの構築",
-                                        "RD-OS-07: 日本語方言対応AI音声認識のプロトタイプ",
-                                        "RD-OS-08: 車両状態データとスマホアプリの連携基盤",
-                                        "RD-OS-09: ワイヤレスCarPlay host接続安定性検証",
-                                        "RD-OS-10: GitHubとJiraのソフトウェア構成管理ブリッジ構築"
-                                    ]
-                                },
-                                {
-                                    id: "L4-7", title: "ビークル・シャシー・サスペンション", level: "Technical Domain",
-                                    issues: [
-                                        "RD-CH-01: GVC Plusが乗員の車酔いに与える影響シミュレーション",
-                                        "RD-CH-02: フロントサスペンションアームの500g軽量化設計",
-                                        "RD-CH-03: センサーフュージョンによるダンパー減衰力のAI最適化",
-                                        "RD-CH-04: ステアリングラックのフリクション低減によるフィードバック改善",
-                                        "RD-CH-05: タイヤ空気圧警告センサーの通信プロトコル標準化"
-                                    ]
-                                }
+                            id: "L3-sync", title: "価値見極めAI (同期ハブ)", level: "Core Logic",
+                            issues: [
+                                "SYNC-01: 作る（評価結果）と売る（WTP）のリアルタイム紐付け",
+                                "SYNC-02: 部門間でのKPI（コストvs魅力）のトレードオフ可視化",
+                                "SYNC-03: 開発中の仕様変更がリセール価値に与える影響予測",
+                                "SYNC-04: 現場エンジニア向けの収益貢献度（スコアリング）計算",
+                                "SYNC-05: 経営陣向け全社ロス（未同期率）のダッシュボード化"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "L2-2", title: "B. Value Delivery: 商品を売る (販社/リセール)", level: "Strategic Wing", type: "wing-sell",
+                    children: [
+                        {
+                            id: "L3-4", title: "マーケティング・販促", level: "Stage",
+                            issues: [
+                                "M-STR-01: 特徴的価値(カラー等)への広告費集中投下 [収益向上]",
+                                "M-STR-02: デジタル接点でのWTPデータの逆引き・収集 [ナレッジ]",
+                                "M-STR-03: 値引きなしでも売れる『ファン層』の特定とエンゲージメント",
+                                "M-STR-04: 地域別インセンティブの動的価格設定モデルの導入 [収益向上]",
+                                "M-STR-05: 店頭試乗体験の満足度と成約率の相関分析"
                             ]
                         },
                         {
-                            id: "L3-4", title: "販管費 (SG&A) の最適化", level: "Business Pillar",
-                            children: [
-                                {
-                                    id: "L4-8", title: "ホワイトカラー事務工数のAI自動化", level: "Program",
-                                    issues: [
-                                        "SGA-WC-01: 経営会議向け週間売上レポートの自動生成",
-                                        "SGA-WC-02: 部品調達請求書のAI OCRによる自動チェック",
-                                        "SGA-WC-03: 多段承認プロセスをバイパスする経費精算フロー設計",
-                                        "SGA-WC-04: 社内人事問い合わせ用AIチャットボットの構築",
-                                        "SGA-WC-05: Teams会議議事録のGitHub Issueへの自動転記プラグイン"
-                                    ]
-                                }
+                            id: "L3-5", title: "販売・アフターサービス", level: "Stage",
+                            issues: [
+                                "S-AFT-01: 整備データから開発への品質フィードバックループ構築",
+                                "S-AFT-02: 車両状態予測による早期代替提案プログラム [数量確保]",
+                                "S-AFT-03: アクセサリー後付けによる平均単価(ARPU)の向上 [収益向上]",
+                                "S-AFT-04: サービス拠点での作業効率化による固定費の削減 [コスト削]",
+                                "S-AFT-05: オーナー向けスマホアプリのMAU向上施策"
+                            ]
+                        },
+                        {
+                            id: "L3-6", title: "中古車・リセール管理", level: "Stage",
+                            issues: [
+                                "R-MNG-01: リース車両の返却タイミング最適化によるリセール防衛",
+                                "R-MNG-02: 認定中古車(CPO)のブランド価値定義と価格維持 [収益向上]",
+                                "R-MNG-03: オークション市場でのマツダ車落札価格の監視と介入策",
+                                "R-MNG-04: 海外市場への過剰在庫流出によるブランド毀損の防止",
+                                "R-MNG-05: リセール価値を考慮した新車ローンの再設計"
                             ]
                         }
                     ]
@@ -256,33 +168,40 @@
             const hasChildren = node.children && node.children.length > 0;
             const hasIssues = node.issues && node.issues.length > 0;
 
+            const getWingStyle = () => {
+                if (node.type === 'wing-make') return 'border-red-600 bg-red-50/10';
+                if (node.type === 'wing-sell') return 'border-green-600 bg-green-50/10';
+                if (node.type === 'engine') return 'border-blue-700 bg-blue-50/10';
+                return '';
+            };
+
             return (
                 <li>
-                    <div className={`tree-node relative inline-block p-6 rounded-[2.5rem] shadow-2xl border-[5px] transition-all bg-white ${
+                    <div className={`tree-node relative inline-block p-8 rounded-[3rem] shadow-2xl border-[6px] transition-all bg-white ${
                         node.type === 'purpose' ? 'bg-black border-black text-white' : 
-                        node.type === 'engine' ? 'border-blue-700' : 'border-slate-200 hover:border-blue-400'
+                        getWingStyle() || 'border-slate-200 hover:border-blue-400'
                     }`}>
-                        <div className="mb-2">
-                            <span className={`text-[10px] font-black uppercase tracking-[0.25em] ${
-                                node.type === 'purpose' ? 'text-blue-400' : 'text-blue-600'
+                        <div className="mb-3">
+                            <span className={`text-[11px] font-black uppercase tracking-[0.3em] ${
+                                node.type === 'purpose' ? 'text-blue-400' : 'text-slate-500'
                             }`}>{node.level}</span>
                         </div>
-                        <h4 className="text-[15px] font-black leading-tight italic uppercase tracking-tighter mb-1">{node.title}</h4>
+                        <h4 className="text-[17px] font-black leading-tight italic uppercase tracking-tighter mb-2">{node.title}</h4>
                         
                         {hasIssues && (
-                            <div className="mt-5 pt-5 border-t-2 border-dashed border-slate-100 space-y-2 text-left">
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center">
-                                    <i className="fas fa-list-check mr-2 text-blue-500"></i>
-                                    Active Issues ({node.issues.length})
-                                </p>
-                                <div className="space-y-1.5">
-                                    {node.issues.map((issue, idx) => (
-                                        <div key={idx} className="issue-tag bg-blue-600 text-white text-[11px] p-3 rounded-2xl font-bold flex items-start shadow-sm border border-blue-400/50">
-                                            <i className="fab fa-github mr-2 mt-0.5 text-blue-200"></i>
+                            <div className="mt-6 pt-6 border-t-2 border-dashed border-slate-200 space-y-2 text-left">
+                                {node.issues.map((issue, idx) => {
+                                    const isCost = issue.includes('[コスト削]');
+                                    const isRevenue = issue.includes('[収益向上]') || issue.includes('[収益寄与]');
+                                    return (
+                                        <div key={idx} className={`issue-tag text-[12px] p-4 rounded-2xl font-bold flex items-start shadow-sm border ${
+                                            isCost ? 'profit-tag-cost' : isRevenue ? 'profit-tag-revenue' : 'bg-slate-800 text-white border-slate-700'
+                                        }`}>
+                                            <i className={`fab fa-github mr-3 mt-1 ${isCost || isRevenue ? '' : 'text-blue-400'}`}></i>
                                             <span className="leading-snug tracking-tight">{issue}</span>
                                         </div>
-                                    ))}
-                                </div>
+                                    );
+                                })}
                             </div>
                         )}
                     </div>
@@ -299,54 +218,58 @@
         };
 
         function App() {
-            const [zoom, setZoom] = useState(0.6); // 初期表示は少し引いて俯瞰しやすく
+            const [zoom, setZoom] = useState(0.4);
 
             const zoomIn = () => setZoom(prev => Math.min(prev + 0.1, 2.0));
             const zoomOut = () => setZoom(prev => Math.max(prev - 0.1, 0.1));
-            const resetZoom = () => setZoom(0.6);
+            const resetZoom = () => setZoom(0.4);
 
             return (
-                <div className="flex h-screen text-gray-800 bg-gray-50 overflow-hidden">
+                <div className="flex h-screen text-slate-800 bg-[#f8fafc] overflow-hidden">
                     {/* Sidebar */}
                     <div className="w-80 glass border-r flex flex-col z-20 shadow-2xl flex-shrink-0">
                         <div className="p-10 text-center">
-                            <h1 className="text-4xl font-black tracking-tighter text-gray-900 italic">MAZDA <span className="text-blue-600 uppercase">Sync</span></h1>
-                            <p className="text-[11px] text-gray-400 font-bold uppercase tracking-[0.3em] mt-3">Organizational OS</p>
+                            <h1 className="text-4xl font-black tracking-tighter text-slate-900 italic">MAZDA <span className="text-blue-600 uppercase">Sync</span></h1>
+                            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-[0.3em] mt-3">Value Chain OS</p>
                         </div>
-                        <div className="flex-1 px-6 py-8 space-y-3">
-                            <div className="bg-blue-600 text-white px-8 py-5 rounded-[2rem] flex items-center space-x-5 shadow-2xl shadow-blue-200">
-                                <i className="fas fa-project-diagram text-xl"></i>
-                                <span className="font-black text-sm uppercase italic tracking-widest">Enterprise Wall</span>
+                        <div className="flex-1 px-8 py-8 space-y-4">
+                            <div className="bg-slate-900 text-white px-8 py-6 rounded-[2.5rem] flex items-center space-x-5 shadow-2xl shadow-slate-200">
+                                <i className="fas fa-link text-xl text-blue-400"></i>
+                                <span className="font-black text-sm uppercase italic tracking-widest">Logic Chain</span>
                             </div>
-                            <div className="px-8 py-5 text-gray-400 flex items-center space-x-5 border border-transparent">
-                                <i className="fas fa-chart-line text-xl"></i>
-                                <span className="font-bold text-sm uppercase italic tracking-widest">Analytics</span>
+                            <div className="flex flex-col gap-2 px-6">
+                                <div className="flex items-center space-x-3 text-xs font-bold text-red-600 italic">
+                                    <div className="w-3 h-3 rounded-full bg-red-600"></div>
+                                    <span>Value Creation (作る)</span>
+                                </div>
+                                <div className="flex items-center space-x-3 text-xs font-bold text-green-600 italic">
+                                    <div className="w-3 h-3 rounded-full bg-green-600"></div>
+                                    <span>Value Delivery (売る)</span>
+                                </div>
                             </div>
                         </div>
                         <div className="p-10 border-t bg-white/50">
                             <div className="flex items-center space-x-5">
-                                <div className="w-14 h-14 rounded-3xl bg-black flex items-center justify-center text-white text-2xl font-black italic shadow-xl">D</div>
+                                <div className="w-16 h-16 rounded-3xl bg-slate-900 flex items-center justify-center text-white text-3xl font-black italic shadow-xl">D</div>
                                 <div>
-                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">System Admin</p>
-                                    <p className="text-base font-black italic">daiki</p>
+                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Strategic Partner</p>
+                                    <p className="text-lg font-black italic">daiki</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Main Content */}
-                    <div className="flex-1 overflow-auto relative scroll-smooth bg-[#f8fafc]">
-                        {/* Fixed Header Overlay */}
-                        <div className="sticky top-0 left-0 p-16 z-30 pointer-events-none w-full">
-                            <div className="pointer-events-auto">
-                                <h2 className="text-7xl font-black text-slate-900 tracking-tighter italic uppercase mb-6 drop-shadow-sm">Strategic Navigator</h2>
-                                <p className="text-2xl font-medium text-slate-400 max-w-4xl leading-relaxed drop-shadow-sm">
-                                    全55タスクが「志」に直結。拡大縮小で組織の全貌を自由自在に。
+                    <div className="flex-1 overflow-auto relative scroll-smooth">
+                        <div className="sticky top-0 left-0 p-20 z-30 pointer-events-none w-full">
+                            <div className="pointer-events-auto bg-white/10 backdrop-blur-sm p-6 rounded-3xl inline-block">
+                                <h2 className="text-8xl font-black text-slate-900 tracking-tighter italic uppercase mb-6 drop-shadow-xl">Value Chain Navigator</h2>
+                                <p className="text-3xl font-medium text-slate-500 max-w-5xl leading-relaxed">
+                                    「作る」と「売る」の同期による収益改善。全ての現場タスクに財務指標を内包。
                                 </p>
                             </div>
                         </div>
 
-                        {/* Zoom Controls */}
                         <div className="zoom-controls">
                             <div className="zoom-level italic tracking-tighter">{Math.round(zoom * 100)}%</div>
                             <button onClick={zoomIn} className="zoom-btn" title="Zoom In"><i className="fas fa-plus"></i></button>
@@ -354,13 +277,12 @@
                             <button onClick={resetZoom} className="zoom-btn" title="Reset"><i className="fas fa-compress-arrows-alt"></i></button>
                         </div>
 
-                        {/* Scaling Tree Container */}
                         <div 
                             className="tree tree-container"
                             style={{ 
                                 transform: `scale(${zoom})`,
                                 transformOrigin: 'top center',
-                                paddingBottom: '500px' // スケール時に下部が見切れないように
+                                paddingBottom: '800px'
                             }}
                         >
                             <ul>
