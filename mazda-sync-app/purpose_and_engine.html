@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>MAZDA Sync | The Purpose & Engine Logic</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .glow { filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5)); }
+        .logic-bridge { border-left: 2px dashed #cbd5e1; height: 40px; margin-left: 40px; }
+    </style>
+</head>
+<body class="bg-slate-50 p-10 font-sans">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        function App() {
+            return (
+                <div class="max-w-4xl mx-auto space-y-4">
+                    <header class="mb-12 text-center">
+                        <h1 class="text-3xl font-black text-slate-900 tracking-tighter italic">STRATEGIC <span class="text-blue-600">ARCHITECTURE</span></h1>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-[0.3em] mt-2">想いを、生存のロジックへ</p>
+                    </header>
+
+                    {/* 1. Purpose Layer (使命) */}
+                    <div class="bg-slate-900 p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden group hover:scale-[1.02] transition-all duration-500">
+                        <div class="absolute top-0 right-0 p-8 opacity-10 text-8xl group-hover:rotate-12 transition-transform"><i class="fas fa-sun"></i></div>
+                        <div class="relative z-10">
+                            <p class="text-blue-400 text-[10px] font-black uppercase tracking-widest mb-3 flex items-center">
+                                <span class="w-2 h-2 bg-blue-400 rounded-full mr-2 animate-ping"></span>
+                                Mission / Purpose (使命)
+                            </p>
+                            <h2 class="text-2xl font-black text-white italic leading-tight">
+                                「前向きに今日を生きる人の輪を広げる」
+                            </h2>
+                            <p class="text-xs text-slate-400 mt-4 leading-relaxed max-w-xl">
+                                なぜマツダが存在するのか？ その答えは「利益」ではなく、この「人の輝き」にある。
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="logic-bridge"></div>
+
+                    {/* 2. Strategic Engine Layer (戦略エンジン) */}
+                    <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border-2 border-blue-600 relative overflow-hidden group hover:scale-[1.02] transition-all duration-500">
+                        <div class="absolute top-0 right-0 p-8 opacity-5 text-8xl group-hover:-rotate-12 transition-transform"><i class="fas fa-engine"></i></div>
+                        <div class="relative z-10">
+                            <p class="text-blue-600 text-[10px] font-black uppercase tracking-widest mb-3">Strategy / Survival (存続のロジック)</p>
+                            <h3 class="text-xl font-black text-slate-800">
+                                営業利益の回復と、投資原資の創出
+                            </h3>
+                            <div class="grid grid-cols-2 gap-4 mt-6">
+                                <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                                    <p class="text-[10px] font-bold text-blue-500 uppercase mb-1">Financial Focus</p>
+                                    <p class="text-sm font-black text-blue-900 italic">固定費 1,000億円削減</p>
+                                </div>
+                                <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                                    <p class="text-[10px] font-bold text-blue-500 uppercase mb-1">Action Link</p>
+                                    <p class="text-sm font-black text-blue-900 italic">手戻り・重複の撲滅</p>
+                                </div>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-6 leading-relaxed bg-slate-50 p-4 rounded-xl italic">
+                                <b>Logic Connection:</b> 「収益が上がらなければ、人の輪を広げるための新しい車も、新しい技術も作れない。だから今、我々はムダを削ぎ落とし、存続の力を蓄える。」
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mt-12 p-8 bg-blue-600 rounded-[2rem] text-white shadow-2xl text-center">
+                        <h4 class="font-black text-lg mb-2 italic">「魂」と「数字」は、どちらも欠かせない。</h4>
+                        <p class="text-xs text-blue-100 opacity-80 leading-relaxed max-w-md mx-auto">
+                            このシステムは、あなたの目の前の「数字の仕事」が、どうやって遠くの「誰かの笑顔」に繋がっているかを証明し続けます。
+                        </p>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

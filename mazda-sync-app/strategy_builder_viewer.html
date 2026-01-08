@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>MAZDA Sync | Strategy Builder & Viewer</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .strategy-node { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .strategy-node:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .line-connector { width: 2px; background: #e5e7eb; height: 40px; margin: 0 auto; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        function App() {
+            const [view, setView] = useState('viewer'); // 'builder' or 'viewer'
+
+            return (
+                <div class="min-h-screen">
+                    {/* Navigation */}
+                    <nav class="bg-white border-b px-8 py-4 flex justify-between items-center shadow-sm">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 bg-gray-900 rounded flex items-center justify-center">
+                                <i class="fas fa-bullseye text-white text-xs"></i>
+                            </div>
+                            <span class="font-black text-xl tracking-tighter">STRATEGY <span class="text-blue-600">CORE</span></span>
+                        </div>
+                        <div class="flex space-x-1 bg-gray-100 p-1 rounded-xl">
+                            <button 
+                                onClick={() => setView('viewer')}
+                                class={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${view === 'viewer' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500'}`}
+                            >表示モード</button>
+                            <button 
+                                onClick={() => setView('builder')}
+                                class={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${view === 'builder' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500'}`}
+                            >作成・編集モード</button>
+                        </div>
+                    </nav>
+
+                    <main class="p-12 max-w-5xl mx-auto">
+                        {view === 'builder' ? (
+                            <div class="bg-white p-10 rounded-3xl shadow-xl border border-gray-100 animate-in fade-in duration-500">
+                                <h2 class="text-2xl font-black mb-8">上位方針の定義</h2>
+                                <div class="space-y-6">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">方針タイトル (Vision Phrase)</label>
+                                        <input type="text" class="w-full p-4 bg-gray-50 border-0 rounded-xl text-lg font-bold outline-none ring-2 ring-transparent focus:ring-blue-100 transition-all" placeholder="例：R&D固定費 180億円の構造的削減" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">背景・想い (Context)</label>
+                                        <textarea class="w-full p-4 bg-gray-50 border-0 rounded-xl text-sm leading-relaxed outline-none ring-2 ring-transparent focus:ring-blue-100 transition-all h-32" placeholder="なぜこの目標が必要なのか、リーダーの言葉で入力してください..."></textarea>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-6">
+                                        <div>
+                                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">主要な指標 (KPI)</label>
+                                            <input type="text" class="w-full p-4 bg-gray-50 border-0 rounded-xl text-sm font-bold outline-none" placeholder="例：検索工数 80% 削減" />
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">動かす財務レバー</label>
+                                            <select class="w-full p-4 bg-gray-50 border-0 rounded-xl text-sm font-bold outline-none appearance-none">
+                                                <option>固定費 (Fixed Cost)</option>
+                                                <option>変動費 (Variable Cost)</option>
+                                                <option>単価 (Price Premium)</option>
+                                                <option>数量 (Volume)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <button class="w-full py-4 bg-gray-900 text-white rounded-xl font-black text-sm uppercase tracking-widest shadow-lg hover:bg-black transition-all">
+                                        GitHubに保存して全員と同期する
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div class="space-y-4 animate-in fade-in duration-500">
+                                {/* 全社方針 */}
+                                <div class="strategy-node bg-gray-900 text-white p-10 rounded-3xl shadow-2xl text-center relative overflow-hidden">
+                                    <div class="absolute top-0 right-0 p-6 opacity-10 text-8xl"><i class="fas fa-landmark"></i></div>
+                                    <p class="text-blue-400 text-[10px] font-black uppercase tracking-widest mb-2">Company Goal</p>
+                                    <h3 class="text-3xl font-black italic">営業利益のV字回復</h3>
+                                    <p class="mt-4 text-sm text-gray-400 max-w-lg mx-auto leading-relaxed">2025年度末までに黒字化。固定費の構造改革を断行する。</p>
+                                </div>
+
+                                <div class="line-connector"></div>
+
+                                {/* 部門方針 */}
+                                <div class="strategy-node bg-white p-10 rounded-3xl shadow-lg border border-gray-100 text-center relative group">
+                                    <div class="absolute -top-3 -right-3 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center text-[10px] font-bold shadow-lg ring-4 ring-white">5</div>
+                                    <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2">Dept Strategy</p>
+                                    <h3 class="text-2xl font-black text-gray-900">R&D固定費 180億円の構造的削減</h3>
+                                    <p class="mt-4 text-sm text-gray-500 max-w-lg mx-auto leading-relaxed italic">「探し物」と「やり直し」をゼロにし、純粋な開発時間を最大化する。</p>
+                                    <div class="mt-6 flex justify-center space-x-2">
+                                        <span class="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold rounded-full border border-blue-100">#固定費削減</span>
+                                        <span class="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-bold rounded-full border border-green-100">#手戻り撲滅</span>
+                                    </div>
+                                    <div class="mt-8 pt-6 border-t border-gray-50 flex justify-between items-center text-[10px] font-bold text-gray-400 px-4">
+                                        <div class="flex items-center"><i class="far fa-comments mr-1"></i> 5件の対話</div>
+                                        <div class="flex items-center text-blue-500 cursor-pointer hover:underline">
+                                            詳細と対話を見る <i class="fas fa-chevron-right ml-1"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </main>
+                    
+                    <footer class="mt-20 py-10 text-center text-[10px] text-gray-400 font-bold uppercase tracking-widest border-t bg-white">
+                        Designed for Mazda Revitalization Project
+                    </footer>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

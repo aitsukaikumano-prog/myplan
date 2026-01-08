@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>MAZDA Sync Spec Map v1.2</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f0f2f5; padding: 40px; display: flex; justify-content: center; }
+        .spec-card { background: white; border-radius: 20px; padding: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); width: 100%; max-width: 1100px; }
+        h1 { color: #1e293b; font-size: 1.8rem; font-weight: 900; text-align: center; margin-bottom: 40px; letter-spacing: -0.05em; }
+        .mermaid { background: white; }
+    </style>
+</head>
+<body>
+    <div class="spec-card">
+        <h1>手戻り・重複撲滅パッケージ：機能相関と財務貢献</h1>
+        <div class="mermaid">
+            flowchart TD
+                subgraph Core_Functions ["三種の神器（優先機能）"]
+                    P1[<b>1. 戦略マップ</b><br/>方針の可視化]
+                    P2[<b>2. 会議同期</b><br/>決定事項の即時伝達]
+                    P3[<b>3. 重複検知</b><br/>過去知見・他部署連携]
+                end
+
+                subgraph Waste_Elimination ["撲滅するムダ (Pain Relief)"]
+                    W1[筋違いな作業の防止]
+                    W2[古い方針でのやり直し防止]
+                    W3[二重作業・検索時間の消滅]
+                end
+
+                subgraph Financial_Impact ["財務的成果 (Profit)"]
+                    RD[<b>R&D固定費の効率化</b><br/>純粋な開発時間の最大化]
+                    SG[<b>販管費の最適化</b><br/>間接工数・調査コスト削減]
+                    Value[<b>正味単価の向上</b><br/>市場価値へのリソース集中]
+                end
+
+                P1 --> W1
+                P2 --> W2
+                P3 --> W3
+
+                W1 & W2 --> RD
+                W3 --> SG
+                W1 & W3 --> Value
+
+                style Core_Functions fill:#f8fafc,stroke:#334155,stroke-width:2px
+                style Financial_Impact fill:#ecfdf5,stroke:#059669,stroke-width:2px
+                style P1 fill:#dbeafe,stroke:#2563eb
+                style P2 fill:#dbeafe,stroke:#2563eb
+                style P3 fill:#dbeafe,stroke:#2563eb
+        </div>
+    </div>
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral', securityLevel: 'loose' });
+    </script>
+</body>
+</html>

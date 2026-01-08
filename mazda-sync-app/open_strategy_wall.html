@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>MAZDA Sync | Open Strategy Wall</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        function App() {
+            const [comments, setComments] = useState([
+                { id: 1, user: "ケンジ", type: "質問", text: "「図面検索のDX」について、30年前の紙図面も対象に含まれますか？", date: "10:20" },
+                { id: 2, user: "佐藤工場長", type: "補足", text: "まずは直近5年分を優先しよう。紙図面は別途スキャン計画を立てる必要があるな。", date: "11:05" },
+                { id: 3, user: "Daiki", type: "提案", text: "AIでの自動タグ付けも併用すれば、現場の負担を減らせそうです。", date: "11:45" }
+            ]);
+
+            return (
+                <div class="max-w-4xl mx-auto p-8 space-y-8">
+                    {/* 上位方針：北極星の表示 */}
+                    <div class="bg-gray-900 text-white p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4 opacity-20 text-6xl"><i class="fas fa-bullseye"></i></div>
+                        <p class="text-blue-400 text-xs font-black uppercase tracking-widest mb-2">Team Strategy</p>
+                        <h2 class="text-2xl font-black mb-4 italic">R&D固定費 180億円の構造的削減</h2>
+                        <p class="text-sm text-gray-300 leading-relaxed max-w-2xl">
+                            「探し物」と「やり直し」をゼロにする。現場の知見をGitHubに集約し、マツダの未来をエンジニア全員で同期（Sync）させる。
+                        </p>
+                    </div>
+
+                    {/* 対話広場：Open Discussion */}
+                    <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
+                        <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
+                            <h3 class="font-black text-lg text-gray-800">意志の同期（コメント）</h3>
+                            <span class="text-xs font-bold text-gray-400">{comments.length} 意見が集まっています</span>
+                        </div>
+
+                        <div class="p-8 space-y-6">
+                            {comments.map(c => (
+                                <div key={c.id} class="flex items-start space-x-4">
+                                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">
+                                        {c.user[0]}
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center space-x-2 mb-1">
+                                            <span class="font-black text-sm text-gray-900">{c.user}</span>
+                                            <span class={`px-2 py-0.5 rounded text-[10px] font-bold ${c.type === '質問' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
+                                                {c.type}
+                                            </span>
+                                            <span class="text-[10px] text-gray-400 font-bold">{c.date}</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600 leading-relaxed">{c.text}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* 入力欄 */}
+                        <div class="p-8 bg-gray-50 border-t border-gray-100">
+                            <div class="flex items-center space-x-4">
+                                <input 
+                                    type="text" 
+                                    placeholder="方針への疑問、現場の声を残してください..." 
+                                    class="flex-1 p-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-4 focus:ring-blue-100 outline-none transition-all"
+                                />
+                                <button class="p-4 bg-gray-900 text-white rounded-xl hover:bg-black transition-all">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="text-center text-gray-400 text-[10px] font-bold uppercase tracking-widest leading-relaxed">
+                        ※ここに残された声はすべてGitHubのIssueに同期され、<br/>
+                        未来のマツダの資産（ナレッジベース）となります。
+                    </p>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
