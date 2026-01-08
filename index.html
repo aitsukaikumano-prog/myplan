@@ -3,186 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAZDA Strategic Analysis | Financial Target Identification</title>
+    <title>マツダ再興ロードマップ | Strategic Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        body { background-color: #ffffff; color: #1a1a1a; }
-        .card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 0px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .logic-header { border-left: 5px solid #000000; padding-left: 1.5rem; }
-        .logic-node > rect { fill: #f9fafb !important; stroke: #111827 !important; stroke-width: 2px !important; }
-        .critical-node > rect { fill: #fef2f2 !important; stroke: #dc2626 !important; stroke-width: 2px !important; }
-        .data-table th { background-color: #f3f4f6; text-align: left; padding: 12px; font-size: 0.75rem; text-transform: uppercase; color: #4b5563; border-bottom: 2px solid #e5e7eb; }
-        .data-table td { padding: 12px; border-bottom: 1px solid #f3f4f6; font-family: 'Courier New', Courier, monospace; font-size: 0.875rem; }
-        .target-high { background-color: #fee2e2; color: #991b1b; font-weight: bold; }
-        .target-mid { background-color: #fef3c7; color: #92400e; }
-        .summary-box { border-top: 3px solid #111827; }
+        body { background-color: #f3f4f6; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .mega { border-top: 8px solid #e91e63; }
+        .local { border-top: 8px solid #4caf50; }
+        .action { border-top: 8px solid #2196f3; }
+        .selected-route { background-color: #fffaf0; border: 2px dashed #ed8936; }
     </style>
 </head>
-<body class="p-12 font-sans leading-relaxed">
-    <div class="max-w-7xl mx-auto">
-        <!-- 役員報告用ヘッダー -->
-        <header class="mb-16 border-b-2 border-black pb-8 flex justify-between items-start">
-            <div>
-                <h1 class="text-4xl font-extrabold tracking-tight">マツダ：財務データ分析に基づく「撃破目標」の特定</h1>
-                <p class="text-sm text-gray-600 mt-2 uppercase tracking-widest font-semibold">Strictly Confidential | Financial Analysis & Target Identification</p>
-            </div>
-            <div class="text-right">
-                <p class="text-xs text-gray-500 uppercase">Analysis Period</p>
-                <p class="text-xl font-bold">FY2021 - FY2025 Forecast</p>
-            </div>
+<body class="p-8">
+    <div class="max-w-5xl mx-auto">
+        <header class="mb-12 text-center">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">マツダ再興ロードマップ</h1>
+            <p class="text-xl text-gray-600">Strategic Alignment Dashboard</p>
         </header>
 
-        <!-- 1. 収益改善のマスターロジック（固定） -->
-        <section class="card p-10 mb-12 summary-box">
-            <div class="logic-header mb-8">
-                <h2 class="text-2xl font-bold uppercase tracking-tighter">1. 戦略の全体像 (Master Logic Tree)</h2>
-            </div>
+        <!-- セクション1: トップダウン戦略分解 -->
+        <section class="card p-6 mb-12">
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-700">1. 戦略的分解と選択 (Top-Down Analysis)</h2>
+            <p class="text-sm text-gray-500 mb-4 text-center">マツダ再興に必要な全要素から、daikiのリソース（スキル・経歴・立地）に最適なルートを選択</p>
             <div class="mermaid flex justify-center">
-                flowchart TD
-                    ROOT(["<b>営業利益のV字回復</b>"])
-                    ROOT --> MG["<b>1. 限界利益の拡大</b>"]
-                    ROOT --> FC["<b>2. 固定費の構造改革</b>"]
+                graph TD
+                    ROOT((<b>マツダ再興</b>))
                     
-                    MG --> P["単価（P）向上"]
-                    MG --> Q["数量（Q）確保"]
-                    MG --> V["変動費（V）削減"]
+                    ROOT --> C1[収益性向上]
+                    ROOT --> C2[ブランド価値向上]
+                    ROOT --> C3[組織実行力強化]
                     
-                    FC --> RD["R&D費の効率化"]
-                    FC --> SG["販管費の最適化"]
+                    C1 --> C1A[生産ライン自動化]
+                    C1 --> C1B[SCM最適化]
+                    
+                    C2 --> C2A[次世代EV体験]
+                    C2 --> C2B(<b>ファンの熱狂化</b>)
+                    
+                    C3 --> C3A(<b>意思決定の同期</b>)
+                    C3 --> C3B(<b>現場のDX・リテラシー</b>)
+                    
+                    %% 選択ルートの強調
+                    classDef selected fill:#fff3e0,stroke:#ff9800,stroke-width:2px;
+                    class C2B,C3A,C3B selected;
+
+                    %% アクションへの接続
+                    C3B --> ACTION[熊野町：図面DX実証]
+                    C2B --> ART[熊野町：AIアート展示]
+            </div>
+            <div class="mt-6 p-4 bg-orange-50 rounded-lg border border-orange-200">
+                <p class="text-sm text-orange-800 font-bold">【戦略的選択の論理】</p>
+                <p class="text-xs text-orange-700 mt-1">
+                    製造ラインの直接改修（C1A）などは莫大な資本が必要。対して、元社員としての知見を活かした「意思決定ロス（C3A）」や「現場DX（C3B）」の解決は、個人の知恵とAIスキルで勝負できる、最もレバレッジの効く領域である。
+                </p>
             </div>
         </section>
 
-        <!-- 2. マルチイヤー財務データ分析 -->
-        <section class="card p-10 mb-12">
-            <div class="logic-header mb-8">
-                <h2 class="text-2xl font-bold uppercase tracking-tighter">2. 財務データ推移：収益を圧迫している真犯人の特定</h2>
-                <p class="text-gray-600 mt-2">過去5年間の数値を並べることで、売上の伸びに対しどのコストが異常に膨らんでいるかを可視化。</p>
+        <!-- セクション2: 具体的な積み上げ -->
+        <div class="grid grid-cols-1 gap-8 mb-12">
+            <div class="card p-6 mega">
+                <span class="text-xs font-bold text-pink-600 uppercase tracking-widest">Target Layer</span>
+                <h3 class="text-2xl font-bold text-gray-800 mt-1">【Mega】マツダの救済・再興</h3>
+                <p class="text-gray-600 mt-2">組織の「迷い（意思決定ロス）」をAIで排除し、全社員の力を集結させる。</p>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="w-full data-table">
-                    <thead>
-                        <tr>
-                            <th>項目 (億円)</th>
-                            <th>FY2021</th>
-                            <th>FY2022</th>
-                            <th>FY2023</th>
-                            <th>FY2024</th>
-                            <th>FY2025(予)</th>
-                            <th>増減率(21→25)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>売上高</td>
-                            <td>28,822</td>
-                            <td>31,203</td>
-                            <td>38,268</td>
-                            <td>48,277</td>
-                            <td>50,189</td>
-                            <td class="text-blue-600">+74.1%</td>
-                        </tr>
-                        <tr>
-                            <td>営業利益</td>
-                            <td>88</td>
-                            <td>1,042</td>
-                            <td>1,420</td>
-                            <td>2,505</td>
-                            <td class="text-red-600">▲539(H1)</td>
-                            <td class="text-red-600">赤字転落</td>
-                        </tr>
-                        <tr class="target-mid">
-                            <td>売上原価率</td>
-                            <td>78.4%</td>
-                            <td>77.2%</td>
-                            <td>76.5%</td>
-                            <td>75.8%</td>
-                            <td class="target-high">79.2%(推計)</td>
-                            <td>悪化傾向</td>
-                        </tr>
-                        <tr class="target-high">
-                            <td>研究開発費 (R&D)</td>
-                            <td>1,120</td>
-                            <td>1,250</td>
-                            <td>1,400</td>
-                            <td>1,463</td>
-                            <td class="target-high">1,800(予測)</td>
-                            <td class="text-red-600">+60.7%</td>
-                        </tr>
-                        <tr class="target-high">
-                            <td>広告宣伝・販売諸費</td>
-                            <td>980</td>
-                            <td>1,050</td>
-                            <td>1,150</td>
-                            <td>1,336</td>
-                            <td class="target-high">1,450(予測)</td>
-                            <td class="text-red-600">+48.0%</td>
-                        </tr>
-                        <tr>
-                            <td>販売台数 (千台)</td>
-                            <td>1,287</td>
-                            <td>1,251</td>
-                            <td>1,110</td>
-                            <td>1,241</td>
-                            <td>1,100(推計)</td>
-                            <td class="text-red-600">▲14.5%</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="card p-6 local">
+                <span class="text-xs font-bold text-green-600 uppercase tracking-widest">Proof Layer</span>
+                <h3 class="text-2xl font-bold text-gray-800 mt-1">【Local】熊野町：社会的証明</h3>
+                <p class="text-gray-600 mt-2">「頑固な現場」を動かし、数字を出した実績。これがマツダへの最強のパスポートになる。</p>
             </div>
 
-            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="p-6 bg-red-50 border-l-4 border-red-600">
-                    <h4 class="font-bold text-red-900 mb-2">【撃破目標 A】肥大化したR&D・販管費</h4>
-                    <p class="text-xs text-red-800 leading-relaxed">
-                        売上高が大きく成長している一方で、販売台数は減少。つまり「1台あたりの固定費負担」が激増している。特にR&D費が4年で60%増、広告費が48%増となっており、売上の伸びを固定費が食い潰している。この「組織の贅肉」を叩くのが最優先。
-                    </p>
-                </div>
-                <div class="p-6 bg-yellow-50 border-l-4 border-yellow-600">
-                    <h4 class="font-bold text-yellow-900 mb-2">【撃破目標 B】急激な原価率の悪化</h4>
-                    <p class="text-xs text-yellow-800 leading-relaxed">
-                        直近（FY25）で原価率が急激に跳ね上がっている。これは原材料高もあるが、魅力不足による値引き（インセンティブ）の拡大が実質的な売上単価を下げ、相対的に原価率を押し上げている。
-                    </p>
-                </div>
+            <div class="card p-6 action">
+                <span class="text-xs font-bold text-blue-600 uppercase tracking-widest">Action Layer</span>
+                <h3 class="text-2xl font-bold text-gray-800 mt-1">【Action】佐藤工場長：現場実証</h3>
+                <p class="text-gray-600 mt-2">すべての土台。「図面探し」という最小単位の迷いを消し、AIとの共生を証明する。</p>
+            </div>
+        </div>
+
+        <section class="card p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-700">2. ボトムアップ実行図 (Execution Flow)</h2>
+            <div class="mermaid flex justify-center">
+                graph BT
+                    S1[図面検索AI成功] -->|現場実績| E1[AI展示会]
+                    S2[現場の抵抗突破] -->|変革力証明| E2[ドキュメンタリー]
+                    E1 & E2 -->|信頼獲得| M1[マツダへ提案]
+                    M1 --> M2[システム導入]
+                    M2 --> GOAL((<b>マツダ再興</b>))
+
+                    style GOAL fill:#e91e63,stroke:#fff,color:#fff
+                    style S1 fill:#2196f3,stroke:#fff,color:#fff
+                    style S2 fill:#2196f3,stroke:#fff,color:#fff
+                    style E2 fill:#4caf50,stroke:#fff,color:#fff
             </div>
         </section>
 
-        <!-- 3. 結論：どこを叩けばいいか？ -->
-        <section class="card p-10 mb-12">
-            <div class="logic-header mb-8">
-                <h2 class="text-2xl font-bold uppercase tracking-tighter">3. 結論：叩くべきは「固定費の硬直性」と「不透明な開発プロセス」</h2>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="border p-6">
-                    <h3 class="font-black text-3xl mb-4">TARGET 01</h3>
-                    <p class="font-bold text-xl mb-2">R&Dプロセスの抜本的効率化</p>
-                    <p class="text-sm text-gray-600">
-                        年間1,800億円（予測）に達するR&D費。ここには「探し物」「やり直し」「合意形成待ち」という、付加価値を生まない**「死に時間」**が30%以上含まれているとの推計。ここを叩けば、年間数百億円規模の利益をノーコストで捻出できる。
-                    </p>
-                </div>
-                <div class="border p-6 bg-black text-white">
-                    <h3 class="font-black text-3xl mb-4">TARGET 02</h3>
-                    <p class="font-bold text-xl mb-2">「魅力」の定量化による値引き抑制</p>
-                    <p class="text-sm text-gray-400">
-                        広告費を1,400億円かけても販売台数が減っている事実は、広告の質ではなく**「商品と市場のミスマッチ」**を示唆。開発の最上流で「顧客が対価を払うポイント」を確実に射抜くことで、1,000億円規模の値引き原資（インセンティブ）を最小化する。
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <footer class="mt-20 pt-8 border-t border-gray-200 text-center text-gray-400 text-xs">
-            <p>Data Source: Mazda Financial Reports (FY2021-2024 Actual, FY2025 Forecast based on H1 Trends)</p>
+        <footer class="mt-12 text-center text-gray-500 pb-12">
+            <p>Strategic Map Created by AI Strategy Advisor for daiki</p>
         </footer>
     </div>
     <script>
-        mermaid.initialize({ 
-            startOnLoad: true, 
-            theme: 'neutral',
-            securityLevel: 'loose',
-            flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'step' }
-        });
+        mermaid.initialize({ startOnLoad: true, flowchart: { useMaxWidth: true, htmlLabels: true } });
     </script>
 </body>
 </html>

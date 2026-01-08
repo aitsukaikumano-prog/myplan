@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAZDA Sync | Perfect Logic Chain</title>
+    <title>MAZDA Sync | Strategic Navigator with Zoom</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -15,7 +15,7 @@
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
         
         /* --- 完璧なツリーコネクタのCSS --- */
-        .tree-container { min-width: 7000px; padding: 100px; }
+        .tree-container { min-width: 7500px; padding: 100px; transition: transform 0.2s ease-out; transform-origin: top center; }
         
         .tree ul {
             padding-top: 40px; position: relative;
@@ -73,6 +73,46 @@
         .active-sidebar { background: rgba(37, 99, 235, 0.1); color: #2563eb; border-right: 4px solid #2563eb; }
         .issue-tag { animation: slideIn 0.3s ease-out; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Zoom Controls Overlay */
+        .zoom-controls {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .zoom-btn {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            display: flex;
+            items-center: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #475569;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            transition: all 0.2s;
+        }
+        .zoom-btn:hover {
+            background: #f8fafc;
+            border-color: #2563eb;
+            color: #2563eb;
+            transform: translateY(-2px);
+        }
+        .zoom-level {
+            background: #2563eb;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 900;
+            padding: 4px 8px;
+            border-radius: 8px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -176,7 +216,7 @@
                                         "RD-OS-06: 外部アプリデベロッパー向けSDKの構築",
                                         "RD-OS-07: 日本語方言対応AI音声認識のプロトタイプ",
                                         "RD-OS-08: 車両状態データとスマホアプリの連携基盤",
-                                        "RD-OS-09: ワイヤレスCarPlayの接続安定性検証",
+                                        "RD-OS-09: ワイヤレスCarPlay host接続安定性検証",
                                         "RD-OS-10: GitHubとJiraのソフトウェア構成管理ブリッジ構築"
                                     ]
                                 },
@@ -259,6 +299,12 @@
         };
 
         function App() {
+            const [zoom, setZoom] = useState(0.6); // 初期表示は少し引いて俯瞰しやすく
+
+            const zoomIn = () => setZoom(prev => Math.min(prev + 0.1, 2.0));
+            const zoomOut = () => setZoom(prev => Math.max(prev - 0.1, 0.1));
+            const resetZoom = () => setZoom(0.6);
+
             return (
                 <div className="flex h-screen text-gray-800 bg-gray-50 overflow-hidden">
                     {/* Sidebar */}
@@ -289,21 +335,34 @@
                     </div>
 
                     {/* Main Content */}
-                    <div className="flex-1 overflow-auto p-16 relative scroll-smooth bg-[#f8fafc]">
-                        <header className="mb-24 flex justify-between items-end">
-                            <div>
-                                <h2 className="text-7xl font-black text-slate-900 tracking-tighter italic uppercase mb-6">Strategic Navigator</h2>
-                                <p className="text-2xl font-medium text-slate-400 max-w-4xl leading-relaxed">
-                                    全55タスクが「志」に直結。完璧な論理の鎖が、組織の迷いをゼロにする。
+                    <div className="flex-1 overflow-auto relative scroll-smooth bg-[#f8fafc]">
+                        {/* Fixed Header Overlay */}
+                        <div className="sticky top-0 left-0 p-16 z-30 pointer-events-none w-full">
+                            <div className="pointer-events-auto">
+                                <h2 className="text-7xl font-black text-slate-900 tracking-tighter italic uppercase mb-6 drop-shadow-sm">Strategic Navigator</h2>
+                                <p className="text-2xl font-medium text-slate-400 max-w-4xl leading-relaxed drop-shadow-sm">
+                                    全55タスクが「志」に直結。拡大縮小で組織の全貌を自由自在に。
                                 </p>
                             </div>
-                            <div className="bg-white p-6 rounded-[2rem] shadow-xl border-4 border-blue-600 text-center px-12">
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Current Sync Rate</p>
-                                <p className="text-5xl font-black text-blue-600 italic tracking-tighter">100<span className="text-2xl">%</span></p>
-                            </div>
-                        </header>
+                        </div>
 
-                        <div className="tree tree-container">
+                        {/* Zoom Controls */}
+                        <div className="zoom-controls">
+                            <div className="zoom-level italic tracking-tighter">{Math.round(zoom * 100)}%</div>
+                            <button onClick={zoomIn} className="zoom-btn" title="Zoom In"><i className="fas fa-plus"></i></button>
+                            <button onClick={zoomOut} className="zoom-btn" title="Zoom Out"><i className="fas fa-minus"></i></button>
+                            <button onClick={resetZoom} className="zoom-btn" title="Reset"><i className="fas fa-compress-arrows-alt"></i></button>
+                        </div>
+
+                        {/* Scaling Tree Container */}
+                        <div 
+                            className="tree tree-container"
+                            style={{ 
+                                transform: `scale(${zoom})`,
+                                transformOrigin: 'top center',
+                                paddingBottom: '500px' // スケール時に下部が見切れないように
+                            }}
+                        >
                             <ul>
                                 <TreeNode node={STRATEGY_DATA} />
                             </ul>
