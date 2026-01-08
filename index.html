@@ -3,124 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>マツダ再興戦略 | 財務・論理分解モデル</title>
+    <title>マツダ再興戦略 | プロフェッショナル論理分解モデル</title>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         body { background-color: #f3f4f6; }
         .card { background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .logic-header { border-left: 8px solid #b91c1c; padding-left: 1rem; }
-        .profit-node { fill: #fee2e2 !important; stroke: #b91c1c !important; stroke-width: 2px !important; }
+        .logic-header { border-left: 8px solid #1e3a8a; padding-left: 1rem; }
+        .profit-node { fill: #dbeafe !important; stroke: #1e3a8a !important; stroke-width: 3px !important; }
         .focus-node { fill: #fff3e0 !important; stroke: #ff9800 !important; stroke-width: 2px !important; }
         .past-version { border-top: 2px dashed #ccc; padding-top: 2rem; margin-top: 4rem; }
     </style>
 </head>
-<body class="p-8 font-sans">
+<body class="p-8 font-sans text-gray-900">
     <div class="max-w-6xl mx-auto">
         <header class="mb-12 text-center">
-            <h1 class="text-4xl font-bold text-gray-800 mb-4">マツダ再興ロードマップ</h1>
-            <p class="text-xl text-gray-600 font-bold text-red-700">財務的・論理的整合性モデル (Strict Logic Model)</p>
+            <h1 class="text-4xl font-bold mb-4">マツダ再興・戦略ダッシュボード</h1>
+            <p class="text-xl text-blue-800 font-bold italic">Version 3.0: MECE Financial Logic Strategy</p>
         </header>
 
-        <!-- 現行バージョン: 財務的ブレイクダウン -->
-        <section class="card p-8 mb-12">
-            <div class="logic-header mb-8 border-red-700">
-                <h2 class="text-2xl font-bold text-gray-800">1. 収益改善の論理分解 (Top-Down Financial Breakdown)</h2>
-                <p class="text-gray-600 mt-2">「再興」を財務的成功と定義し、収益を「売上（価値）向上」と「コスト（工数）削減」にMECE分解</p>
+        <!-- セクション1: プロフェッショナル論理分解 -->
+        <section class="card p-8 mb-12 border-t-8 border-blue-900">
+            <div class="logic-header mb-8">
+                <h2 class="text-2xl font-bold">1. 営業利益改善の数学的分解 (Profit Logic Tree)</h2>
+                <p class="text-gray-600 mt-2">収益を「単価」「数量」「コスト」の3変数に分解し、daikiの打ち手がどこに効くかを明確化</p>
             </div>
             
             <div class="mermaid flex justify-center overflow-x-auto">
                 graph TD
-                    ROOT(("<b>マツダ再興<br/>(営業利益改善)</b>"))
+                    ROOT(("<b>マツダ再興<br/>(営業利益の最大化)</b>"))
                     
-                    ROOT --> REVENUE["<b>売上の拡大<br/>(付加価値の向上)</b>"]
-                    ROOT --> COST["<b>コストの最適化<br/>(工数・ロスの削減)</b>"]
+                    ROOT --> PRICE["<b>1. 単価向上<br/>(Premiumization)</b>"]
+                    ROOT --> VOLUME["<b>2. 数量維持・拡大<br/>(Loyalty & Sales)</b>"]
+                    ROOT --> COST["<b>3. コスト・固定費削減<br/>(Efficiency)</b>"]
                     
-                    REVENUE --> R1[ブランド力の強化]
-                    REVENUE --> R2["商品力の向上<br/>(次世代EV/感性)"]
+                    %% 1. 単価向上
+                    PRICE --> P1[ブランド価値による価格支配力]
+                    PRICE --> P2[高付加価値ミックスへの移行]
+                    P1 --> FOCUS_ART("<b>AIアート・感性価値による<br/>ブランド再定義</b>")
                     
-                    R1 --> R1A("<b>ファンコミュニティの<br/>LTV最大化</b>")
-                    R2 --> R2A("<b>過去の設計資産の<br/>高度活用</b>")
+                    %% 2. 数量維持
+                    VOLUME --> V1[既存ファンの維持(LTV)]
+                    VOLUME --> V2[販売チャネルのデジタル変革]
+                    V1 --> FOCUS_COMM("<b>AIによるファンコミュニティ<br/>エンゲージメント強化</b>")
                     
-                    COST --> C1[製造コストの削減]
-                    COST --> C2["<b>組織的ロスの削減<br/>(間接工数削減)</b>"]
-                    
-                    C1 --> C1A[生産ラインの自動化]
-                    C2 --> C2A("<b>図面検索・事務作業の<br/>AI自動化</b>")
-                    C2 --> C2B("<b>意思決定・合意形成の<br/>スピードアップ</b>")
+                    %% 3. コスト・固定費削減
+                    COST --> C1[製造・調達コストの削減]
+                    COST --> C2["<b>R&D・組織ロスの削減</b>"]
+                    C2 --> FOCUS_DRAWING("<b>図面検索AIによる<br/>設計工数 80% 削減</b>")
+                    C2 --> FOCUS_SYNC("<b>AI意思決定同期による<br/>合意形成スピードの劇的向上</b>")
 
                     classDef focus fill:#fff3e0,stroke:#ff9800,stroke-width:2px;
-                    class R1A,R2A,C2A,C2B focus;
+                    class FOCUS_ART,FOCUS_COMM,FOCUS_DRAWING,FOCUS_SYNC focus;
                     class ROOT profit-node;
             </div>
-            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-red-50 p-4 border border-red-200 rounded">
-                    <p class="font-bold text-red-800 text-sm">【売上・価値向上の論理】</p>
-                    <p class="text-xs text-red-700 mt-1">
-                        マツダが競合に勝つには、価格競争ではなく「ファンを熱狂させるブランド価値」が必要。AI展示会は、このファン形成（R1A）の最小単位の実証。
-                    </p>
+
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="p-4 bg-blue-50 rounded border border-blue-100">
+                    <h4 class="font-bold text-blue-900 mb-2">単価(Price)への寄与</h4>
+                    <p class="text-xs text-blue-800">「ただの車」を「芸術品」に昇華させる。熊野町のアート実績は、マツダのプレミアム価格を正当化する強力な武器になる。</p>
                 </div>
-                <div class="bg-gray-50 p-4 border border-gray-200 rounded">
-                    <p class="font-bold text-gray-800 text-sm">【コスト・ロス削減の論理】</p>
-                    <p class="text-xs text-gray-700 mt-1">
-                        間接部門や設計現場の「探し物・迷い（C2A/B）」は膨大なコスト。図面検索AIは、この組織的ロスを削り、利益率を向上させるための外科手術。
-                    </p>
+                <div class="p-4 bg-green-50 rounded border border-green-100">
+                    <h4 class="font-bold text-green-900 mb-2">数量(Volume)への寄与</h4>
+                    <p class="text-xs text-green-800">熱狂的ファンは、広告費なしで売れ続ける仕組み。AIでファンとの絆をデジタル化し、持続可能な販売網を構築する。</p>
+                </div>
+                <div class="p-4 bg-orange-50 rounded border border-orange-100">
+                    <h4 class="font-bold text-orange-900 mb-2">コスト(Cost)への寄与</h4>
+                    <p class="text-xs text-orange-800">設計現場の「探し物」は死に金。図面AIで浮かせた工数を「新しい価値創造」へ転換し、固定費効率を最大化する。</p>
                 </div>
             </div>
         </section>
 
+        <!-- セクション2: 接続レイヤー -->
         <section class="card p-8 mb-12">
-            <h2 class="text-2xl font-bold mb-8 text-center text-gray-800 underline">2. 実行アクションと財務目標の接続</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                <div class="p-4 border-t-4 border-blue-500 card">
-                    <p class="text-xs font-bold text-blue-600 uppercase">Step 1: Action (熊野町)</p>
-                    <h4 class="font-bold my-2 text-gray-800">現場実証</h4>
-                    <p class="text-xs text-gray-500">図面検索工数を80%削減し、コスト削減の有効性を数字で証明する。</p>
+            <h2 class="text-2xl font-bold mb-8 text-center text-gray-800 underline">2. アクション・アライメント</h2>
+            <div class="flex flex-col space-y-4">
+                <div class="flex items-center p-4 bg-white border rounded shadow-sm">
+                    <div class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl mr-6">1</div>
+                    <div>
+                        <h4 class="font-bold text-blue-600 uppercase tracking-wider text-sm">Action: 最小単位の実証 (vs 佐藤さん)</h4>
+                        <p class="text-gray-700">コスト削減(C2)の証明。図面1枚から「組織の迷い」を消す技術と信頼を確立。</p>
+                    </div>
                 </div>
-                <div class="p-4 border-t-4 border-green-500 card">
-                    <p class="text-xs font-bold text-green-600 uppercase">Step 2: Local (証明)</p>
-                    <h4 class="font-bold my-2 text-gray-800">社会的信頼</h4>
-                    <p class="text-xs text-gray-500">AI活用による価値向上を町民・経営者に証明し、コンサルとしての実績を作る。</p>
+                <div class="flex items-center p-4 bg-white border rounded shadow-sm">
+                    <div class="w-16 h-16 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-xl mr-6">2</div>
+                    <div>
+                        <h4 class="font-bold text-green-600 uppercase tracking-wider text-sm">Local: 社会的証明 (熊野町イベント)</h4>
+                        <p class="text-gray-700">単価向上(P1)とファン形成(V1)の証明。芸術×AIで「変革のリーダーシップ」を可視化。</p>
+                    </div>
                 </div>
-                <div class="p-4 border-t-4 border-pink-500 card">
-                    <p class="text-xs font-bold text-pink-600 uppercase">Step 3: Mega (マツダ)</p>
-                    <h4 class="font-bold my-2 text-gray-800">マツダ再興</h4>
-                    <p class="text-xs text-gray-500">実証した「コスト削減」と「価値向上」の仕組みをマツダの全バリューチェーンに展開。</p>
+                <div class="flex items-center p-4 bg-white border rounded shadow-sm">
+                    <div class="w-16 h-16 bg-pink-600 text-white rounded-full flex items-center justify-center font-bold text-xl mr-6">3</div>
+                    <div>
+                        <h4 class="font-bold text-pink-600 uppercase tracking-wider text-sm">Mega: マツダ再興</h4>
+                        <p class="text-gray-700">利益改善方程式の全展開。元社員の知見をAIで増幅し、経営再建の立役者へ。</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- 過去のバージョンセクション -->
-        <div class="past-version">
-            <h2 class="text-2xl font-bold mb-8 text-gray-500 text-center">過去の検討プロセス (Archives)</h2>
+        <!-- アーカイブ -->
+        <div class="past-version bg-gray-200 p-8 rounded-lg">
+            <h2 class="text-2xl font-bold mb-8 text-gray-600 text-center">アーカイブ：思考の変遷 (Archives)</h2>
             
-            <details class="mb-8">
-                <summary class="cursor-pointer text-lg font-bold text-gray-700 p-4 bg-gray-200 rounded">Version 1: バリューチェーン分解モデル</summary>
-                <div class="card p-8 mt-4 bg-gray-50">
-                    <p class="text-sm text-gray-600 mb-4 text-center italic">※製造プロセスの流れ（企画・製造・販売）に沿ったMECE分解案</p>
-                    <div class="mermaid flex justify-center overflow-x-auto">
+            <details class="mb-4">
+                <summary class="cursor-pointer font-bold text-gray-700 p-4 bg-gray-300 rounded hover:bg-gray-400 transition">Version 2: 収益・財務モデル (2026/01/08)</summary>
+                <div class="p-6 mt-2 bg-white rounded shadow-inner">
+                    <p class="text-xs text-gray-500 mb-4 italic">※売上とコストの単純分解期</p>
+                    <div class="mermaid flex justify-center">
                         graph TD
-                            ROOT_V1(("<b>マツダ再興</b>"))
-                            ROOT_V1 --> VC1["<b>R&D・商品企画</b><br/>知財の活用・感性価値"]
-                            ROOT_V1 --> VC2["<b>調達・製造</b><br/>生産効率・技術継承"]
-                            ROOT_V1 --> VC3["<b>販売・マーケ</b><br/>ファン形成・ブランド"]
-                            
-                            VC1 --> VC1A[過去の設計知見のデータ化]
-                            VC1 --> VC1B[AIによる意匠・戦略支援]
-                            VC2 --> VC2A[製造プロセスの自動化]
-                            VC2 --> VC2B[現場の暗黙知の形式知化]
-                            VC3 --> VC3A[ファンコミュニティ活性化]
-                            VC3 --> VC3B[営業・接客のDX支援]
+                            V2ROOT((マツダ再興)) --> V2REVENUE[売上拡大]
+                            V2ROOT --> V2COST[コスト最適化]
+                            V2REVENUE --> V2R1[ブランド強化]
+                            V2COST --> V2C1[組織ロス削減]
+                    </div>
+                </div>
+            </details>
 
-                            classDef focus fill:#fff3e0,stroke:#ff9800,stroke-width:2px;
-                            class VC1A,VC2B,VC3A focus;
+            <details class="mb-4">
+                <summary class="cursor-pointer font-bold text-gray-700 p-4 bg-gray-300 rounded hover:bg-gray-400 transition">Version 1: バリューチェーン分解モデル</summary>
+                <div class="p-6 mt-2 bg-white rounded shadow-inner">
+                    <p class="text-xs text-gray-500 mb-4 italic">※製造プロセスの流れ（企画・製造・販売）に沿った分解期</p>
+                    <div class="mermaid flex justify-center">
+                        graph TD
+                            V1VC1[R&D・企画] --> V1VC2[調達・製造] --> V1VC3[販売・マーケ]
                     </div>
                 </div>
             </details>
         </div>
 
         <footer class="mt-12 text-center text-gray-400 pb-12">
-            <p>Mazda Revitalization Strategic Alignment Dashboard</p>
+            <p>Mathematical Strategic Alignment Dashboard for daiki</p>
         </footer>
     </div>
     <script>
