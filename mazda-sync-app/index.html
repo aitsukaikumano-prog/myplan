@@ -15,8 +15,11 @@
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
         .sidebar-item:hover { background: rgba(37, 99, 235, 0.1); color: #2563eb; }
         .active-sidebar { background: rgba(37, 99, 235, 0.1); color: #2563eb; border-right: 4px solid #2563eb; }
-        .animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .7; } }
+        .markdown-content h1 { font-size: 1.5rem; font-weight: 900; margin-bottom: 1rem; border-bottom: 2px solid #eee; padding-bottom: 0.5rem; }
+        .markdown-content h2 { font-size: 1.2rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #1f2937; }
+        .markdown-content p { margin-bottom: 1rem; font-size: 0.875rem; color: #4b5563; line-height: 1.6; }
+        .markdown-content ul { list-style: disc; margin-left: 1.5rem; margin-bottom: 1rem; font-size: 0.875rem; color: #4b5563; }
+        .markdown-content li { margin-bottom: 0.25rem; }
     </style>
 </head>
 <body>
@@ -25,30 +28,17 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // Mock Database (Loaded from our markdown files)
-        const INITIAL_DATA = {
-            strategy: {
-                title: "マツダ再興：全社上位方針",
-                goals: ["2025年 H2 営業利益の黒字化", "固定費の構造的削減（1,000億円規模）"],
-                pillars: ["R&D効率化 (Speed & Lean)", "価値見極め (WTP Focus)"]
-            },
-            dept_strategy: {
-                title: "商品戦略部：2026年度 モデル価値向上",
-                mission: ["リセールバリュー 5% 向上", "値引き 30% 削減"]
-            },
-            tasks: [
-                { id: "010", title: "現場ヒアリング（佐藤工場長）", dept: "ワークスタイル改革", status: "In Progress", align: 92 },
-                { id: "006", title: "意思決定同期AI開発", dept: "ディシジョン・シンクロ", status: "In Progress", align: 88 },
-                { id: "002", title: "AIデザイン評価ツール", dept: "ナレッジ・アクセラレーション", status: "Done", align: 95 }
-            ],
-            knowledge_base: [
-                { title: "2023_不具合対策書_A.pdf", tags: ["不具合", "図面", "検索"] },
-                { title: "CX-60 開発ロス報告書.pdf", tags: ["R&D", "効率化"] }
-            ]
+        const REPO_FILES = {
+            "STRATEGY.md": `# マツダ再興：全社上位方針 (Main Strategy)\n\n## 1. 最終目標 (Goal)\n- **2025年 H2 営業利益の黒字化**\n- **固定費（R&D/販管費）の構造적削減（1,000億円規模）**\n\n## 2. 戦略の柱 (Pillars)\n1. **R&D効率化 (Speed & Lean)**: 開発現場の「死に時間」を排除し、価値創造に集中する。\n2. **価値見極め (WTP Focus)**: 顧客が対価を払う機能を見極め、値引き（インセンティブ）を最小化する。\n\n## 3. 本期の最重点領域\n- **図面検索・管理プロセスのDX**: R&D固定費削減のクイックウィン（即効性のある成果）として位置づける。`,
+            "DEPT_STRATEGY.md": `# 商品戦略部：2026年度 モデル価値向上プロジェクト\n\n## 1. 上位組織（経営）からのミッション\n- **リセールバリュー（3年残価率）の 5% 向上**\n- **値引き（販売インセンティブ）の 30% 削減**\n\n## 2. 部の方針：WTP（支払い意欲）重視型・商品改良\n「エンジニアのこだわりを、顧客の『財布が開く価値』へと変換し、一台あたりの限界利益を最大化する」\n\n## 3. 重点プロジェクト：価値実証 5大プロトタイプ\n1. 感性価値の定量化（デザイン）\n2. デジタル体験の統合（コネクティッド）\n3. 走りの質感の再定義（ダイナミクス）\n4. 持続可能なラグジュアリー（マテリアル）\n5. 所有体験のDX（サービス・アプリ）`,
+            "KANBAN.md": `# マツダ再興プロジェクト：進捗ボード (Kanban)\n\n## 🎯 Backlog (未着手)\n- [ ] Issue #002: 市場価値見極めAIのアルゴリズム策定\n- [ ] Issue #003: トヨタ共通部品採用による原価低減シミュレーション\n\n## 🏗️ In Progress (進行中)\n- [x] **Issue #001: 図面検索工数の削減によるR&D固定費の圧縮**\n- [ ] **Mazda Sync プロトタイプ実証 (mazda-sync-app)**\n\n## ✅ Done (完了)\n- [x] 全社財務分析（Version 8.0）\n- [x] 組織変革プロポーザル（GitHub型業務管理）\n- [x] フロントエンド・システム基盤構築 (React/Tailwind)\n- [x] **Issue #002: 市場価値見極めAIのアルゴリズム策定**`,
+            "issues/001_drawing_search.md": `# Issue #001: 図面検索工数の削減によるR&D固定費の圧縮\n\n## 1. 解決すべき課題 (Problem)\nマツダの開発現場において、過去の設計図面や知見の検索に、エンジニア一人あたり週平均5時間が費やされている。\n\n## 2. 成功の定義 (Definition of Done)\n- [ ] 現場エンジニア（佐藤工場長等）へのヒアリング\n- [ ] AIプロトタイプによる検索時間の50%削減の証明`,
+            "issues/002_value_quantization.md": `# Issue #002: 市場価値見極めAIのアルゴリズム策定\n\n## 1. 解決すべき課題 (Problem)\n「いいものを作れば売れる」という主観的な開発を脱却するため、顧客の支払い意欲（WTP）を定量化するロジックが必要。\n\n## 2. 成果物 (Deliverables)\n- [x] カノ・モデルによる機能分類ロジックの定義\n- [x] ヘドニック価格理論とコンジョイント分析のハイブリッドロジック`
         };
 
         function App() {
             const [activeTab, setActiveTab] = useState('dashboard');
+            const [selectedFile, setSelectedFile] = useState('STRATEGY.md');
             const [workLog, setWorkLog] = useState('');
             const [syncResult, setSyncResult] = useState(null);
             const [isSyncing, setIsSyncing] = useState(false);
@@ -56,43 +46,47 @@
             const handleSync = () => {
                 if (!workLog) return;
                 setIsSyncing(true);
-                
-                // Simulate AI Processing
                 setTimeout(() => {
-                    const keywords = ["リセール", "図面", "効率", "削減", "工場", "顧客"];
-                    const foundKeywords = keywords.filter(k => workLog.includes(k));
-                    const score = 70 + (foundKeywords.length * 5);
-                    
                     setSyncResult({
-                        score: Math.min(score, 98),
-                        summary: `本日の作業は「${workLog.substring(0, 20)}...」として記録されました。上位方針「R&D効率化」に合致しており、特に現場課題の具体化に寄与しています。`,
-                        recommendations: foundKeywords.length > 0 ? ["過去の図面DB構造図.dwg", "佐藤工場長インタビュー記録_2025.docx"] : []
+                        score: 85,
+                        summary: "上位方針「R&D効率化」との高い親和性を確認。現場の心を開くアプローチが評価されました。",
+                        recommendations: ["STRATEGY.md", "issues/001_drawing_search.md"]
                     });
                     setIsSyncing(false);
-                }, 1500);
+                }, 1000);
+            };
+
+            const renderMarkdown = (text) => {
+                const lines = text.split('\n');
+                return lines.map((line, i) => {
+                    if (line.startsWith('# ')) return <h1 key={i}>{line.substring(2)}</h1>;
+                    if (line.startsWith('## ')) return <h2 key={i}>{line.substring(3)}</h2>;
+                    if (line.startsWith('- ')) return <li key={i}>{line.substring(2)}</li>;
+                    return <p key={i}>{line}</p>;
+                });
             };
 
             return (
-                <div class="flex h-screen overflow-hidden">
+                <div class="flex h-screen overflow-hidden text-gray-800">
                     {/* Sidebar */}
-                    <div class="w-64 glass border-r flex flex-col">
+                    <div class="w-64 glass border-r flex flex-col z-20">
                         <div class="p-6">
-                            <h1 class="text-2xl font-black tracking-tighter text-gray-900">MAZDA <span class="text-blue-600">SYNC</span></h1>
+                            <h1 class="text-2xl font-black tracking-tighter text-gray-900 italic">MAZDA <span class="text-blue-600">SYNC</span></h1>
                             <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 text-center">Organizational OS</p>
                         </div>
                         <nav class="flex-1 mt-4">
-                            <div onClick={() => setActiveTab('dashboard')} class={`sidebar-item px-6 py-4 cursor-pointer flex items-center space-x-3 transition-all ${activeTab === 'dashboard' ? 'active-sidebar' : 'text-gray-500'}`}>
-                                <i class="fas fa-chart-line"></i>
-                                <span class="text-sm font-semibold">ダッシュボード</span>
-                            </div>
-                            <div onClick={() => setActiveTab('tasks')} class={`sidebar-item px-6 py-4 cursor-pointer flex items-center space-x-3 transition-all ${activeTab === 'tasks' ? 'active-sidebar' : 'text-gray-500'}`}>
-                                <i class="fas fa-tasks"></i>
-                                <span class="text-sm font-semibold">案件・タスク</span>
-                            </div>
-                            <div onClick={() => setActiveTab('strategy')} class={`sidebar-item px-6 py-4 cursor-pointer flex items-center space-x-3 transition-all ${activeTab === 'strategy' ? 'active-sidebar' : 'text-gray-500'}`}>
-                                <i class="fas fa-bullseye"></i>
-                                <span class="text-sm font-semibold">経営・部門方針</span>
-                            </div>
+                            {[
+                                { id: 'dashboard', icon: 'fa-chart-line', label: 'Dashboard' },
+                                { id: 'repository', icon: 'fa-folder-open', label: 'Repository' },
+                                { id: 'tasks', icon: 'fa-tasks', label: 'Tasks' },
+                                { id: 'strategy', icon: 'fa-bullseye', label: 'Strategy' },
+                            ].map(tab => (
+                                <div key={tab.id} onClick={() => setActiveTab(tab.id)} 
+                                     class={`sidebar-item px-6 py-4 cursor-pointer flex items-center space-x-3 transition-all ${activeTab === tab.id ? 'active-sidebar' : 'text-gray-500'}`}>
+                                    <i class={`fas ${tab.icon} w-5`}></i>
+                                    <span class="text-sm font-semibold">{tab.label}</span>
+                                </div>
+                            ))}
                         </nav>
                         <div class="p-4 border-t text-[10px] text-gray-400 text-center">
                             Logged in as: <b>daiki</b>
@@ -100,151 +94,177 @@
                     </div>
 
                     {/* Main Content */}
-                    <div class="flex-1 overflow-y-auto p-8">
-                        {activeTab === 'dashboard' && (
-                            <div class="animate-in fade-in duration-500">
-                                <header class="mb-8">
-                                    <h2 class="text-3xl font-bold text-gray-900">Dashboard</h2>
-                                    <p class="text-gray-500">今日の「マツダとの同期」を始めましょう。</p>
-                                </header>
+                    <div class="flex-1 overflow-y-auto bg-gray-50 relative">
+                        {/* Header Decoration */}
+                        <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-blue-50 to-transparent -z-10"></div>
 
-                                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                    {/* Work Logger */}
-                                    <div class="lg:col-span-2 space-y-6">
-                                        <div class="card p-6 bg-white shadow-sm border rounded-xl">
-                                            <h3 class="text-sm font-bold text-gray-400 uppercase mb-4">作業ログの入力</h3>
-                                            <textarea 
-                                                value={workLog}
-                                                onChange={(e) => setWorkLog(e.target.value)}
-                                                class="w-full p-4 bg-gray-50 border border-gray-100 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                                                rows="5" 
-                                                placeholder="今日取り組んだこと、気づいたこと、直面した課題を自由に入力してください..."
-                                            ></textarea>
-                                            <div class="flex justify-between items-center mt-4">
-                                                <p class="text-[10px] text-gray-400 italic">※AIが自動的に戦略との整合性を判定し、日報を作成します。</p>
-                                                <button 
-                                                    onClick={handleSync}
-                                                    disabled={isSyncing || !workLog}
-                                                    class={`px-6 py-2 bg-blue-600 text-white rounded-lg font-bold text-sm shadow-lg hover:bg-blue-700 transition-all ${isSyncing ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                >
-                                                    {isSyncing ? <i class="fas fa-sync fa-spin mr-2"></i> : <i class="fas fa-bolt mr-2"></i>}
-                                                    戦略と同期する
-                                                </button>
-                                            </div>
-                                        </div>
+                        <div class="p-8 max-w-6xl mx-auto">
+                            {activeTab === 'dashboard' && (
+                                <div class="animate-in fade-in slide-in-from-top-4 duration-500">
+                                    <header class="mb-8">
+                                        <h2 class="text-4xl font-black text-gray-900 tracking-tight">Sync Your Work</h2>
+                                        <p class="text-gray-500 mt-2">今日の足跡を、組織の資産へ。</p>
+                                    </header>
 
-                                        {syncResult && (
-                                            <div class="card p-6 bg-blue-600 text-white shadow-xl rounded-xl animate-in slide-in-from-bottom-4 duration-300">
-                                                <div class="flex justify-between items-start mb-4">
-                                                    <h3 class="font-bold">AI 同期レポート</h3>
-                                                    <div class="text-2xl font-black">{syncResult.score}% <span class="text-[10px] font-normal block">Alignment</span></div>
+                                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                        <div class="lg:col-span-2 space-y-6">
+                                            <div class="card p-8 bg-white shadow-xl shadow-blue-100/50 border border-blue-50 rounded-2xl">
+                                                <h3 class="text-xs font-black text-blue-500 uppercase tracking-widest mb-6 flex items-center">
+                                                    <span class="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></span>
+                                                    Work Logger
+                                                </h3>
+                                                <textarea 
+                                                    value={workLog}
+                                                    onChange={(e) => setWorkLog(e.target.value)}
+                                                    class="w-full p-6 bg-gray-50 border-0 rounded-xl text-sm focus:ring-4 focus:ring-blue-100 outline-none transition-all min-h-[200px] leading-relaxed"
+                                                    placeholder="今日取り組んだこと、気づいたこと、直面した課題を入力..."
+                                                ></textarea>
+                                                <div class="flex justify-between items-center mt-6">
+                                                    <p class="text-[10px] text-gray-400 font-medium">※AIが自動的に戦略との整合性をスコアリングし、日報を作成します。</p>
+                                                    <button 
+                                                        onClick={handleSync}
+                                                        disabled={isSyncing || !workLog}
+                                                        class={`px-8 py-3 bg-gray-900 text-white rounded-xl font-bold text-sm shadow-xl hover:bg-black transition-all transform hover:-translate-y-1 ${isSyncing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                    >
+                                                        {isSyncing ? <i class="fas fa-sync fa-spin mr-2"></i> : <i class="fas fa-bolt mr-2 text-yellow-400"></i>}
+                                                        同期を開始
+                                                    </button>
                                                 </div>
-                                                <p class="text-sm mb-6 leading-relaxed opacity-90">{syncResult.summary}</p>
-                                                
-                                                {syncResult.recommendations.length > 0 && (
-                                                    <div class="bg-blue-700 p-4 rounded-lg">
-                                                        <h4 class="text-xs font-bold mb-2 text-blue-200">AI推奨のナレッジ:</h4>
-                                                        <ul class="text-xs space-y-1">
-                                                            {syncResult.recommendations.map(r => (
-                                                                <li key={r} class="flex items-center space-x-2">
-                                                                    <i class="fas fa-file-alt"></i>
-                                                                    <span class="underline cursor-pointer">{r}</span>
-                                                                </li>
-                                                            ))}
-                                                        </ul>
+                                            </div>
+
+                                            {syncResult && (
+                                                <div class="card p-8 bg-blue-600 text-white shadow-2xl shadow-blue-400/30 rounded-2xl animate-in slide-in-from-bottom-8 duration-500">
+                                                    <div class="flex justify-between items-center mb-6">
+                                                        <h3 class="font-black text-xl tracking-tight">AI Analysis Results</h3>
+                                                        <div class="flex items-center space-x-2">
+                                                            <div class="text-4xl font-black">{syncResult.score}</div>
+                                                            <div class="text-xs font-bold uppercase tracking-widest leading-none">Align<br/>Score</div>
+                                                        </div>
                                                     </div>
-                                                )}
-                                                <button class="mt-4 w-full py-2 bg-white text-blue-600 rounded-lg text-xs font-bold shadow-inner">
-                                                    このまま日報として送信する
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Stats & Info */}
-                                    <div class="space-y-6">
-                                        <div class="card p-6 bg-white shadow-sm border rounded-xl">
-                                            <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">現在の最重要目標</h3>
-                                            <p class="text-sm font-bold text-gray-800 leading-tight">R&D固定費 180億円削減</p>
-                                            <div class="w-full bg-gray-100 h-2 rounded-full mt-3 overflow-hidden">
-                                                <div class="bg-green-500 h-full" style={{width: '35%'}}></div>
-                                            </div>
-                                            <p class="text-[10px] text-gray-400 mt-2 text-right">進捗: 35% (見込み)</p>
+                                                    <p class="text-sm mb-8 leading-relaxed font-medium bg-blue-500/30 p-4 rounded-xl border border-blue-400/50">{syncResult.summary}</p>
+                                                    <button class="w-full py-4 bg-white text-blue-600 rounded-xl text-sm font-black shadow-lg hover:bg-blue-50 transition-all uppercase tracking-widest">
+                                                        日報を生成・送信
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
 
-                                        <div class="card p-6 bg-gray-900 text-white shadow-sm rounded-xl overflow-hidden relative">
-                                            <div class="absolute -right-8 -bottom-8 text-8xl text-gray-800 opacity-20"><i class="fas fa-lightbulb"></i></div>
-                                            <h3 class="text-xs font-bold text-blue-400 uppercase mb-2">今日のヒント</h3>
-                                            <p class="text-xs leading-relaxed">佐藤工場長とのヒアリングが進行中です。「不具合対策書」の検索不備について深掘りすると、さらなる効率化が見込めます。</p>
+                                        <div class="space-y-6">
+                                            <div class="card p-6 bg-white shadow-lg border border-gray-100 rounded-2xl">
+                                                <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Target KPI</h3>
+                                                <p class="text-xl font-black text-gray-900 leading-none mb-2">R&D固定費 180億円削減</p>
+                                                <div class="w-full bg-gray-100 h-3 rounded-full mt-4 overflow-hidden shadow-inner">
+                                                    <div class="bg-gradient-to-r from-blue-500 to-green-400 h-full" style={{width: '35%'}}></div>
+                                                </div>
+                                                <div class="flex justify-between mt-2 font-bold text-[10px]">
+                                                    <span class="text-blue-500 tracking-tighter uppercase">Current: 35%</span>
+                                                    <span class="text-gray-400 tracking-tighter uppercase">Goal: 100%</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
 
-                        {activeTab === 'tasks' && (
-                            <div class="animate-in fade-in duration-500">
-                                <header class="mb-8">
-                                    <h2 class="text-3xl font-bold text-gray-900">Task Management</h2>
-                                    <p class="text-gray-500">あなたが支えている組織の歯車です。</p>
-                                </header>
-                                <div class="space-y-4">
-                                    {INITIAL_DATA.tasks.map(task => (
-                                        <div key={task.id} class="p-6 bg-white border rounded-xl flex items-center justify-between hover:shadow-md transition-all">
-                                            <div>
-                                                <div class="flex items-center space-x-2 mb-1">
-                                                    <span class="text-[10px] font-bold text-gray-400">#{task.id}</span>
-                                                    <h4 class="font-bold text-gray-800">{task.title}</h4>
-                                                </div>
-                                                <p class="text-xs text-gray-400">{task.dept}</p>
+                            {activeTab === 'repository' && (
+                                <div class="animate-in fade-in duration-500 h-full">
+                                    <header class="mb-8">
+                                        <h2 class="text-4xl font-black text-gray-900 tracking-tight tracking-tight">Repository</h2>
+                                        <p class="text-gray-500 mt-2">組織の全知見がここに。(`github_sim/`)</p>
+                                    </header>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 h-[600px]">
+                                        {/* File Tree */}
+                                        <div class="bg-white border rounded-2xl p-6 overflow-y-auto shadow-sm">
+                                            <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">Files</h3>
+                                            <div class="space-y-2">
+                                                {Object.keys(REPO_FILES).map(path => (
+                                                    <div 
+                                                        key={path} 
+                                                        onClick={() => setSelectedFile(path)}
+                                                        class={`px-3 py-2 rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center space-x-2 ${selectedFile === path ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100'}`}
+                                                    >
+                                                        <i class={`fas ${path.includes('/') ? 'fa-file-code' : 'fa-file-alt'} opacity-70`}></i>
+                                                        <span class="truncate">{path}</span>
+                                                    </div>
+                                                ))}
                                             </div>
-                                            <div class="text-right flex items-center space-x-8">
+                                        </div>
+
+                                        {/* File Content */}
+                                        <div class="md:col-span-3 bg-white border rounded-2xl shadow-sm flex flex-col overflow-hidden">
+                                            <div class="px-6 py-3 border-b bg-gray-50 flex items-center justify-between">
+                                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{selectedFile}</span>
+                                                <div class="flex space-x-1">
+                                                    <div class="w-2 h-2 rounded-full bg-gray-200"></div>
+                                                    <div class="w-2 h-2 rounded-full bg-gray-200"></div>
+                                                    <div class="w-2 h-2 rounded-full bg-gray-200"></div>
+                                                </div>
+                                            </div>
+                                            <div class="p-10 overflow-y-auto markdown-content">
+                                                {renderMarkdown(REPO_FILES[selectedFile])}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'tasks' && (
+                                <div class="animate-in fade-in duration-500">
+                                    <h2 class="text-4xl font-black text-gray-900 tracking-tight mb-8">Tasks</h2>
+                                    <p class="text-gray-500 mb-8">あなたの担当案件です。</p>
+                                    <div class="space-y-4">
+                                        {[
+                                            { id: "010", title: "現場ヒアリング（佐藤工場長）", dept: "ワークスタイル改革", status: "In Progress", align: 92 },
+                                            { id: "006", title: "意思決定同期AI開発", dept: "ディシジョン・シンクロ", status: "In Progress", align: 88 }
+                                        ].map(task => (
+                                            <div key={task.id} class="p-8 bg-white border-l-8 border-l-blue-600 rounded-2xl flex items-center justify-between shadow-lg hover:shadow-xl transition-all group">
                                                 <div>
-                                                    <p class="text-[10px] text-gray-400 uppercase font-bold">Alignment</p>
-                                                    <p class={`text-sm font-bold ${task.align > 90 ? 'text-green-500' : 'text-blue-500'}`}>{task.align}%</p>
+                                                    <div class="flex items-center space-x-3 mb-2">
+                                                        <span class="px-2 py-1 bg-gray-100 text-[10px] font-black text-gray-500 rounded uppercase">#{task.id}</span>
+                                                        <h4 class="font-black text-xl text-gray-800 group-hover:text-blue-600 transition-colors">{task.title}</h4>
+                                                    </div>
+                                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">{task.dept}</p>
                                                 </div>
-                                                <span class={`px-3 py-1 rounded-full text-[10px] font-bold ${task.status === 'Done' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                                                    {task.status}
-                                                </span>
+                                                <div class="text-right">
+                                                    <div class="text-3xl font-black text-blue-600 mb-1">{task.align}%</div>
+                                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Alignment Score</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'strategy' && (
+                                <div class="animate-in fade-in duration-500">
+                                    <h2 class="text-4xl font-black text-gray-900 tracking-tight mb-12">Strategy Root</h2>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                                        <div class="relative">
+                                            <div class="absolute -top-6 -left-6 w-24 h-24 bg-blue-600/10 rounded-full -z-10 animate-pulse"></div>
+                                            <h3 class="text-2xl font-black mb-6 border-b-4 border-gray-900 inline-block">全社最上位方針</h3>
+                                            <div class="space-y-6 mt-8">
+                                                <div class="p-6 bg-white shadow-xl rounded-2xl border border-gray-100">
+                                                    <p class="text-sm font-black text-blue-600 mb-2 uppercase tracking-widest">Target 01</p>
+                                                    <p class="text-lg font-bold text-gray-800">2025年 H2 営業利益の黒字化</p>
+                                                </div>
+                                                <div class="p-6 bg-white shadow-xl rounded-2xl border border-gray-100">
+                                                    <p class="text-sm font-black text-blue-600 mb-2 uppercase tracking-widest">Target 02</p>
+                                                    <p class="text-lg font-bold text-gray-800">固定費の構造的削減（1,000億円）</p>
+                                                </div>
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {activeTab === 'strategy' && (
-                            <div class="animate-in fade-in duration-500">
-                                <header class="mb-8">
-                                    <h2 class="text-3xl font-bold text-gray-900">Strategy & Mission</h2>
-                                    <p class="text-gray-500">迷ったときは、ここに戻ってきてください。</p>
-                                </header>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    <div class="card p-8 bg-white border-l-8 border-gray-900 shadow-sm">
-                                        <h3 class="text-xl font-bold mb-6">全社上位方針</h3>
-                                        <div class="space-y-4">
-                                            {INITIAL_DATA.strategy.goals.map(g => (
-                                                <div key={g} class="p-4 bg-gray-50 rounded-lg text-sm font-semibold text-gray-700 flex items-center space-x-3">
-                                                    <i class="fas fa-check-circle text-gray-300"></i>
-                                                    <span>{g}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <div class="card p-8 bg-white border-l-8 border-blue-600 shadow-sm">
-                                        <h3 class="text-xl font-bold mb-6">商品戦略部ミッション</h3>
-                                        <div class="space-y-4">
-                                            {INITIAL_DATA.dept_strategy.mission.map(m => (
-                                                <div key={m} class="p-4 bg-blue-50 rounded-lg text-sm font-semibold text-blue-800 flex items-center space-x-3">
-                                                    <i class="fas fa-star text-blue-200"></i>
-                                                    <span>{m}</span>
-                                                </div>
-                                            ))}
+                                        <div class="bg-gray-900 p-10 rounded-3xl text-white shadow-2xl relative overflow-hidden">
+                                            <div class="absolute right-0 bottom-0 opacity-10 text-[200px] leading-none transform translate-y-1/4 translate-x-1/4">
+                                                <i class="fas fa-rocket"></i>
+                                            </div>
+                                            <h3 class="text-2xl font-black mb-8 border-b-4 border-blue-500 inline-block">部の方針</h3>
+                                            <p class="text-xl font-medium leading-relaxed italic opacity-90">「エンジニアのこだわりを、顧客の『財布が開く価値』へと変換し、一台あたりの限界利益を最大化する」</p>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </div>
             );
