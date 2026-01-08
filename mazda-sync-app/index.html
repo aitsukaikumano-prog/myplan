@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAZDA Sync | Full 55 Task Map</title>
+    <title>MAZDA Sync | Perfect Logic Chain</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -13,13 +13,66 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-        .sidebar-item:hover { background: rgba(37, 99, 235, 0.1); color: #2563eb; }
+        
+        /* --- 完璧なツリーコネクタのCSS --- */
+        .tree-container { min-width: 7000px; padding: 100px; }
+        
+        .tree ul {
+            padding-top: 40px; position: relative;
+            transition: all 0.5s;
+            display: flex;
+            justify-content: center;
+        }
+
+        .tree li {
+            float: left; text-align: center;
+            list-style-type: none;
+            position: relative;
+            padding: 40px 10px 0 10px;
+            transition: all 0.5s;
+        }
+
+        /* 親から伸びる垂直線 */
+        .tree li::before, .tree li::after {
+            content: '';
+            position: absolute; top: 0; right: 50%;
+            border-top: 3px solid #cbd5e1;
+            width: 50%; height: 40px;
+        }
+        .tree li::after {
+            right: auto; left: 50%;
+            border-left: 3px solid #cbd5e1;
+        }
+
+        /* 兄弟がいない場合や端の処理 */
+        .tree li:only-child::after, .tree li:only-child::before {
+            display: none;
+        }
+        .tree li:only-child { padding-top: 0; }
+        .tree li:first-child::before, .tree li:last-child::after {
+            border: 0 none;
+        }
+        .tree li:last-child::before {
+            border-right: 3px solid #cbd5e1;
+            border-radius: 0 5px 0 0;
+        }
+        .tree li:first-child::after {
+            border-radius: 5px 0 0 0;
+        }
+
+        /* 子から親へ向かう線 */
+        .tree ul ul::before {
+            content: '';
+            position: absolute; top: 0; left: 50%;
+            border-left: 3px solid #cbd5e1;
+            width: 0; height: 40px;
+        }
+        /* --- コネクタCSS終了 --- */
+
+        .tree-node { min-width: 320px; transition: all 0.2s ease-out; }
         .active-sidebar { background: rgba(37, 99, 235, 0.1); color: #2563eb; border-right: 4px solid #2563eb; }
-        .logic-line { width: 2px; background: #cbd5e1; margin: 0 auto; height: 30px; }
-        .tree-node { transition: all 0.2s ease-out; }
-        /* ツリー全体を俯瞰できるようコンテナサイズを拡張 */
-        .tree-container { min-width: 6000px; padding: 50px; }
-        .issue-card { min-width: 280px; }
+        .issue-tag { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -164,26 +217,29 @@
             const hasIssues = node.issues && node.issues.length > 0;
 
             return (
-                <div className="flex flex-col items-center w-full mt-2">
-                    <div className={`tree-node relative group issue-card p-5 rounded-3xl shadow-lg border-4 transition-all ${
+                <li>
+                    <div className={`tree-node relative inline-block p-6 rounded-[2.5rem] shadow-2xl border-[5px] transition-all bg-white ${
                         node.type === 'purpose' ? 'bg-black border-black text-white' : 
-                        node.type === 'engine' ? 'bg-white border-blue-700' : 'bg-white border-gray-300'
+                        node.type === 'engine' ? 'border-blue-700' : 'border-slate-200 hover:border-blue-400'
                     }`}>
                         <div className="mb-2">
-                            <span className={`text-[9px] font-black uppercase tracking-[0.2em] ${
+                            <span className={`text-[10px] font-black uppercase tracking-[0.25em] ${
                                 node.type === 'purpose' ? 'text-blue-400' : 'text-blue-600'
                             }`}>{node.level}</span>
                         </div>
-                        <h4 className="text-[13px] font-black leading-tight italic uppercase tracking-tighter">{node.title}</h4>
+                        <h4 className="text-[15px] font-black leading-tight italic uppercase tracking-tighter mb-1">{node.title}</h4>
                         
                         {hasIssues && (
-                            <div className="mt-4 pt-4 border-t-2 border-dashed border-gray-200 space-y-2">
-                                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3">Target Issues ({node.issues.length})</p>
+                            <div className="mt-5 pt-5 border-t-2 border-dashed border-slate-100 space-y-2 text-left">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center">
+                                    <i className="fas fa-list-check mr-2 text-blue-500"></i>
+                                    Active Issues ({node.issues.length})
+                                </p>
                                 <div className="space-y-1.5">
                                     {node.issues.map((issue, idx) => (
-                                        <div key={idx} className="bg-blue-600 text-white text-[10px] p-2.5 rounded-xl font-bold flex items-start shadow-sm border border-blue-400">
-                                            <i className="fab fa-github mr-2 mt-0.5 opacity-80"></i>
-                                            <span className="leading-snug">{issue}</span>
+                                        <div key={idx} className="issue-tag bg-blue-600 text-white text-[11px] p-3 rounded-2xl font-bold flex items-start shadow-sm border border-blue-400/50">
+                                            <i className="fab fa-github mr-2 mt-0.5 text-blue-200"></i>
+                                            <span className="leading-snug tracking-tight">{issue}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -192,60 +248,65 @@
                     </div>
 
                     {hasChildren && (
-                        <div className="w-full">
-                            <div className="logic-line"></div>
-                            <div className="flex justify-center space-x-12">
-                                {node.children.map(child => (
-                                    <TreeNode key={child.id} node={child} />
-                                ))}
-                            </div>
-                        </div>
+                        <ul>
+                            {node.children.map(child => (
+                                <TreeNode key={child.id} node={child} />
+                            ))}
+                        </ul>
                     )}
-                </div>
+                </li>
             );
         };
 
         function App() {
             return (
-                <div className="flex h-screen text-gray-800 bg-gray-100 overflow-hidden">
+                <div className="flex h-screen text-gray-800 bg-gray-50 overflow-hidden">
                     {/* Sidebar */}
-                    <div className="w-72 glass border-r flex flex-col z-20 shadow-2xl flex-shrink-0">
-                        <div className="p-8 text-center">
-                            <h1 className="text-3xl font-black tracking-tighter text-gray-900 italic">MAZDA <span className="text-blue-600 uppercase">Sync</span></h1>
-                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-2">Enterprise Operating System</p>
+                    <div className="w-80 glass border-r flex flex-col z-20 shadow-2xl flex-shrink-0">
+                        <div className="p-10 text-center">
+                            <h1 className="text-4xl font-black tracking-tighter text-gray-900 italic">MAZDA <span className="text-blue-600 uppercase">Sync</span></h1>
+                            <p className="text-[11px] text-gray-400 font-bold uppercase tracking-[0.3em] mt-3">Organizational OS</p>
                         </div>
-                        <div className="flex-1 px-4 py-6 space-y-2">
-                            <div className="bg-blue-600 text-white px-6 py-4 rounded-2xl flex items-center space-x-4 shadow-lg shadow-blue-200">
-                                <i className="fas fa-project-diagram"></i>
-                                <span className="font-black text-sm uppercase italic">Full Strategy Wall</span>
+                        <div className="flex-1 px-6 py-8 space-y-3">
+                            <div className="bg-blue-600 text-white px-8 py-5 rounded-[2rem] flex items-center space-x-5 shadow-2xl shadow-blue-200">
+                                <i className="fas fa-project-diagram text-xl"></i>
+                                <span className="font-black text-sm uppercase italic tracking-widest">Enterprise Wall</span>
                             </div>
-                            <div className="px-6 py-4 text-gray-400 flex items-center space-x-4">
-                                <i className="fas fa-lock"></i>
-                                <span className="font-bold text-sm uppercase italic">Locked View</span>
+                            <div className="px-8 py-5 text-gray-400 flex items-center space-x-5 border border-transparent">
+                                <i className="fas fa-chart-line text-xl"></i>
+                                <span className="font-bold text-sm uppercase italic tracking-widest">Analytics</span>
                             </div>
                         </div>
-                        <div className="p-8 border-t bg-gray-50/50">
-                            <div className="flex items-center space-x-4">
-                                <div className="w-12 h-12 rounded-2xl bg-black flex items-center justify-center text-white text-lg font-black italic">D</div>
+                        <div className="p-10 border-t bg-white/50">
+                            <div className="flex items-center space-x-5">
+                                <div className="w-14 h-14 rounded-3xl bg-black flex items-center justify-center text-white text-2xl font-black italic shadow-xl">D</div>
                                 <div>
-                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Administrator</p>
-                                    <p className="text-sm font-black italic">daiki</p>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">System Admin</p>
+                                    <p className="text-base font-black italic">daiki</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Main Content */}
-                    <div className="flex-1 overflow-auto p-12 relative scroll-smooth">
-                        <header className="mb-20">
-                            <h2 className="text-6xl font-black text-gray-900 tracking-tighter italic uppercase mb-4">Enterprise Full Map</h2>
-                            <p className="text-xl font-medium text-gray-500 max-w-4xl">
-                                全55タスク、折りたたみなしの完全同期。マツダの「志」から「現場の1秒」までを一画面で網羅。
-                            </p>
+                    <div className="flex-1 overflow-auto p-16 relative scroll-smooth bg-[#f8fafc]">
+                        <header className="mb-24 flex justify-between items-end">
+                            <div>
+                                <h2 className="text-7xl font-black text-slate-900 tracking-tighter italic uppercase mb-6">Strategic Navigator</h2>
+                                <p className="text-2xl font-medium text-slate-400 max-w-4xl leading-relaxed">
+                                    全55タスクが「志」に直結。完璧な論理の鎖が、組織の迷いをゼロにする。
+                                </p>
+                            </div>
+                            <div className="bg-white p-6 rounded-[2rem] shadow-xl border-4 border-blue-600 text-center px-12">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Current Sync Rate</p>
+                                <p className="text-5xl font-black text-blue-600 italic tracking-tighter">100<span className="text-2xl">%</span></p>
+                            </div>
                         </header>
 
-                        <div className="tree-container">
-                            <TreeNode node={STRATEGY_DATA} />
+                        <div className="tree tree-container">
+                            <ul>
+                                <TreeNode node={STRATEGY_DATA} />
+                            </ul>
                         </div>
                     </div>
                 </div>
