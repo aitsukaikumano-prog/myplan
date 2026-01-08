@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAZDA Sync | Direct Value Chain</title>
+    <title>MAZDA Sync | Ultra Development Matrix</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -14,10 +14,11 @@
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
         
-        .tree-container { min-width: 8000px; padding: 120px; transition: transform 0.2s ease-out; transform-origin: top center; }
+        /* 超巨大ツリー用コンテナ設定 */
+        .tree-container { min-width: 15000px; padding: 150px; transition: transform 0.2s ease-out; transform-origin: top center; }
         
         .tree ul {
-            padding-top: 60px; position: relative;
+            padding-top: 80px; position: relative;
             display: flex;
             justify-content: center;
         }
@@ -26,14 +27,14 @@
             float: left; text-align: center;
             list-style-type: none;
             position: relative;
-            padding: 60px 20px 0 20px;
+            padding: 80px 30px 0 30px;
         }
 
         .tree li::before, .tree li::after {
             content: '';
             position: absolute; top: 0; right: 50%;
             border-top: 4px solid #cbd5e1;
-            width: 50%; height: 60px;
+            width: 50%; height: 80px;
         }
         .tree li::after {
             right: auto; left: 50%;
@@ -43,17 +44,17 @@
         .tree li:only-child::after, .tree li:only-child::before { display: none; }
         .tree li:only-child { padding-top: 0; }
         .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
-        .tree li:last-child::before { border-right: 4px solid #cbd5e1; border-radius: 0 10px 0 0; }
-        .tree li:first-child::after { border-radius: 10px 0 0 0; }
+        .tree li:last-child::before { border-right: 4px solid #cbd5e1; border-radius: 0 15px 0 0; }
+        .tree li:first-child::after { border-radius: 15px 0 0 0; }
 
         .tree ul ul::before {
             content: '';
             position: absolute; top: 0; left: 50%;
             border-left: 4px solid #cbd5e1;
-            width: 0; height: 60px;
+            width: 0; height: 80px;
         }
 
-        .tree-node { min-width: 360px; }
+        .tree-node { min-width: 400px; }
         .issue-tag { animation: slideIn 0.3s ease-out; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -61,9 +62,6 @@
         .zoom-btn { width: 60px; height: 60px; background: white; border: 2px solid #e2e8f0; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #475569; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); transition: all 0.2s; }
         .zoom-btn:hover { border-color: #2563eb; color: #2563eb; transform: scale(1.1); }
         .zoom-level { background: #2563eb; color: white; font-size: 0.8rem; font-weight: 900; padding: 6px 12px; border-radius: 10px; text-align: center; }
-
-        .profit-tag-cost { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
-        .profit-tag-revenue { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
     </style>
 </head>
 <body>
@@ -72,79 +70,42 @@
     <script type="text/babel">
         const { useState } = React;
 
+        const generateStages = (modelName) => [
+            {
+                id: `${modelName}-FD`, title: "FD Phase: 企画・要件定義", level: "Development Stage",
+                children: [
+                    {
+                        id: `${modelName}-FD-ELE`, title: "電気系部品開発", level: "Domain",
+                        children: [
+                            { id: `${modelName}-FD-ELE-ADAS`, title: "ADAS企画", level: "Sub-Domain", issues: [`${modelName}: ADAS機能要件策定`, `${modelName}: センサー配置案の検討`] },
+                            { id: `${modelName}-FD-ELE-AUD`, title: "音響・HMI企画", level: "Sub-Domain", issues: [`${modelName}: スピーカー配置コンセプト`, `${modelName}: 画面UI要件`] }
+                        ]
+                    },
+                    { id: `${modelName}-FD-PT`, title: "パワートレイン (PT)", level: "Domain", issues: [`${modelName}: PT出力目標設定`, `${modelName}: 燃費シミュレーション`] }
+                ]
+            },
+            {
+                id: `${modelName}-DC`, title: "DC Phase: 設計完了・出図", level: "Development Stage",
+                children: [
+                    {
+                        id: `${modelName}-DC-ELE`, title: "電気系部品詳細設計", level: "Domain",
+                        children: [
+                            { id: `${modelName}-DC-ELE-ADAS`, title: "ADAS回路設計", level: "Sub-Domain", issues: [`${modelName}: ADAS基板レイアウト確定`, `${modelName}: ハーネス図面出図`] },
+                            { id: `${modelName}-DC-ELE-AUD`, title: "音響システム設計", level: "Sub-Domain", issues: [`${modelName}: アンプ筐体設計`, `${modelName}: スピーカー取付図面`] }
+                        ]
+                    },
+                    { id: `${modelName}-DC-NVH`, title: "NVH設計・解析", level: "Domain", issues: [`${modelName}: 防音材配置図面`, `${modelName}: 振動減衰シミュレーション`] }
+                ]
+            }
+        ];
+
         const STRATEGY_DATA = {
             id: "root", title: "前向きに今日を生きる人の輪を広げる", level: "Corporate Purpose", type: "purpose",
             children: [
-                {
-                    id: "L2-1", title: "A. Value Creation: 商品を作る (R&D/生産)", level: "Strategic Wing", type: "wing-make",
-                    children: [
-                        {
-                            id: "L3-1", title: "商品コンセプト・要件定義", level: "Stage",
-                            issues: [
-                                "RD-CON-01: 顧客要望に基づくCX-80装備の優先順位付け [収益寄与]",
-                                "RD-CON-02: ターゲット顧客の感性価値(質感)の数値化 [価値向上]",
-                                "RD-CON-03: 競合他社比較による『あたりまえ品質』のコスト最適化 [コスト削]",
-                                "RD-CON-04: 商品企画段階でのリサイクル性評価ロジック構築",
-                                "RD-CON-05: MBDモデルの初期段階での全社共有ルールの策定"
-                            ]
-                        },
-                        {
-                            id: "L3-2", title: "設計・エンジニアリング", level: "Stage",
-                            issues: [
-                                "RD-ENG-01: 樹脂部品の形状最適化による金型費の20%削減 [コスト削]",
-                                "RD-ENG-02: 次世代EV向けバッテリー冷却配管の共通化設計",
-                                "RD-ENG-03: ハーネス径の細分化による車両総重量の5kg軽量化 [価値向上]",
-                                "RD-ENG-04: 開発リードタイム短縮のための3D図面出図プロセスのDX",
-                                "RD-ENG-05: サプライヤー共同開発による部品単価の早期確定"
-                            ]
-                        },
-                        {
-                            id: "L3-3", title: "実車評価・テスト (信頼性/感性)", level: "Stage",
-                            issues: [
-                                "RD-EVA-01: 寒冷地テストの仮想化による海外輸送費の削減 [コスト削]",
-                                "RD-EVA-02: 官能評価（乗り心地）のAI自動スコアリング実装 [価値向上]",
-                                "RD-EVA-03: 衝突シミュレーションと実機相関の精度向上(誤差5%以内)",
-                                "RD-EVA-04: 長期信頼性テストでの不具合自動検知システムの導入",
-                                "RD-EVA-05: 排ガス認証試験の自動ログ作成による法規対応工数削減"
-                            ]
-                        }
-                    ]
-                },
-                {
-                    id: "L2-2", title: "B. Value Delivery: 商品を売る (販社/リセール)", level: "Strategic Wing", type: "wing-sell",
-                    children: [
-                        {
-                            id: "L3-4", title: "マーケティング・販促", level: "Stage",
-                            issues: [
-                                "M-STR-01: 特徴的価値(カラー等)への広告費集中投下 [収益向上]",
-                                "M-STR-02: デジタル接点での顧客ニーズの収集・共有 [ナレッジ]",
-                                "M-STR-03: 値引きなしでも売れる『ファン層』の特定とエンゲージメント",
-                                "M-STR-04: 地域別インセンティブの動的価格設定モデルの導入 [収益向上]",
-                                "M-STR-05: 店頭試乗体験の満足度と成約率の相関分析"
-                            ]
-                        },
-                        {
-                            id: "L3-5", title: "販売・アフターサービス", level: "Stage",
-                            issues: [
-                                "S-AFT-01: 整備データから開発への品質フィードバックループ構築",
-                                "S-AFT-02: 車両状態予測による早期代替提案プログラム [数量確保]",
-                                "S-AFT-03: アクセサリー後付けによる平均単価(ARPU)の向上 [収益向上]",
-                                "S-AFT-04: サービス拠点での作業効率化による固定費の削減 [コスト削]",
-                                "S-AFT-05: オーナー向けスマホアプリのMAU向上施策"
-                            ]
-                        },
-                        {
-                            id: "L3-6", title: "中古車・リセール管理", level: "Stage",
-                            issues: [
-                                "R-MNG-01: リース車両の返却タイミング最適化によるリセール防衛",
-                                "R-MNG-02: 認定中古車(CPO)のブランド価値定義と価格維持 [収益向上]",
-                                "R-MNG-03: オークション市場でのマツダ車落札価格の監視と介入策",
-                                "R-MNG-04: 海外市場への過剰在庫流出によるブランド毀損の防止",
-                                "R-MNG-05: リセール価値を考慮した新車ローンの再設計"
-                            ]
-                        }
-                    ]
-                }
+                { id: "M-CX5", title: "CX-5 Project", level: "Model", type: "model", children: generateStages("CX-5") },
+                { id: "M-CX60", title: "CX-60 Project", level: "Model", type: "model", children: generateStages("CX-60") },
+                { id: "M-CX80", title: "CX-80 Project", level: "Model", type: "model", children: generateStages("CX-80") },
+                { id: "M-MX5", title: "Roadster (ND) Project", level: "Model", type: "model", children: generateStages("Roadster") }
             ]
         };
 
@@ -152,39 +113,32 @@
             const hasChildren = node.children && node.children.length > 0;
             const hasIssues = node.issues && node.issues.length > 0;
 
-            const getWingStyle = () => {
-                if (node.type === 'wing-make') return 'border-red-600 bg-red-50/10';
-                if (node.type === 'wing-sell') return 'border-green-600 bg-green-50/10';
-                return '';
+            const getNodeStyle = () => {
+                if (node.type === 'purpose') return 'bg-black border-black text-white';
+                if (node.type === 'model') return 'border-blue-800 bg-blue-50/20';
+                if (node.level === 'Development Stage') return 'border-amber-600 bg-amber-50/10';
+                if (node.level === 'Domain') return 'border-emerald-600 bg-emerald-50/10';
+                return 'border-slate-200 hover:border-blue-400 bg-white';
             };
 
             return (
                 <li>
-                    <div className={`tree-node relative inline-block p-8 rounded-[3rem] shadow-2xl border-[6px] transition-all bg-white ${
-                        node.type === 'purpose' ? 'bg-black border-black text-white' : 
-                        getWingStyle() || 'border-slate-200 hover:border-blue-400'
-                    }`}>
-                        <div className="mb-3">
-                            <span className={`text-[11px] font-black uppercase tracking-[0.3em] ${
-                                node.type === 'purpose' ? 'text-blue-400' : 'text-slate-500'
+                    <div className={`tree-node relative inline-block p-10 rounded-[3.5rem] shadow-2xl border-[6px] transition-all ${getNodeStyle()}`}>
+                        <div className="mb-4">
+                            <span className={`text-[12px] font-black uppercase tracking-[0.35em] ${
+                                node.type === 'purpose' ? 'text-blue-400' : 'text-slate-400'
                             }`}>{node.level}</span>
                         </div>
-                        <h4 className="text-[17px] font-black leading-tight italic uppercase tracking-tighter mb-2">{node.title}</h4>
+                        <h4 className="text-[20px] font-black leading-tight italic uppercase tracking-tighter mb-2">{node.title}</h4>
                         
                         {hasIssues && (
-                            <div className="mt-6 pt-6 border-t-2 border-dashed border-slate-200 space-y-2 text-left">
-                                {node.issues.map((issue, idx) => {
-                                    const isCost = issue.includes('[コスト削]');
-                                    const isRevenue = issue.includes('[収益向上]') || issue.includes('[収益寄与]');
-                                    return (
-                                        <div key={idx} className={`issue-tag text-[12px] p-4 rounded-2xl font-bold flex items-start shadow-sm border ${
-                                            isCost ? 'profit-tag-cost' : isRevenue ? 'profit-tag-revenue' : 'bg-slate-800 text-white border-slate-700'
-                                        }`}>
-                                            <i className={`fab fa-github mr-3 mt-1 ${isCost || isRevenue ? '' : 'text-blue-400'}`}></i>
-                                            <span className="leading-snug tracking-tight">{issue}</span>
-                                        </div>
-                                    );
-                                })}
+                            <div className="mt-8 pt-8 border-t-2 border-dashed border-slate-200 space-y-3 text-left">
+                                {node.issues.map((issue, idx) => (
+                                    <div key={idx} className="issue-tag bg-slate-900 text-white text-[13px] p-5 rounded-3xl font-bold flex items-start shadow-xl border border-slate-700">
+                                        <i className="fab fa-github mr-4 mt-1 text-blue-400 text-lg"></i>
+                                        <span className="leading-snug tracking-tight">{issue}</span>
+                                    </div>
+                                ))}
                             </div>
                         )}
                     </div>
@@ -201,11 +155,11 @@
         };
 
         function App() {
-            const [zoom, setZoom] = useState(0.5);
+            const [zoom, setZoom] = useState(0.2); // 最初は非常に引いた状態で全体像を表示
 
-            const zoomIn = () => setZoom(prev => Math.min(prev + 0.1, 2.0));
-            const zoomOut = () => setZoom(prev => Math.max(prev - 0.1, 0.1));
-            const resetZoom = () => setZoom(0.5);
+            const zoomIn = () => setZoom(prev => Math.min(prev + 0.1, 1.5));
+            const zoomOut = () => setZoom(prev => Math.max(prev - 0.1, 0.05));
+            const resetZoom = () => setZoom(0.2);
 
             return (
                 <div className="flex h-screen text-slate-800 bg-[#f8fafc] overflow-hidden">
@@ -213,46 +167,33 @@
                     <div className="w-80 glass border-r flex flex-col z-20 shadow-2xl flex-shrink-0">
                         <div className="p-10 text-center">
                             <h1 className="text-4xl font-black tracking-tighter text-slate-900 italic">MAZDA <span className="text-blue-600 uppercase">Sync</span></h1>
-                            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-[0.3em] mt-3">Value Chain OS</p>
+                            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-[0.3em] mt-3">Portfolio Operating System</p>
                         </div>
-                        <div className="flex-1 px-8 py-8 space-y-4">
-                            <div className="bg-slate-900 text-white px-8 py-6 rounded-[2.5rem] flex items-center space-x-5 shadow-2xl shadow-slate-200">
-                                <i className="fas fa-link text-xl text-blue-400"></i>
-                                <span className="font-black text-sm uppercase italic tracking-widest">Logic Chain</span>
+                        <div className="flex-1 px-8 py-8 space-y-6">
+                            <div className="bg-slate-900 text-white px-8 py-6 rounded-[2.5rem] flex items-center space-x-5 shadow-2xl">
+                                <i className="fas fa-layer-group text-xl text-blue-400"></i>
+                                <span className="font-black text-sm uppercase italic tracking-widest">Multi-Model Wall</span>
                             </div>
-                            <div className="flex flex-col gap-2 px-6">
-                                <div className="flex items-center space-x-3 text-xs font-bold text-red-600 italic">
-                                    <div className="w-3 h-3 rounded-full bg-red-600"></div>
-                                    <span>Value Creation (作る)</span>
+                            <div className="space-y-4 px-6">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Legends</p>
+                                <div className="flex items-center space-x-3 text-xs font-bold text-blue-800 italic">
+                                    <div className="w-4 h-4 rounded-full bg-blue-800"></div>
+                                    <span>Model (車種)</span>
                                 </div>
-                                <div className="flex items-center space-x-3 text-xs font-bold text-green-600 italic">
-                                    <div className="w-3 h-3 rounded-full bg-green-600"></div>
-                                    <span>Value Delivery (売る)</span>
+                                <div className="flex items-center space-x-3 text-xs font-bold text-amber-600 italic">
+                                    <div className="w-4 h-4 rounded-full bg-amber-600"></div>
+                                    <span>Stage (FD/DC工程)</span>
                                 </div>
-                            </div>
-                        </div>
-                        <div className="p-10 border-t bg-white/50">
-                            <div className="flex items-center space-x-5">
-                                <div className="w-16 h-16 rounded-3xl bg-slate-900 flex items-center justify-center text-white text-3xl font-black italic shadow-xl">D</div>
-                                <div>
-                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Strategic Partner</p>
-                                    <p className="text-lg font-black italic">daiki</p>
+                                <div className="flex items-center space-x-3 text-xs font-bold text-emerald-600 italic">
+                                    <div className="w-4 h-4 rounded-full bg-emerald-600"></div>
+                                    <span>Domain (技術領域)</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Main Content */}
-                    <div className="flex-1 overflow-auto relative scroll-smooth">
-                        <div className="sticky top-0 left-0 p-20 z-30 pointer-events-none w-full">
-                            <div className="pointer-events-auto bg-white/10 backdrop-blur-sm p-6 rounded-3xl inline-block">
-                                <h2 className="text-8xl font-black text-slate-900 tracking-tighter italic uppercase mb-6 drop-shadow-xl">Value Chain Navigator</h2>
-                                <p className="text-3xl font-medium text-slate-500 max-w-5xl leading-relaxed">
-                                    「作る」と「売る」を直結。全ての現場タスクに財務指標を内包し、組織の意志を同期。
-                                </p>
-                            </div>
-                        </div>
-
+                    <div className="flex-1 overflow-auto relative scroll-smooth bg-slate-50">
                         <div className="zoom-controls">
                             <div className="zoom-level italic tracking-tighter">{Math.round(zoom * 100)}%</div>
                             <button onClick={zoomIn} className="zoom-btn" title="Zoom In"><i className="fas fa-plus"></i></button>
@@ -265,9 +206,15 @@
                             style={{ 
                                 transform: `scale(${zoom})`,
                                 transformOrigin: 'top center',
-                                paddingBottom: '800px'
+                                paddingBottom: '1000px'
                             }}
                         >
+                            <header className="mb-40 text-center">
+                                <h2 className="text-[120px] font-black text-slate-900 tracking-tighter italic uppercase leading-none mb-10">Ultra Development Matrix</h2>
+                                <p className="text-5xl font-medium text-slate-400 leading-relaxed">
+                                    4車種 × 多工程 × 全技術ドメイン。マツダの「複雑さ」を「同期」に変える地図。
+                                </p>
+                            </header>
                             <ul>
                                 <TreeNode node={STRATEGY_DATA} />
                             </ul>
