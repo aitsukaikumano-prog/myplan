@@ -10,8 +10,9 @@
         body { background-color: #f3f4f6; }
         .card { background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .logic-header { border-left: 8px solid #b91c1c; padding-left: 1rem; }
-        .profit-node { fill: #fee2e2; stroke: #b91c1c; stroke-width: 2px; }
-        .focus-node { fill: #fff3e0; stroke: #ff9800; stroke-width: 2px; }
+        .profit-node { fill: #fee2e2 !important; stroke: #b91c1c !important; stroke-width: 2px !important; }
+        .focus-node { fill: #fff3e0 !important; stroke: #ff9800 !important; stroke-width: 2px !important; }
+        .past-version { border-top: 2px dashed #ccc; padding-top: 2rem; margin-top: 4rem; }
     </style>
 </head>
 <body class="p-8 font-sans">
@@ -21,7 +22,7 @@
             <p class="text-xl text-gray-600 font-bold text-red-700">財務的・論理的整合性モデル (Strict Logic Model)</p>
         </header>
 
-        <!-- セクション1: 財務的ブレイクダウン（収益改善を起点とする） -->
+        <!-- 現行バージョン: 財務的ブレイクダウン -->
         <section class="card p-8 mb-12">
             <div class="logic-header mb-8 border-red-700">
                 <h2 class="text-2xl font-bold text-gray-800">1. 収益改善の論理分解 (Top-Down Financial Breakdown)</h2>
@@ -30,27 +31,24 @@
             
             <div class="mermaid flex justify-center overflow-x-auto">
                 graph TD
-                    ROOT((<b>マツダ再興<br/>(営業利益改善)</b>))
+                    ROOT(("<b>マツダ再興<br/>(営業利益改善)</b>"))
                     
-                    ROOT --> REVENUE[<b>売上の拡大<br/>(付加価値の向上)</b>]
-                    ROOT --> COST[<b>コストの最適化<br/>(工数・ロスの削減)</b>]
+                    ROOT --> REVENUE["<b>売上の拡大<br/>(付加価値の向上)</b>"]
+                    ROOT --> COST["<b>コストの最適化<br/>(工数・ロスの削減)</b>"]
                     
-                    %% 売上・価値向上
                     REVENUE --> R1[ブランド力の強化]
-                    REVENUE --> R2[商品力の向上<br/>(次世代EV/感性)]
+                    REVENUE --> R2["商品力の向上<br/>(次世代EV/感性)"]
                     
-                    R1 --> R1A(<b>ファンコミュニティの<br/>LTV最大化</b>)
-                    R2 --> R2A(<b>過去の設計資産の<br/>高度活用</b>)
+                    R1 --> R1A("<b>ファンコミュニティの<br/>LTV最大化</b>")
+                    R2 --> R2A("<b>過去の設計資産の<br/>高度活用</b>")
                     
-                    %% コスト・ロス削減
                     COST --> C1[製造コストの削減]
-                    COST --> C2[<b>組織的ロスの削減<br/>(間接工数削減)</b>]
+                    COST --> C2["<b>組織的ロスの削減<br/>(間接工数削減)</b>"]
                     
                     C1 --> C1A[生産ラインの自動化]
-                    C2 --> C2A(<b>図面検索・事務作業の<br/>AI自動化</b>)
-                    C2 --> C2B(<b>意思決定・合意形成の<br/>スピードアップ</b>)
+                    C2 --> C2A("<b>図面検索・事務作業の<br/>AI自動化</b>")
+                    C2 --> C2B("<b>意思決定・合意形成の<br/>スピードアップ</b>")
 
-                    %% フォーカスエリアの強調
                     classDef focus fill:#fff3e0,stroke:#ff9800,stroke-width:2px;
                     class R1A,R2A,C2A,C2B focus;
                     class ROOT profit-node;
@@ -59,19 +57,18 @@
                 <div class="bg-red-50 p-4 border border-red-200 rounded">
                     <p class="font-bold text-red-800 text-sm">【売上・価値向上の論理】</p>
                     <p class="text-xs text-red-700 mt-1">
-                        マツダが競合に勝つには、価格競争ではなく「ファンを熱狂させるブランド価値」が必要。AI展示会は、このファン形成（R1A）の最小単位の実証であり、将来的にマツダのLTV（顧客生涯価値）を高めるための戦略。
+                        マツダが競合に勝つには、価格競争ではなく「ファンを熱狂させるブランド価値」が必要。AI展示会は、このファン形成（R1A）の最小単位の実証。
                     </p>
                 </div>
                 <div class="bg-gray-50 p-4 border border-gray-200 rounded">
                     <p class="font-bold text-gray-800 text-sm">【コスト・ロス削減の論理】</p>
                     <p class="text-xs text-gray-700 mt-1">
-                        製造現場だけでなく、間接部門や設計現場の「探し物・迷い（C2A/B）」は、膨大な見えないコストを生んでいる。図面検索AIは、この組織的ロスを直接的に削り取り、営業利益率を向上させるための「外科手術」である。
+                        間接部門や設計現場の「探し物・迷い（C2A/B）」は膨大なコスト。図面検索AIは、この組織的ロスを削り、利益率を向上させるための外科手術。
                     </p>
                 </div>
             </div>
         </section>
 
-        <!-- セクション2: 戦略的アライメント -->
         <section class="card p-8 mb-12">
             <h2 class="text-2xl font-bold mb-8 text-center text-gray-800 underline">2. 実行アクションと財務目標の接続</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
@@ -93,12 +90,46 @@
             </div>
         </section>
 
+        <!-- 過去のバージョンセクション -->
+        <div class="past-version">
+            <h2 class="text-2xl font-bold mb-8 text-gray-500 text-center">過去の検討プロセス (Archives)</h2>
+            
+            <details class="mb-8">
+                <summary class="cursor-pointer text-lg font-bold text-gray-700 p-4 bg-gray-200 rounded">Version 1: バリューチェーン分解モデル</summary>
+                <div class="card p-8 mt-4 bg-gray-50">
+                    <p class="text-sm text-gray-600 mb-4 text-center italic">※製造プロセスの流れ（企画・製造・販売）に沿ったMECE分解案</p>
+                    <div class="mermaid flex justify-center overflow-x-auto">
+                        graph TD
+                            ROOT_V1(("<b>マツダ再興</b>"))
+                            ROOT_V1 --> VC1["<b>R&D・商品企画</b><br/>知財の活用・感性価値"]
+                            ROOT_V1 --> VC2["<b>調達・製造</b><br/>生産効率・技術継承"]
+                            ROOT_V1 --> VC3["<b>販売・マーケ</b><br/>ファン形成・ブランド"]
+                            
+                            VC1 --> VC1A[過去の設計知見のデータ化]
+                            VC1 --> VC1B[AIによる意匠・戦略支援]
+                            VC2 --> VC2A[製造プロセスの自動化]
+                            VC2 --> VC2B[現場の暗黙知の形式知化]
+                            VC3 --> VC3A[ファンコミュニティ活性化]
+                            VC3 --> VC3B[営業・接客のDX支援]
+
+                            classDef focus fill:#fff3e0,stroke:#ff9800,stroke-width:2px;
+                            class VC1A,VC2B,VC3A focus;
+                    </div>
+                </div>
+            </details>
+        </div>
+
         <footer class="mt-12 text-center text-gray-400 pb-12">
-            <p>※過去の戦略案（v1, v2）はバックアップ済み。常に論理的破綻のない最適解を追求する。</p>
+            <p>Mazda Revitalization Strategic Alignment Dashboard</p>
         </footer>
     </div>
     <script>
-        mermaid.initialize({ startOnLoad: true, flowchart: { useMaxWidth: true, htmlLabels: true } });
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'default',
+            flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+            securityLevel: 'loose'
+        });
     </script>
 </body>
 </html>
