@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAZDA Sync | Real-time Organizational Alignment System</title>
+    <title>MAZDA Sync | Strategy & Task Navigation</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -15,12 +15,10 @@
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
         .sidebar-item:hover { background: rgba(37, 99, 235, 0.1); color: #2563eb; }
         .active-sidebar { background: rgba(37, 99, 235, 0.1); color: #2563eb; border-right: 4px solid #2563eb; }
-        .markdown-content h1 { font-size: 1.5rem; font-weight: 900; margin-bottom: 1rem; border-bottom: 2px solid #eee; padding-bottom: 0.5rem; }
-        .markdown-content h2 { font-size: 1.2rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #1f2937; }
-        .markdown-content p { margin-bottom: 1rem; font-size: 0.875rem; color: #4b5563; line-height: 1.6; }
-        .markdown-content ul { list-style: disc; margin-left: 1.5rem; margin-bottom: 1rem; font-size: 0.875rem; color: #4b5563; }
-        .markdown-content li { margin-bottom: 0.25rem; }
-        .logic-line { width: 2px; height: 30px; background: #e5e7eb; margin: 0 auto; }
+        .logic-line { width: 2px; background: #cbd5e1; margin: 0 auto; height: 20px; }
+        .tree-node { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .issue-tag { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -29,19 +27,105 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        const REPO_FILES = {
-            "STRATEGY.md": `# マツダ再興：戦略コア (Strategic Core)\n\n## 1. パーパス (Purpose)\n「前向きに今日を生きる人の輪を広げる」\n\n## 2. 戦略エンジン (Strategic Engine)\n### 営業利益のV字回復 (Δ +1,500億円)\n- **レバーA: 固定費の構造的削減 (-1,000億円)**\n- **レバーB: 限界利益の最大化 (+500億円)**\n\n## 3. 2026年度 重点領域\n- **R&D/事務現場の「同期(Sync)」による手戻り・検索工数の消滅**`,
-            "VISION_STORY.md": `# 変革ドキュメンタリー：意志が繋がった日\n**〜GitHub型同期システムが変えた、ある若手エンジニアの24時間〜**\n\n### 登場人物\n* **ケンジ（26歳）**: R&D本部・入社3年目。\n* **佐藤工場長（58歳）**: 現場の生き字引。\n\n---\n\n## 10:00 | 現在のケンジ： 「知見の共鳴」\nPCを開き、**MAZDA SYNC**のダッシュボードに「ボルト 締結不良 対策」と打ち込む。瞬時にAIが関連情報を提示。探し物の時間は、過去の先鋭たちとの対話へと変わった。`,
-            "KANBAN.md": `# マツダ再興プロジェクト：進捗ボード (Kanban)\n\n## 🎯 Backlog (未着手)\n- [ ] Issue #003: トヨタ共通部品採用による原価低減シミュレーション\n\n## 🏗️ In Progress (進行中)\n- [x] **Issue #001: 図面検索工数の削減によるR&D固定費の圧縮**\n- [x] **Mazda Sync プロトタイプ実証 (mazda-sync-app)**\n    - [x] 戦略アライメント階層(Level 1-4)の実装\n\n## ✅ Done (完了)\n- [x] **Issue #002: 市場価値見極めAIのアルゴリズム策定**`,
+        const STRATEGY_DATA = {
+            id: "root", title: "前向きに今日を生きる人の輪を広げる", level: "Purpose", type: "purpose",
+            children: [
+                {
+                    id: "L2-1", title: "2. 固定費の構造改革", level: "Strategic Engine", type: "engine",
+                    children: [
+                        {
+                            id: "L3-1", title: "R&D費の効率化", level: "Dept Strategy",
+                            children: [
+                                {
+                                    id: "L4-1", title: "図面検索・知見管理のDX", level: "Component",
+                                    issues: ["図面検索AIの開発", "過去の不具合知見の自動タグ付け", "佐藤工場長へのヒアリング実施"]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "L2-2", title: "1. 限界利益の拡大", level: "Strategic Engine", type: "engine",
+                    children: [
+                        {
+                            id: "L3-2", title: "感性価値の最大化（良いものを作る）", level: "Dept Strategy",
+                            children: [
+                                {
+                                    id: "L4-2", title: "電気・電子・音響システム", level: "System",
+                                    children: [
+                                        {
+                                            id: "L5-1", title: "原音再生の追求（音の純度）", level: "Tech Goal",
+                                            issues: ["スピーカー配置の最適化シミュレーション", "車内定在波除去アルゴリズムの実装"]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
         };
 
-        const TEAM_INBOX = [
-            { id: "REQ-001", from: "マーケティング本部", title: "CX-80 市場導入に伴う広告費最適化の検討依頼", date: "2026-01-08 09:15", status: "New", triage: "R&D目標「価値見極め」に直結。過去のCX-60データを参照推奨。" },
-            { id: "REQ-002", from: "調達本部", title: "新素材採用による原価低減インパクトの算出依頼", date: "2026-01-08 10:30", status: "Assigned", assignee: "ケンジ", triage: "固定費削減目標への寄与度高。材料工学DBとの連携が必要。" }
-        ];
+        const REPO_FILES = {
+            "STRATEGY.md": `# マツダ再興：戦略コア\n\n## 1. パーパス\n「前向きに今日を生きる人の輪を広げる」\n\n## 2. 戦略エンジン\n### 利益V字回復\n- 固定費削減 (-1,000億円)\n- 限界利益拡大 (+500億円)`,
+            "VISION_STORY.md": `# 変革ドキュメンタリー：意志が繋がった日\n**〜GitHub型同期システムが変えた、ある若手エンジニアの24時間〜**\n\n...（省略）`
+        };
+
+        const TreeNode = ({ node }) => {
+            const [isExpanded, setIsExpanded] = useState(node.level === "Purpose" || node.level === "Strategic Engine");
+            const hasChildren = node.children && node.children.length > 0;
+            const hasIssues = node.issues && node.issues.length > 0;
+
+            return (
+                <div className="flex flex-col items-center w-full mt-2">
+                    <div className={`tree-node relative group max-w-sm w-full p-4 rounded-2xl shadow-sm border-2 transition-all ${
+                        node.type === 'purpose' ? 'bg-gray-900 border-gray-900 text-white' : 
+                        node.type === 'engine' ? 'bg-white border-blue-600' : 'bg-white border-gray-200 hover:border-blue-400'
+                    }`}>
+                        <div className="flex justify-between items-start mb-1">
+                            <span className={`text-[8px] font-black uppercase tracking-widest ${
+                                node.type === 'purpose' ? 'text-blue-400' : 'text-gray-400'
+                            }`}>{node.level}</span>
+                            {hasChildren && (
+                                <button 
+                                    onClick={() => setIsExpanded(!isExpanded)}
+                                    className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center text-gray-900 hover:bg-blue-600 hover:text-white transition-all"
+                                >
+                                    <i className={`fas ${isExpanded ? 'fa-minus' : 'fa-plus'} text-[8px]`}></i>
+                                </button>
+                            )}
+                        </div>
+                        <h4 className="text-xs font-black leading-tight italic">{node.title}</h4>
+                        
+                        {isExpanded && hasIssues && (
+                            <div className="mt-4 pt-3 border-t border-dashed space-y-2">
+                                <p className="text-[8px] font-black text-blue-500 uppercase tracking-widest mb-2">Detailed Tasks (GitHub Issues)</p>
+                                {node.issues.map((issue, idx) => (
+                                    <div key={idx} className="issue-tag bg-blue-600 text-white text-[10px] p-2 rounded-lg font-bold flex items-center shadow-md">
+                                        <i className="fab fa-github mr-2"></i>
+                                        <span className="truncate">{issue}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {isExpanded && hasChildren && (
+                        <div className="w-full">
+                            <div className="logic-line"></div>
+                            <div className="flex justify-center space-x-6">
+                                {node.children.map(child => (
+                                    <TreeNode key={child.id} node={child} />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
 
         function App() {
-            const [activeTab, setActiveTab] = useState('strategy'); // 最初に戦略を見せる
+            const [activeTab, setActiveTab] = useState('strategy');
             const [selectedFile, setSelectedFile] = useState('STRATEGY.md');
             const [workLog, setWorkLog] = useState('');
             const [syncResult, setSyncResult] = useState(null);
@@ -71,275 +155,150 @@
             };
 
             return (
-                <div class="flex h-screen overflow-hidden text-gray-800">
-                    {/* Sidebar */}
-                    <div class="w-64 glass border-r flex flex-col z-20">
-                        <div class="p-6">
-                            <h1 class="text-2xl font-black tracking-tighter text-gray-900 italic">MAZDA <span class="text-blue-600">SYNC</span></h1>
-                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 text-center">Organizational OS</p>
+                <div className="flex h-screen overflow-hidden text-gray-800">
+                    <div className="w-64 glass border-r flex flex-col z-20 shadow-xl">
+                        <div className="p-6">
+                            <h1 className="text-2xl font-black tracking-tighter text-gray-900 italic">MAZDA <span className="text-blue-600">SYNC</span></h1>
+                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 text-center">Organizational OS</p>
                         </div>
-                        <nav class="flex-1 mt-4">
+                        <nav className="flex-1 mt-4">
                             {[
                                 { id: 'strategy', icon: 'fa-bullseye', label: 'Strategy Core' },
                                 { id: 'dashboard', icon: 'fa-chart-line', label: 'Sync Dashboard' },
-                                { id: 'inbox', icon: 'fa-inbox', label: 'Team Inbox', count: 1 },
+                                { id: 'inbox', icon: 'fa-inbox', label: 'Team Inbox' },
                                 { id: 'repository', icon: 'fa-folder-open', label: 'Repository' },
                                 { id: 'tasks', icon: 'fa-tasks', label: 'My Tasks' },
                             ].map(tab => (
                                 <div key={tab.id} onClick={() => setActiveTab(tab.id)} 
-                                     class={`sidebar-item px-6 py-4 cursor-pointer flex items-center justify-between transition-all ${activeTab === tab.id ? 'active-sidebar' : 'text-gray-500'}`}>
-                                    <div class="flex items-center space-x-3">
-                                        <i class={`fas ${tab.icon} w-5`}></i>
-                                        <span class="text-sm font-semibold">{tab.label}</span>
+                                     className={`sidebar-item px-6 py-4 cursor-pointer flex items-center justify-between transition-all ${activeTab === tab.id ? 'active-sidebar' : 'text-gray-500'}`}>
+                                    <div className="flex items-center space-x-3">
+                                        <i className={`fas ${tab.icon} w-5`}></i>
+                                        <span className="text-sm font-semibold">{tab.label}</span>
                                     </div>
-                                    {tab.count > 0 && (
-                                        <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{tab.count}</span>
-                                    )}
                                 </div>
                             ))}
                         </nav>
-                        <div class="p-4 border-t text-[10px] text-gray-400 text-center">
+                        <div className="p-4 border-t text-[10px] text-gray-400 text-center uppercase font-bold tracking-widest">
                             Logged in as: <b>daiki</b>
                         </div>
                     </div>
 
-                    {/* Main Content */}
-                    <div class="flex-1 overflow-y-auto bg-gray-50 relative">
-                        <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-blue-50 to-transparent -z-10"></div>
-
-                        <div class="p-8 max-w-6xl mx-auto">
+                    <div className="flex-1 overflow-y-auto bg-gray-50 relative">
+                        <div className="p-8 max-w-[1600px] mx-auto">
                             {activeTab === 'strategy' && (
-                                <div class="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                    <header class="mb-12 text-center">
-                                        <h2 class="text-4xl font-black text-gray-900 tracking-tight italic">Strategic Alignment Tree</h2>
-                                        <p class="text-gray-500 mt-2">「魂」と「数字」を一本の鎖でつなぐ。</p>
+                                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                    <header className="mb-12 text-center">
+                                        <h2 className="text-4xl font-black text-gray-900 tracking-tight italic uppercase">Strategic Navigator</h2>
+                                        <p className="text-gray-500 mt-2 font-medium">上位方針をクリックして、あなたの仕事が支えている「論理」を深掘りしてください。</p>
                                     </header>
 
-                                    <div class="flex flex-col items-center">
-                                        {/* Level 1: Purpose */}
-                                        <div class="w-full max-w-2xl bg-gray-900 p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden group border-4 border-gray-800">
-                                            <div class="absolute top-0 right-0 p-8 opacity-10 text-8xl group-hover:rotate-12 transition-transform"><i class="fas fa-sun"></i></div>
-                                            <p class="text-blue-400 text-[10px] font-black uppercase tracking-widest mb-2 flex items-center">
-                                                <span class="w-2 h-2 bg-blue-400 rounded-full mr-2 animate-ping"></span>
-                                                Level 1: Mission / Purpose (使命)
-                                            </p>
-                                            <h3 class="text-2xl font-black text-white italic leading-tight">「前向きに今日を生きる人の輪を広げる」</h3>
-                                            <p class="text-[10px] text-gray-400 mt-4 leading-relaxed italic">マツダが存在する究極の理由。すべての仕事はこの輝きのためにある。</p>
-                                        </div>
-
-                                        <div class="logic-line"></div>
-
-                                        {/* Level 2: Engine */}
-                                        <div class="w-full max-w-xl bg-white p-6 rounded-[2rem] shadow-xl border-4 border-blue-600 relative overflow-hidden">
-                                            <p class="text-blue-600 text-[10px] font-black uppercase tracking-widest mb-2">Level 2: Strategic Engine (生存のロジック)</p>
-                                            <h3 class="text-xl font-black text-gray-800 italic">営業利益のV字回復 (Δ +1,500億円)</h3>
-                                            <div class="grid grid-cols-2 gap-4 mt-4">
-                                                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                                                    <p class="text-[8px] font-bold text-blue-500 uppercase mb-1">Lever A</p>
-                                                    <p class="text-xs font-black text-blue-900 leading-tight">固定費削減<br/>-1,000億円</p>
-                                                </div>
-                                                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                                                    <p class="text-[8px] font-bold text-blue-500 uppercase mb-1">Lever B</p>
-                                                    <p class="text-xs font-black text-blue-900 leading-tight">限界利益拡大<br/>+500億円</p>
-                                                </div>
-                                            </div>
-                                            <div class="mt-4 p-3 bg-gray-50 rounded-xl text-[10px] text-gray-500 leading-relaxed italic border">
-                                                <b>Logic Bridge:</b> 「収益がなければ、人の輪を広げる投資も続けられない。だから今、我々は生存のために固定費を削る必要がある。」
-                                            </div>
-                                        </div>
-
-                                        <div class="logic-line"></div>
-
-                                        {/* Level 3: Department */}
-                                        <div class="w-full max-w-lg bg-white p-5 rounded-2xl shadow-lg border-2 border-gray-200 text-center relative">
-                                            <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-1">Level 3: Dept Strategy (R&D戦略部)</p>
-                                            <h4 class="font-black text-gray-800 italic">「探し物・手戻り」による死に金の消滅</h4>
-                                            <p class="text-[10px] text-blue-600 font-bold mt-1">固定費削減目標への寄与度: 18%</p>
-                                        </div>
-
-                                        <div class="logic-line"></div>
-
-                                        {/* Level 4: Task */}
-                                        <div class="w-full max-w-md bg-blue-50 p-6 rounded-2xl border-2 border-dashed border-blue-400 text-center shadow-inner relative group cursor-pointer hover:bg-blue-100 transition-all">
-                                            <div class="absolute -top-3 -right-3 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-[10px] font-bold shadow-lg group-hover:scale-110 transition-transform">YOU</div>
-                                            <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">Level 4: My Task (daiki)</p>
-                                            <h4 class="font-black text-blue-700 text-lg italic">佐藤工場長への知見ヒアリング</h4>
-                                            <div class="mt-4 flex justify-center space-x-2">
-                                                <span class="px-2 py-0.5 bg-white border border-blue-200 text-[10px] font-bold text-blue-400 rounded">#現場主義</span>
-                                                <span class="px-2 py-0.5 bg-white border border-blue-200 text-[10px] font-bold text-blue-400 rounded">#飽くなき挑戦</span>
-                                            </div>
-                                        </div>
+                                    <div className="w-full flex justify-center pb-20 overflow-x-auto">
+                                        <TreeNode node={STRATEGY_DATA} />
                                     </div>
                                 </div>
                             )}
 
                             {activeTab === 'dashboard' && (
-                                <div class="animate-in fade-in duration-500">
-                                    <header class="mb-8">
-                                        <h2 class="text-4xl font-black text-gray-900 tracking-tight">Sync Your Work</h2>
-                                        <p class="text-gray-500 mt-2">あなたの活動を、マツダの生存ロジックと同期します。</p>
+                                <div className="animate-in fade-in duration-500">
+                                    <header className="mb-8">
+                                        <h2 className="text-4xl font-black text-gray-900 tracking-tight italic">Sync Dashboard</h2>
+                                        <p className="text-gray-500 mt-2">今日の活動を、マツダの生存ロジックと同期します。</p>
                                     </header>
 
-                                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                        <div class="lg:col-span-2 space-y-6">
-                                            <div class="card p-8 bg-white shadow-xl shadow-blue-100/50 border border-blue-50 rounded-2xl">
-                                                <h3 class="text-xs font-black text-blue-500 uppercase tracking-widest mb-6 flex items-center">
-                                                    <span class="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></span>
+                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                        <div className="lg:col-span-2 space-y-6">
+                                            <div className="card p-8 bg-white shadow-xl shadow-blue-100/50 border border-blue-50 rounded-2xl">
+                                                <h3 className="text-xs font-black text-blue-500 uppercase tracking-widest mb-6 flex items-center">
+                                                    <span className="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></span>
                                                     Work Logger
                                                 </h3>
                                                 <textarea 
                                                     value={workLog}
                                                     onChange={(e) => setWorkLog(e.target.value)}
-                                                    class="w-full p-6 bg-gray-50 border-0 rounded-xl text-sm focus:ring-4 focus:ring-blue-100 outline-none transition-all min-h-[200px] leading-relaxed"
-                                                    placeholder="今日、マツダの『パーパス』と『数字』にどう貢献しましたか？"
+                                                    className="w-full p-6 bg-gray-50 border-0 rounded-xl text-sm focus:ring-4 focus:ring-blue-100 outline-none transition-all min-h-[200px] leading-relaxed"
+                                                    placeholder="今日、どの戦略目標に貢献しましたか？"
                                                 ></textarea>
-                                                <div class="flex justify-between items-center mt-6">
-                                                    <p class="text-[10px] text-gray-400 font-medium italic">※AIが上位方針との整合性を自動判定します。</p>
+                                                <div className="flex justify-between items-center mt-6">
+                                                    <p className="text-[10px] text-gray-400 font-medium italic">※AIが自動的に戦略との整合性を判定します。</p>
                                                     <button 
                                                         onClick={handleSync}
                                                         disabled={isSyncing || !workLog}
-                                                        class={`px-8 py-3 bg-gray-900 text-white rounded-xl font-bold text-sm shadow-xl hover:bg-black transition-all transform hover:-translate-y-1 ${isSyncing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                        className={`px-8 py-3 bg-gray-900 text-white rounded-xl font-bold text-sm shadow-xl hover:bg-black transition-all transform hover:-translate-y-1 ${isSyncing ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                     >
-                                                        {isSyncing ? <i class="fas fa-sync fa-spin mr-2"></i> : <i class="fas fa-bolt mr-2 text-yellow-400"></i>}
+                                                        {isSyncing ? <i className="fas fa-sync fa-spin mr-2"></i> : <i className="fas fa-bolt mr-2 text-yellow-400"></i>}
                                                         同期を開始
                                                     </button>
                                                 </div>
                                             </div>
 
                                             {syncResult && (
-                                                <div class="card p-8 bg-blue-600 text-white shadow-2xl shadow-blue-400/30 rounded-2xl animate-in slide-in-from-bottom-8 duration-500">
-                                                    <div class="flex justify-between items-center mb-6">
-                                                        <h3 class="font-black text-xl tracking-tight">Sync Analysis Result</h3>
-                                                        <div class="flex items-center space-x-2">
-                                                            <div class="text-4xl font-black">{syncResult.score}</div>
-                                                            <div class="text-xs font-bold uppercase tracking-widest leading-none text-blue-200">Alignment<br/>Score</div>
-                                                        </div>
+                                                <div className="card p-8 bg-blue-600 text-white shadow-2xl shadow-blue-400/30 rounded-2xl animate-in slide-in-from-bottom-8 duration-500 text-center">
+                                                    <div className="flex justify-between items-center mb-6">
+                                                        <h3 className="font-black text-xl tracking-tight italic uppercase">Sync Result</h3>
+                                                        <div className="text-4xl font-black">{syncResult.score}%</div>
                                                     </div>
-                                                    <p class="text-sm mb-8 leading-relaxed font-medium bg-blue-500/30 p-4 rounded-xl border border-blue-400/50">{syncResult.summary}</p>
-                                                    <button class="w-full py-4 bg-white text-blue-600 rounded-xl text-sm font-black shadow-lg hover:bg-blue-50 transition-all uppercase tracking-widest">
-                                                        日報を生成して送信
+                                                    <p className="text-sm mb-8 leading-relaxed font-medium bg-blue-500/30 p-4 rounded-xl border border-blue-400/50">{syncResult.summary}</p>
+                                                    <button className="w-full py-4 bg-white text-blue-600 rounded-xl text-sm font-black shadow-lg hover:bg-blue-50 transition-all uppercase tracking-widest italic">
+                                                        Generate Report
                                                     </button>
                                                 </div>
                                             )}
                                         </div>
 
-                                        <div class="space-y-6">
-                                            <div class="card p-6 bg-white shadow-lg border border-gray-100 rounded-2xl">
-                                                <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Core Financial Goal</h3>
-                                                <p class="text-xl font-black text-gray-900 leading-none mb-2 italic">営業利益 V字回復</p>
-                                                <div class="w-full bg-gray-100 h-3 rounded-full mt-4 overflow-hidden shadow-inner">
-                                                    <div class="bg-gradient-to-r from-blue-500 to-green-400 h-full" style={{width: '35%'}}></div>
+                                        <div className="space-y-6">
+                                            <div className="card p-6 bg-white shadow-lg border border-gray-100 rounded-2xl">
+                                                <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 italic">Core Financial Progress</h3>
+                                                <p className="text-xl font-black text-gray-900 leading-none mb-2 italic">Operating Profit</p>
+                                                <div className="w-full bg-gray-100 h-3 rounded-full mt-4 overflow-hidden shadow-inner">
+                                                    <div className="bg-gradient-to-r from-blue-500 to-green-400 h-full" style={{width: '35%'}}></div>
                                                 </div>
-                                                <div class="flex justify-between mt-2 font-bold text-[10px]">
-                                                    <span class="text-blue-500">Current: 35%</span>
-                                                    <span class="text-gray-400 uppercase">Target: 1,500億円</span>
+                                                <div className="flex justify-between mt-2 font-bold text-[10px]">
+                                                    <span className="text-blue-500 italic">35% Recovery</span>
+                                                    <span className="text-gray-400 uppercase">Target: 1,500億円</span>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {activeTab === 'inbox' && (
-                                <div class="animate-in fade-in duration-500">
-                                    <header class="mb-8 text-center lg:text-left">
-                                        <h2 class="text-4xl font-black text-gray-900 tracking-tight italic">Team Inbox</h2>
-                                        <p class="text-gray-500 mt-2">共有された課題が、マツダを救うための扉になります。</p>
-                                    </header>
-
-                                    <div class="space-y-6">
-                                        {TEAM_INBOX.map(req => (
-                                            <div key={req.id} class="bg-white border rounded-3xl shadow-sm hover:shadow-md transition-all overflow-hidden">
-                                                <div class="p-8 flex flex-col lg:flex-row items-start justify-between">
-                                                    <div class="flex-1">
-                                                        <div class="flex items-center space-x-3 mb-2">
-                                                            <span class="px-2 py-0.5 bg-gray-900 text-[10px] font-black text-white rounded uppercase tracking-tighter italic">{req.from}</span>
-                                                            <span class="text-[10px] font-bold text-gray-400">{req.date}</span>
-                                                        </div>
-                                                        <h3 class="text-xl font-black text-gray-900 mb-4 italic">{req.title}</h3>
-                                                        <div class="flex items-center space-x-4 mb-4">
-                                                            <span class={`px-3 py-1 rounded-full text-[10px] font-bold ${req.status === 'New' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>{req.status}</span>
-                                                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Assignee: {req.assignee || 'Unassigned'}</span>
-                                                        </div>
-                                                    </div>
-                                                    <button class="w-full lg:w-auto px-6 py-3 bg-gray-900 text-white text-xs font-black rounded-xl hover:bg-black transition-all italic">担当する</button>
-                                                </div>
-                                                <div class="px-8 py-5 bg-blue-600 text-white flex items-start space-x-4">
-                                                    <i class="fas fa-robot mt-1 text-blue-200"></i>
-                                                    <div>
-                                                        <p class="text-[10px] font-black text-blue-200 uppercase tracking-widest mb-1 italic">Strategic Context (AI Analysis)</p>
-                                                        <p class="text-xs font-medium leading-relaxed">{req.triage}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
                                     </div>
                                 </div>
                             )}
 
                             {activeTab === 'repository' && (
-                                <div class="animate-in fade-in duration-500 h-full">
-                                    <header class="mb-8">
-                                        <h2 class="text-4xl font-black text-gray-900 tracking-tight italic">Knowledge Asset</h2>
-                                        <p class="text-gray-500 mt-2">組織の全知見が、一つのリポジトリ（`github_sim/`）に。 </p>
+                                <div className="animate-in fade-in duration-500 h-full">
+                                    <header className="mb-8">
+                                        <h2 className="text-4xl font-black text-gray-900 tracking-tight italic uppercase">Knowledge Repository</h2>
+                                        <p className="text-gray-500 mt-2">すべての戦略と知見はここに。 (`github_sim/`) </p>
                                     </header>
                                     
-                                    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 h-[600px]">
-                                        <div class="bg-white border rounded-3xl p-6 overflow-y-auto shadow-sm">
-                                            <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">Files</h3>
-                                            <div class="space-y-2">
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8 h-[600px]">
+                                        <div className="bg-white border rounded-3xl p-6 overflow-y-auto shadow-sm">
+                                            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">Files</h3>
+                                            <div className="space-y-2">
                                                 {Object.keys(REPO_FILES).map(path => (
                                                     <div 
                                                         key={path} 
                                                         onClick={() => setSelectedFile(path)}
-                                                        class={`px-3 py-2 rounded-xl text-xs font-bold cursor-pointer transition-all flex items-center space-x-2 ${selectedFile === path ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100'}`}
+                                                        className={`px-3 py-2 rounded-xl text-xs font-bold cursor-pointer transition-all flex items-center space-x-2 ${selectedFile === path ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100'}`}
                                                     >
-                                                        <i class={`fas ${path.includes('/') ? 'fa-file-code' : 'fa-file-alt'} opacity-70`}></i>
-                                                        <span class="truncate">{path}</span>
+                                                        <i className={`fas ${path.includes('/') ? 'fa-file-code' : 'fa-file-alt'} opacity-70`}></i>
+                                                        <span className="truncate">{path}</span>
                                                     </div>
                                                 ))}
                                             </div>
                                         </div>
 
-                                        <div class="md:col-span-3 bg-white border rounded-3xl shadow-sm flex flex-col overflow-hidden">
-                                            <div class="px-8 py-4 border-b bg-gray-50 flex items-center justify-between">
-                                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{selectedFile}</span>
-                                                <div class="flex space-x-1">
-                                                    <div class="w-2 h-2 rounded-full bg-gray-200"></div>
-                                                    <div class="w-2 h-2 rounded-full bg-gray-200"></div>
-                                                    <div class="w-2 h-2 rounded-full bg-gray-200"></div>
+                                        <div className="md:col-span-3 bg-white border rounded-3xl shadow-sm flex flex-col overflow-hidden">
+                                            <div className="px-8 py-4 border-b bg-gray-50 flex items-center justify-between">
+                                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{selectedFile}</span>
+                                                <div className="flex space-x-1">
+                                                    <div className="w-2 h-2 rounded-full bg-gray-200"></div>
+                                                    <div className="w-2 h-2 rounded-full bg-gray-200"></div>
+                                                    <div className="w-2 h-2 rounded-full bg-gray-200"></div>
                                                 </div>
                                             </div>
-                                            <div class="p-10 overflow-y-auto markdown-content bg-white">
+                                            <div className="p-10 overflow-y-auto markdown-content bg-white">
                                                 {renderMarkdown(REPO_FILES[selectedFile])}
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {activeTab === 'tasks' && (
-                                <div class="animate-in fade-in duration-500">
-                                    <h2 class="text-4xl font-black text-gray-900 tracking-tight italic mb-8">My Tasks</h2>
-                                    <div class="space-y-4">
-                                        {[
-                                            { id: "010", title: "現場ヒアリング（佐藤工場長）", dept: "R&D戦略部", status: "In Progress", align: 92 },
-                                            { id: "006", title: "意思決定同期AI開発", dept: "R&D戦略部", status: "In Progress", align: 88 }
-                                        ].map(task => (
-                                            <div key={task.id} class="p-8 bg-white border-l-8 border-l-blue-600 rounded-3xl flex items-center justify-between shadow-lg hover:shadow-xl transition-all group">
-                                                <div>
-                                                    <div class="flex items-center space-x-3 mb-2">
-                                                        <span class="px-2 py-1 bg-gray-100 text-[10px] font-black text-gray-500 rounded uppercase tracking-tighter">#{task.id}</span>
-                                                        <h4 class="font-black text-xl text-gray-800 group-hover:text-blue-600 transition-colors italic">{task.title}</h4>
-                                                    </div>
-                                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">{task.dept}</p>
-                                                </div>
-                                                <div class="text-right">
-                                                    <div class="text-3xl font-black text-blue-600 mb-1 leading-none">{task.align}%</div>
-                                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Alignment</p>
-                                                </div>
-                                            </div>
-                                        ))}
                                     </div>
                                 </div>
                             )}
