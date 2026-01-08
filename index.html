@@ -3,102 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>マツダ再興ロードマップ | Strategic Dashboard</title>
+    <title>マツダ再興戦略 | 財務・論理分解モデル</title>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         body { background-color: #f3f4f6; }
         .card { background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .mega { border-top: 8px solid #e91e63; }
-        .local { border-top: 8px solid #4caf50; }
-        .action { border-top: 8px solid #2196f3; }
-        .selected-route { background-color: #fffaf0; border: 2px dashed #ed8936; }
+        .logic-header { border-left: 8px solid #b91c1c; padding-left: 1rem; }
+        .profit-node { fill: #fee2e2; stroke: #b91c1c; stroke-width: 2px; }
+        .focus-node { fill: #fff3e0; stroke: #ff9800; stroke-width: 2px; }
     </style>
 </head>
-<body class="p-8">
-    <div class="max-w-5xl mx-auto">
+<body class="p-8 font-sans">
+    <div class="max-w-6xl mx-auto">
         <header class="mb-12 text-center">
             <h1 class="text-4xl font-bold text-gray-800 mb-4">マツダ再興ロードマップ</h1>
-            <p class="text-xl text-gray-600">Strategic Alignment Dashboard</p>
+            <p class="text-xl text-gray-600 font-bold text-red-700">財務的・論理的整合性モデル (Strict Logic Model)</p>
         </header>
 
-        <!-- セクション1: トップダウン戦略分解 -->
-        <section class="card p-6 mb-12">
-            <h2 class="text-2xl font-bold mb-6 text-center text-gray-700">1. 戦略的分解と選択 (Top-Down Analysis)</h2>
-            <p class="text-sm text-gray-500 mb-4 text-center">マツダ再興に必要な全要素から、daikiのリソース（スキル・経歴・立地）に最適なルートを選択</p>
-            <div class="mermaid flex justify-center">
+        <!-- セクション1: 財務的ブレイクダウン（収益改善を起点とする） -->
+        <section class="card p-8 mb-12">
+            <div class="logic-header mb-8 border-red-700">
+                <h2 class="text-2xl font-bold text-gray-800">1. 収益改善の論理分解 (Top-Down Financial Breakdown)</h2>
+                <p class="text-gray-600 mt-2">「再興」を財務的成功と定義し、収益を「売上（価値）向上」と「コスト（工数）削減」にMECE分解</p>
+            </div>
+            
+            <div class="mermaid flex justify-center overflow-x-auto">
                 graph TD
-                    ROOT((<b>マツダ再興</b>))
+                    ROOT((<b>マツダ再興<br/>(営業利益改善)</b>))
                     
-                    ROOT --> C1[収益性向上]
-                    ROOT --> C2[ブランド価値向上]
-                    ROOT --> C3[組織実行力強化]
+                    ROOT --> REVENUE[<b>売上の拡大<br/>(付加価値の向上)</b>]
+                    ROOT --> COST[<b>コストの最適化<br/>(工数・ロスの削減)</b>]
                     
-                    C1 --> C1A[生産ライン自動化]
-                    C1 --> C1B[SCM最適化]
+                    %% 売上・価値向上
+                    REVENUE --> R1[ブランド力の強化]
+                    REVENUE --> R2[商品力の向上<br/>(次世代EV/感性)]
                     
-                    C2 --> C2A[次世代EV体験]
-                    C2 --> C2B(<b>ファンの熱狂化</b>)
+                    R1 --> R1A(<b>ファンコミュニティの<br/>LTV最大化</b>)
+                    R2 --> R2A(<b>過去の設計資産の<br/>高度活用</b>)
                     
-                    C3 --> C3A(<b>意思決定の同期</b>)
-                    C3 --> C3B(<b>現場のDX・リテラシー</b>)
+                    %% コスト・ロス削減
+                    COST --> C1[製造コストの削減]
+                    COST --> C2[<b>組織的ロスの削減<br/>(間接工数削減)</b>]
                     
-                    %% 選択ルートの強調
-                    classDef selected fill:#fff3e0,stroke:#ff9800,stroke-width:2px;
-                    class C2B,C3A,C3B selected;
+                    C1 --> C1A[生産ラインの自動化]
+                    C2 --> C2A(<b>図面検索・事務作業の<br/>AI自動化</b>)
+                    C2 --> C2B(<b>意思決定・合意形成の<br/>スピードアップ</b>)
 
-                    %% アクションへの接続
-                    C3B --> ACTION[熊野町：図面DX実証]
-                    C2B --> ART[熊野町：AIアート展示]
+                    %% フォーカスエリアの強調
+                    classDef focus fill:#fff3e0,stroke:#ff9800,stroke-width:2px;
+                    class R1A,R2A,C2A,C2B focus;
+                    class ROOT profit-node;
             </div>
-            <div class="mt-6 p-4 bg-orange-50 rounded-lg border border-orange-200">
-                <p class="text-sm text-orange-800 font-bold">【戦略的選択の論理】</p>
-                <p class="text-xs text-orange-700 mt-1">
-                    製造ラインの直接改修（C1A）などは莫大な資本が必要。対して、元社員としての知見を活かした「意思決定ロス（C3A）」や「現場DX（C3B）」の解決は、個人の知恵とAIスキルで勝負できる、最もレバレッジの効く領域である。
-                </p>
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-red-50 p-4 border border-red-200 rounded">
+                    <p class="font-bold text-red-800 text-sm">【売上・価値向上の論理】</p>
+                    <p class="text-xs text-red-700 mt-1">
+                        マツダが競合に勝つには、価格競争ではなく「ファンを熱狂させるブランド価値」が必要。AI展示会は、このファン形成（R1A）の最小単位の実証であり、将来的にマツダのLTV（顧客生涯価値）を高めるための戦略。
+                    </p>
+                </div>
+                <div class="bg-gray-50 p-4 border border-gray-200 rounded">
+                    <p class="font-bold text-gray-800 text-sm">【コスト・ロス削減の論理】</p>
+                    <p class="text-xs text-gray-700 mt-1">
+                        製造現場だけでなく、間接部門や設計現場の「探し物・迷い（C2A/B）」は、膨大な見えないコストを生んでいる。図面検索AIは、この組織的ロスを直接的に削り取り、営業利益率を向上させるための「外科手術」である。
+                    </p>
+                </div>
             </div>
         </section>
 
-        <!-- セクション2: 具体的な積み上げ -->
-        <div class="grid grid-cols-1 gap-8 mb-12">
-            <div class="card p-6 mega">
-                <span class="text-xs font-bold text-pink-600 uppercase tracking-widest">Target Layer</span>
-                <h3 class="text-2xl font-bold text-gray-800 mt-1">【Mega】マツダの救済・再興</h3>
-                <p class="text-gray-600 mt-2">組織の「迷い（意思決定ロス）」をAIで排除し、全社員の力を集結させる。</p>
-            </div>
-
-            <div class="card p-6 local">
-                <span class="text-xs font-bold text-green-600 uppercase tracking-widest">Proof Layer</span>
-                <h3 class="text-2xl font-bold text-gray-800 mt-1">【Local】熊野町：社会的証明</h3>
-                <p class="text-gray-600 mt-2">「頑固な現場」を動かし、数字を出した実績。これがマツダへの最強のパスポートになる。</p>
-            </div>
-
-            <div class="card p-6 action">
-                <span class="text-xs font-bold text-blue-600 uppercase tracking-widest">Action Layer</span>
-                <h3 class="text-2xl font-bold text-gray-800 mt-1">【Action】佐藤工場長：現場実証</h3>
-                <p class="text-gray-600 mt-2">すべての土台。「図面探し」という最小単位の迷いを消し、AIとの共生を証明する。</p>
-            </div>
-        </div>
-
-        <section class="card p-6 mb-8">
-            <h2 class="text-2xl font-bold mb-6 text-center text-gray-700">2. ボトムアップ実行図 (Execution Flow)</h2>
-            <div class="mermaid flex justify-center">
-                graph BT
-                    S1[図面検索AI成功] -->|現場実績| E1[AI展示会]
-                    S2[現場の抵抗突破] -->|変革力証明| E2[ドキュメンタリー]
-                    E1 & E2 -->|信頼獲得| M1[マツダへ提案]
-                    M1 --> M2[システム導入]
-                    M2 --> GOAL((<b>マツダ再興</b>))
-
-                    style GOAL fill:#e91e63,stroke:#fff,color:#fff
-                    style S1 fill:#2196f3,stroke:#fff,color:#fff
-                    style S2 fill:#2196f3,stroke:#fff,color:#fff
-                    style E2 fill:#4caf50,stroke:#fff,color:#fff
+        <!-- セクション2: 戦略的アライメント -->
+        <section class="card p-8 mb-12">
+            <h2 class="text-2xl font-bold mb-8 text-center text-gray-800 underline">2. 実行アクションと財務目標の接続</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                <div class="p-4 border-t-4 border-blue-500 card">
+                    <p class="text-xs font-bold text-blue-600 uppercase">Step 1: Action (熊野町)</p>
+                    <h4 class="font-bold my-2 text-gray-800">現場実証</h4>
+                    <p class="text-xs text-gray-500">図面検索工数を80%削減し、コスト削減の有効性を数字で証明する。</p>
+                </div>
+                <div class="p-4 border-t-4 border-green-500 card">
+                    <p class="text-xs font-bold text-green-600 uppercase">Step 2: Local (証明)</p>
+                    <h4 class="font-bold my-2 text-gray-800">社会的信頼</h4>
+                    <p class="text-xs text-gray-500">AI活用による価値向上を町民・経営者に証明し、コンサルとしての実績を作る。</p>
+                </div>
+                <div class="p-4 border-t-4 border-pink-500 card">
+                    <p class="text-xs font-bold text-pink-600 uppercase">Step 3: Mega (マツダ)</p>
+                    <h4 class="font-bold my-2 text-gray-800">マツダ再興</h4>
+                    <p class="text-xs text-gray-500">実証した「コスト削減」と「価値向上」の仕組みをマツダの全バリューチェーンに展開。</p>
+                </div>
             </div>
         </section>
 
-        <footer class="mt-12 text-center text-gray-500 pb-12">
-            <p>Strategic Map Created by AI Strategy Advisor for daiki</p>
+        <footer class="mt-12 text-center text-gray-400 pb-12">
+            <p>※過去の戦略案（v1, v2）はバックアップ済み。常に論理的破綻のない最適解を追求する。</p>
         </footer>
     </div>
     <script>

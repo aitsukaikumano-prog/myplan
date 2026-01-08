@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マツダ再興戦略 | バリューチェーン分解</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f3f4f6; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .logic-header { border-left: 8px solid #374151; padding-left: 1rem; }
+        .highlight-blue { background-color: #ebf8ff; border: 1px solid #90cdf4; }
+        .highlight-green { background-color: #f0fff4; border: 1px solid #9ae6b4; }
+    </style>
+</head>
+<body class="p-8 font-sans">
+    <div class="max-w-5xl mx-auto">
+        <header class="mb-12 text-center">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">マツダ再興ロードマップ</h1>
+            <p class="text-xl text-gray-600">MECE（漏れなく・ダブりなく）な戦略分解</p>
+        </header>
+
+        <!-- セクション1: トップダウン分解（バリューチェーン） -->
+        <section class="card p-8 mb-12">
+            <div class="logic-header mb-8">
+                <h2 class="text-2xl font-bold text-gray-800">1. バリューチェーンによる戦略分解 (Top-Down)</h2>
+                <p class="text-gray-600 mt-2">製造業のプロセスに沿って「収益性」と「価値」を最大化する要素をMECEに分解</p>
+            </div>
+            
+            <div class="mermaid flex justify-center overflow-x-auto">
+                graph TD
+                    ROOT((<b>マツダ再興</b>))
+                    
+                    ROOT --> VC1[<b>R&D・商品企画</b><br/>知財の活用・感性価値]
+                    ROOT --> VC2[<b>調達・製造</b><br/>生産効率・技術継承]
+                    ROOT --> VC3[<b>販売・マーケ</b><br/>ファン形成・ブランド]
+                    
+                    VC1 --> VC1A[過去の設計知見のデータ化]
+                    VC1 --> VC1B[AIによる意匠・戦略支援]
+                    
+                    VC2 --> VC2A[製造プロセスの自動化]
+                    VC2 --> VC2B[現場の暗黙知の形式知化]
+                    
+                    VC3 --> VC3A[ファンコミュニティ活性化]
+                    VC3 --> VC3B[営業・接客のDX支援]
+
+                    %% 選択した領域の強調
+                    classDef focus fill:#fff3e0,stroke:#ff9800,stroke-width:2px;
+                    class VC1A,VC2B,VC3A focus;
+            </div>
+        </section>
+
+        <!-- セクション2: 実行戦略（ボトムアップとの接続） -->
+        <section class="card p-8 mb-12">
+            <div class="logic-header mb-8">
+                <h2 class="text-2xl font-bold text-gray-800">2. 選択と実行の論理 (daiki's Approach)</h2>
+                <p class="text-gray-600 mt-2">上記分解図のうち、現在のリソースで最もレバレッジが効く「情報の活用」と「変革の成功体験」にフォーカス</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="p-6 rounded-lg highlight-blue">
+                    <h3 class="font-bold text-blue-800 mb-3">【情報・技術の種】図面DX</h3>
+                    <p class="text-sm text-blue-700 leading-relaxed">
+                        バリューチェーンにおける<b>「R&D（知見）」と「製造（現場）」</b>の結び目を改善。
+                        「図面を探す」という付加価値ゼロの時間をAIで消し去り、技術者が「創造」に集中できる環境を実証する。
+                    </p>
+                </div>
+                <div class="p-6 rounded-lg highlight-green">
+                    <h3 class="font-bold text-green-800 mb-3">【文化・認知の種】AI展示会</h3>
+                    <p class="text-sm text-green-700 leading-relaxed">
+                        バリューチェーンの出口である<b>「販売・マーケ」</b>の領域。
+                        熊野町の特色を活かしたAIアートを通じ、ファンを熱狂させ、「AIは脅威ではなく、価値を磨くパートナーである」という合意を形成する。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- セクション3: 積み上げ -->
+        <section class="card p-8">
+            <div class="logic-header mb-8">
+                <h2 class="text-2xl font-bold text-gray-800">3. 実行ロードマップ</h2>
+            </div>
+            <div class="mermaid flex justify-center">
+                graph BT
+                    subgraph "Action: 最小単位の実証"
+                        S1[佐藤工場長の図面探しをAIで解決]
+                    end
+                    
+                    subgraph "Local: 社会的証明"
+                        E1[熊野町AI展示会での発表]
+                        E2[現場変革ドキュメンタリー公開]
+                    end
+                    
+                    subgraph "Mega: 大企業への応用"
+                        M1[マツダのバリューチェーン全体へのAI導入提案]
+                    end
+
+                    S1 --> E1
+                    S1 --> E2
+                    E1 & E2 --> M1
+                    M1 --> FINAL((マツダ再興))
+
+                    style FINAL fill:#e91e63,stroke:#fff,color:#fff
+                    style S1 fill:#2196f3,stroke:#fff,color:#fff
+            </div>
+        </section>
+
+        <footer class="mt-12 text-center text-gray-400 pb-12">
+            <p>Mazda Revitalization Strategic Alignment Dashboard</p>
+        </footer>
+    </div>
+    <script>
+        mermaid.initialize({ startOnLoad: true, flowchart: { useMaxWidth: true, htmlLabels: true } });
+    </script>
+</body>
+</html>
