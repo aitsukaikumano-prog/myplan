@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAZDA Sync | Platform & Delta Navigator</title>
+    <title>MAZDA Sync | Team Ops Edition</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -13,11 +13,9 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
         .glass { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(20px); }
-        
         .tree-container { min-width: 5000px; padding: 100px; transition: transform 0.2s ease-out; transform-origin: top center; }
         .tree ul { padding-top: 60px; position: relative; display: flex; justify-content: center; }
         .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 60px 20px 0 20px; }
-        
         .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #475569; width: 50%; height: 60px; }
         .tree li::after { right: auto; left: 50%; border-left: 2px solid #475569; }
         .tree li:only-child::after, .tree li:only-child::before { display: none; }
@@ -26,17 +24,14 @@
         .tree li:last-child::before { border-right: 2px solid #475569; border-radius: 0 15px 0 0; }
         .tree li:first-child::after { border-radius: 15px 0 0 0; }
         .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #475569; width: 0; height: 60px; }
-
-        .node { min-width: 320px; padding: 24px; border-radius: 24px; border: 2px solid #334155; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .node:hover { transform: translateY(-5px); border-color: #3b82f6; box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.2); }
-        
+        .node { min-width: 320px; padding: 24px; border-radius: 24px; border: 2px solid #334155; transition: all 0.3s; }
         .node-platform { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-color: #3b82f6; border-width: 3px; }
         .node-delta { background: #1e293b; border-color: #64748b; }
-        .node-duplicate { border-color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
-        
         .zoom-controls { position: fixed; bottom: 40px; right: 40px; z-index: 50; display: flex; flex-direction: column; gap: 10px; }
-        .zoom-btn { width: 56px; height: 56px; background: #1e293b; border: 1px solid #334155; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: #94a3b8; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); }
-        .zoom-btn:hover { background: #334155; color: #f8fafc; border-color: #3b82f6; }
+        .zoom-btn { width: 56px; height: 56px; background: #1e293b; border: 1px solid #334155; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: #94a3b8; }
+        .sidebar-item:hover { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .active-sidebar { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border-right: 4px solid #3b82f6; }
+        .decision-card { background: #1e293b; border: 1px solid #334155; border-left: 4px solid #10b981; }
     </style>
 </head>
 <body>
@@ -49,140 +44,169 @@
             id: "purpose", title: "前向きに今日を生きる人の輪を広げる", level: "Corporate Purpose", type: "purpose",
             children: [
                 {
-                    id: "platform", title: "Shared Platform (共通資産リポジトリ)", level: "Core Assets", type: "platform",
-                    description: "車種を跨いで共通化すべき『知見・部品・ソフト』の塊",
+                    id: "platform", title: "Shared Platform (共通資産)", level: "Core Assets", type: "platform",
                     children: [
                         {
                             id: "p-ele", title: "電気電子・ソフトウェア共通基盤", level: "Domain Platform",
-                            issues: [
-                                "PLAT-ELE-01: Mazda OS 2.0 共通カーネル",
-                                "PLAT-ELE-02: 共通ADASアルゴリズム (第3世代)",
-                                "PLAT-ELE-03: 音響感性価値・標準評価プロトコル"
-                            ],
+                            issues: ["PLAT-ELE-01: Mazda OS 2.0 共通カーネル", "PLAT-ELE-02: 共通ADASアルゴリズム"],
                             children: [
-                                {
-                                    id: "cx60-ele", title: "CX-60 差分開発 (Delta)", level: "Model Specific", type: "delta",
-                                    issues: ["DELTA-CX60: 大型SUV用カメラ画角最適化", "DELTA-CX60: インパネ形状に伴う音響補正"],
-                                },
-                                {
-                                    id: "cx80-ele", title: "CX-80 差分開発 (Delta)", level: "Model Specific", type: "delta",
-                                    issues: ["DELTA-CX80: 3列目空間の空調・音響最適化", "DUPLICATE!!: CX-60の図面を流用可能(検知済)"],
-                                    isDuplicate: true
-                                }
-                            ]
-                        },
-                        {
-                            id: "p-pt", title: "パワートレイン共通基盤", level: "Domain Platform",
-                            issues: ["PLAT-PT-01: 直列6気筒エンジン基本設計", "PLAT-PT-02: 共通FRプラグインハイブリッドシステム"],
-                            children: [
-                                {
-                                    id: "mx5-pt", title: "Roadster 独自開発 (Unique)", level: "Model Specific", type: "delta",
-                                    issues: ["UNIQUE-ND: 軽量化特化型パワーユニット適合", "UNIQUE-ND: 官能的排気サウンドの調律"]
-                                }
+                                { id: "cx60-ele", title: "CX-60 差分開発", level: "Model Specific", type: "delta", issues: ["DELTA-CX60: 大型SUV用カメラ画角"] }
                             ]
                         }
                     ]
-                },
-                {
-                    id: "sell", title: "Value Delivery (全社販売・リセール)", level: "Corporate Function", type: "platform",
-                    description: "車種に依存しないブランド・ファイナンス戦略",
-                    issues: ["SELL-01: 全車種共通リセール予測ロジック", "SELL-02: 認定中古車グローバル基準"]
                 }
             ]
         };
 
-        const TreeNode = ({ node }) => {
-            const hasChildren = node.children && node.children.length > 0;
-            const hasIssues = node.issues && node.issues.length > 0;
+        const TreeNode = ({ node }) => (
+            <li>
+                <div className={`node relative inline-block text-left ${node.type === 'purpose' ? 'bg-white text-black' : node.type === 'platform' ? 'node-platform' : 'node-delta'}`}>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-blue-400">{node.level}</span>
+                    <h4 className="text-lg font-black italic uppercase leading-none mb-2">{node.title}</h4>
+                    {node.issues && <div className="space-y-1 mt-4">{node.issues.map((i, idx) => <div key={idx} className="text-[10px] text-slate-400"># {i}</div>)}</div>}
+                </div>
+                {node.children && <ul>{node.children.map(child => <TreeNode key={child.id} node={child} />)}</ul>}
+            </li>
+        );
+
+        function TeamOpsView() {
+            const [report, setReport] = useState("");
+            const [isGenerating, setIsGenerating] = useState(false);
+
+            const generateReport = () => {
+                setIsGenerating(true);
+                setTimeout(() => {
+                    setReport(`【週報：2026/01/05 - 01/11】
+1. 成果 (Done)
+   - Issue #001: 図面検索工数の削減 PoC完了 (削減率55%達成)
+   - Issue #002: 市場価値見極めロジック確定
+2. 意思決定 (Decisions)
+   - CX-60用ADASセンサー配置：案Aを採用 (PR #45で承認済)
+3. 次週の予定
+   - 佐藤工場長への実証結果フィードバック
+   - R&D費削減効果の経営報告資料（GitHub上）作成`);
+                    setIsGenerating(false);
+                }, 1500);
+            };
 
             return (
-                <li>
-                    <div className={`node relative inline-block text-left ${
-                        node.type === 'purpose' ? 'bg-white text-black' : 
-                        node.type === 'platform' ? 'node-platform' : 
-                        node.isDuplicate ? 'node-duplicate' : 'node-delta'
-                    }`}>
-                        <div className="flex justify-between items-start mb-2">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-blue-400">{node.level}</span>
-                            {node.isDuplicate && (
-                                <span className="bg-amber-500 text-black text-[9px] font-black px-2 py-0.5 rounded animate-pulse">REUSE ALERT</span>
-                            )}
+                <div className="p-8 max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <header className="flex justify-between items-center">
+                        <div>
+                            <h2 className="text-4xl font-black italic uppercase tracking-tighter">Team UX Operations</h2>
+                            <p className="text-slate-400">「会議のための会議」を廃止し、非同期で動く現場のハブ。</p>
                         </div>
-                        <h4 className="text-lg font-black italic uppercase leading-none mb-2">{node.title}</h4>
-                        {node.description && <p className="text-xs text-slate-400 mb-4">{node.description}</p>}
-                        
-                        {hasIssues && (
-                            <div className="space-y-2 border-t border-slate-700 pt-4 mt-2">
-                                {node.issues.map((issue, idx) => (
-                                    <div key={idx} className={`text-[11px] font-bold p-3 rounded-xl border ${
-                                        issue.includes('DUPLICATE') ? 'border-amber-500/50 bg-amber-500/5 text-amber-200' : 'border-slate-700 bg-slate-800/50 text-slate-300'
-                                    }`}>
-                                        <i className={`fas ${issue.includes('DUPLICATE') ? 'fa-copy' : 'fa-tag'} mr-2`}></i>
-                                        {issue}
+                        <button onClick={generateReport} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-black italic flex items-center space-x-2 transition-all shadow-lg shadow-blue-500/20">
+                            <i className={`fas ${isGenerating ? 'fa-spinner fa-spin' : 'fa-magic'}`}></i>
+                            <span>{isGenerating ? "AIがGitHubから集計中..." : "AI週報を自動生成"}</span>
+                        </button>
+                    </header>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Decision Stream */}
+                        <div className="space-y-4">
+                            <h3 className="text-sm font-black text-slate-500 uppercase tracking-[0.2em] flex items-center space-x-2">
+                                <i className="fas fa-check-circle text-emerald-500"></i>
+                                <span>Recent Decisions (会議なしの承認)</span>
+                            </h3>
+                            {[
+                                { title: "CX-60 センサー配置案の確定", author: "@daiki", time: "2時間前", comment: "PR #45にて佐藤工場長より承認。試作レス化に寄与。" },
+                                { title: "図面検索AI 認識エンジン選定", author: "@kenji", time: "昨日", comment: "性能評価の結果、Azure OpenAI Visionを採用。Issue #001にて合意。" },
+                            ].map((d, i) => (
+                                <div key={i} className="decision-card p-6 rounded-2xl space-y-2">
+                                    <div className="flex justify-between text-[10px] font-bold">
+                                        <span className="text-emerald-400">{d.author}</span>
+                                        <span className="text-slate-500">{d.time}</span>
                                     </div>
-                                ))}
+                                    <h4 className="font-black italic">{d.title}</h4>
+                                    <p className="text-xs text-slate-400">{d.comment}</p>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Blocker & Sync */}
+                        <div className="space-y-4">
+                            <h3 className="text-sm font-black text-slate-500 uppercase tracking-[0.2em] flex items-center space-x-2">
+                                <i className="fas fa-exclamation-triangle text-amber-500"></i>
+                                <span>Current Blockers (相談事項)</span>
+                            </h3>
+                            <div className="bg-amber-500/10 border border-amber-500/20 p-6 rounded-2xl space-y-4">
+                                <p className="text-xs text-amber-200 leading-relaxed">
+                                    「週次定例」を待たずにここで解決。GitHub Issueのメンションで会話を完結させます。
+                                </p>
+                                <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-700">
+                                    <div className="text-[10px] font-bold text-amber-400 mb-1">Issue #003: 試作車両の確保</div>
+                                    <p className="text-xs text-slate-300">実車評価の枠が埋まっていて検証が止まっています。 @boss 優先順位の調整をお願いできますか？</p>
+                                </div>
                             </div>
-                        )}
+                        </div>
                     </div>
 
-                    {hasChildren && (
-                        <ul>
-                            {node.children.map(child => (
-                                <TreeNode key={child.id} node={child} />
-                            ))}
-                        </ul>
+                    {/* Auto-generated Report Section */}
+                    {report && (
+                        <div className="bg-slate-800 border border-slate-700 p-8 rounded-3xl space-y-4 animate-in zoom-in-95 duration-300">
+                            <div className="flex justify-between items-center">
+                                <h3 className="font-black italic text-blue-400 uppercase tracking-widest">AI Generated Weekly Report</h3>
+                                <button className="text-[10px] font-black text-slate-500 hover:text-white uppercase tracking-widest">
+                                    <i className="fas fa-copy mr-1"></i> Teamsに共有
+                                </button>
+                            </div>
+                            <pre className="text-sm font-mono text-slate-300 whitespace-pre-wrap leading-relaxed">
+                                {report}
+                            </pre>
+                        </div>
                     )}
-                </li>
+                </div>
             );
-        };
+        }
 
         function App() {
+            const [activeView, setActiveView] = useState('team'); // デフォルトをチームビューに
             const [zoom, setZoom] = useState(0.7);
 
             return (
                 <div className="flex h-screen overflow-hidden">
+                    {/* Sidebar */}
                     <div className="w-80 glass border-r border-slate-800 flex flex-col z-20 shadow-2xl">
                         <div className="p-8">
                             <h1 className="text-2xl font-black italic tracking-tighter">MAZDA <span className="text-blue-500">SYNC</span></h1>
                             <p className="text-[10px] font-bold text-slate-500 tracking-[0.2em] mt-1 uppercase">Complexity Resolver</p>
                         </div>
                         <nav className="flex-1 px-4 space-y-2">
-                            <div className="bg-blue-600/10 text-blue-400 px-6 py-4 rounded-2xl flex items-center space-x-4 border border-blue-500/20">
-                                <i className="fas fa-microchip"></i>
-                                <span className="font-black text-sm italic uppercase">Platform Central</span>
+                            <div onClick={() => setActiveView('team')} className={`sidebar-item px-6 py-4 rounded-2xl flex items-center space-x-4 cursor-pointer transition-all ${activeView === 'team' ? 'active-sidebar font-black' : 'text-slate-500 font-bold'}`}>
+                                <i className="fas fa-users"></i>
+                                <span className="text-sm italic uppercase tracking-widest">Team Operations</span>
+                            </div>
+                            <div onClick={() => setActiveView('strategy')} className={`sidebar-item px-6 py-4 rounded-2xl flex items-center space-x-4 cursor-pointer transition-all ${activeView === 'strategy' ? 'active-sidebar font-black' : 'text-slate-500 font-bold'}`}>
+                                <i className="fas fa-sitemap"></i>
+                                <span className="text-sm italic uppercase tracking-widest">Strategy Wall</span>
                             </div>
                         </nav>
-                        <div className="p-8 border-t border-slate-800 space-y-4">
-                            <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Management Strategy</div>
-                            <div className="flex items-center space-x-3 text-xs">
-                                <div className="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]"></div>
-                                <span className="text-slate-300 font-bold">共通資産 (Platform)</span>
-                            </div>
-                            <div className="flex items-center space-x-3 text-xs">
-                                <div className="w-3 h-3 rounded-full bg-slate-600"></div>
-                                <span className="text-slate-300 font-bold">車種差分 (Delta)</span>
-                            </div>
+                        <div className="p-8 border-t border-slate-800 space-y-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                            Logged in as: <span className="text-slate-300 italic">@daiki</span>
                         </div>
                     </div>
 
+                    {/* Main Content */}
                     <div className="flex-1 overflow-auto bg-slate-950 relative">
-                        <div className="zoom-controls">
-                            <button onClick={() => setZoom(z => Math.min(z + 0.1, 2))} className="zoom-btn"><i className="fas fa-plus"></i></button>
-                            <button onClick={() => setZoom(z => Math.max(z - 0.1, 0.2))} className="zoom-btn"><i className="fas fa-minus"></i></button>
-                            <div className="text-center text-[10px] font-black text-slate-500 italic mt-2">{Math.round(zoom * 100)}%</div>
-                        </div>
-
-                        <div className="tree-container" style={{ transform: `scale(${zoom})` }}>
-                            <header className="mb-20 text-center">
-                                <h2 className="text-6xl font-black italic tracking-tighter uppercase mb-4">Platform-Based Management</h2>
-                                <p className="text-slate-400 text-lg max-w-2xl mx-auto font-medium">
-                                    車種ごとの重複タスクを解体し、共通資産を核とした「最小管理」を実現する。
-                                </p>
-                            </header>
-                            <div className="tree">
-                                <ul><TreeNode node={STRATEGY_DATA} /></ul>
+                        {activeView === 'team' ? (
+                            <TeamOpsView />
+                        ) : (
+                            <div className="tree-container" style={{ transform: `scale(${zoom})` }}>
+                                <header className="mb-20 text-center">
+                                    <h2 className="text-6xl font-black italic tracking-tighter uppercase mb-4">Strategic Mapping</h2>
+                                    <p className="text-slate-400 text-lg max-w-2xl mx-auto font-medium">全社目標から現場の差分（Delta）までを同期する。</p>
+                                </header>
+                                <div className="tree"><ul><TreeNode node={STRATEGY_DATA} /></ul></div>
                             </div>
-                        </div>
+                        )}
+                        
+                        {activeView === 'strategy' && (
+                            <div className="zoom-controls">
+                                <button onClick={() => setZoom(z => Math.min(z + 0.1, 2))} className="zoom-btn"><i className="fas fa-plus"></i></button>
+                                <button onClick={() => setZoom(z => Math.max(z - 0.1, 0.2))} className="zoom-btn"><i className="fas fa-minus"></i></button>
+                            </div>
+                        )}
                     </div>
                 </div>
             );
