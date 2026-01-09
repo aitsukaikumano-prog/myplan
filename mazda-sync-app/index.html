@@ -894,6 +894,246 @@
             );
         };
 
+        // プロジェクトごとの議事録データ
+        const DOCS_DATA = {
+            brand: {
+                meetings: [
+                    {
+                        id: '20260109_brand_fan_community_workshop',
+                        date: '2026-01-09',
+                        title: 'ファンコミュニティ設計ワークショップ',
+                        type: 'workshop',
+                        attendees: ['CX推進チーム', 'デジタルマーケティング部', 'ファンコミュニティ運営'],
+                        summary: 'ファンコミュニティの設計方針とMyMazda連携について議論。イベント管理、ポイントシステム、ランク制度の詳細を決定。',
+                        relatedIssue: '2.3-C1-01',
+                        decisions: [
+                            'ファン活動をポイントとして可視化する仕組みを導入',
+                            'ランクに応じた特典（試乗会優先招待等）を設計',
+                            'MyMazdaアプリとの連携でシームレスな体験を実現'
+                        ]
+                    },
+                    {
+                        id: '20260108_brand_cx_audit_design',
+                        date: '2026-01-08',
+                        title: 'CX監査スコアカード設計ワークショップ',
+                        type: 'workshop',
+                        attendees: ['品質管理部', 'CX推進チーム', 'データ分析チーム', '店舗開発部'],
+                        summary: 'CX監査スコアカードの設計について議論。評価指標、測定方法、フィードバックプロセスを定義。',
+                        relatedIssue: '2.1-A2-01',
+                        decisions: [
+                            '6つの評価カテゴリを定義（第一印象、商品説明、試乗体験、提案力、アフターケア、総合満足）',
+                            '各カテゴリに3-5の具体的評価項目を設定',
+                            '月次での店舗ランキング公開を実施'
+                        ]
+                    },
+                    {
+                        id: '20260107_brand_resale_value_planning',
+                        date: '2026-01-07',
+                        title: 'リセールバリュー監視システム要件定義',
+                        type: 'planning',
+                        attendees: ['商品企画部', 'データサイエンスチーム', 'CPO事業部', 'マーケティング部'],
+                        summary: 'リセールバリュー監視システムの要件定義。データソース、分析手法、アラート機能について議論。',
+                        relatedIssue: '2.2-B1-01',
+                        decisions: [
+                            '主要中古車サイト5社のデータを日次で自動収集',
+                            '機械学習を用いた予測モデルの開発着手',
+                            '競合比較ダッシュボードの要件確定'
+                        ]
+                    },
+                    {
+                        id: '20260106_brand_storytelling_review',
+                        date: '2026-01-06',
+                        title: 'ブランド・ストーリーテリング中間レビュー',
+                        type: 'review',
+                        attendees: ['ブランド戦略室', 'コンテンツ制作チーム', '広報部', '販売店教育部'],
+                        summary: 'ブランド・ストーリーテリング施策の中間レビュー。制作進捗、店舗展開計画、効果測定方法を確認。',
+                        relatedIssue: '2.1-A2-02',
+                        decisions: [
+                            '2026年3月末までに全車種の物語を完成',
+                            '販売店スタッフ向け研修プログラムを開発',
+                            'VR体験コンテンツのパイロット導入を決定'
+                        ]
+                    },
+                    {
+                        id: '20251215_brand_mymazda_kickoff',
+                        date: '2025-12-15',
+                        title: 'MyMazdaデータ連携プロジェクト キックオフ',
+                        type: 'kickoff',
+                        attendees: ['IT基盤チーム', 'CRM推進室', 'データサイエンスチーム', 'セキュリティ統括部'],
+                        summary: 'MyMazdaアプリとCRMのデータ連携プロジェクトのキックオフ。目的、スコープ、スケジュールを共有。',
+                        relatedIssue: '2.1-A1-01',
+                        decisions: [
+                            '2026年Q2までにPhase1（基盤構築）を完了',
+                            'プライバシーポリシーの改定を法務部と連携',
+                            '週次での進捗確認会議を設定'
+                        ]
+                    }
+                ]
+            },
+            powertrain: {
+                meetings: []
+            }
+        };
+
+        // ドキュメント一覧・詳細ビュー
+        const DocsView = ({ currentProject }) => {
+            const [selectedDoc, setSelectedDoc] = useState(null);
+            const [filterType, setFilterType] = useState('all');
+            
+            const docs = DOCS_DATA[currentProject]?.meetings || [];
+            const filteredDocs = filterType === 'all' ? docs : docs.filter(d => d.type === filterType);
+            
+            const typeLabels = {
+                kickoff: { label: 'キックオフ', color: 'bg-green-100 text-green-700 border-green-300' },
+                review: { label: 'レビュー', color: 'bg-blue-100 text-blue-700 border-blue-300' },
+                planning: { label: '計画', color: 'bg-purple-100 text-purple-700 border-purple-300' },
+                workshop: { label: 'ワークショップ', color: 'bg-orange-100 text-orange-700 border-orange-300' }
+            };
+
+            if (selectedDoc) {
+                const typeConfig = typeLabels[selectedDoc.type] || { label: selectedDoc.type, color: 'bg-slate-100 text-slate-700' };
+                return (
+                    <div className="h-full overflow-y-auto">
+                        <div className="p-10 max-w-4xl mx-auto pb-20">
+                            <button 
+                                onClick={() => setSelectedDoc(null)}
+                                className="flex items-center space-x-2 text-slate-500 hover:text-slate-700 mb-8 transition-colors"
+                            >
+                                <i className="fas fa-arrow-left"></i>
+                                <span className="font-bold">議事録一覧に戻る</span>
+                            </button>
+                            
+                            <div className="bg-white rounded-3xl border-2 border-slate-100 overflow-hidden">
+                                <div className="p-8 border-b border-slate-100">
+                                    <div className="flex items-center space-x-3 mb-4">
+                                        <span className={`text-xs font-bold px-3 py-1 rounded-full border ${typeConfig.color}`}>
+                                            {typeConfig.label}
+                                        </span>
+                                        <span className="text-sm text-slate-400">{selectedDoc.date}</span>
+                                        {selectedDoc.relatedIssue && (
+                                            <span className="text-xs font-bold px-2 py-1 rounded-lg bg-blue-50 text-blue-600 border border-blue-200">
+                                                関連: #{selectedDoc.relatedIssue}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <h2 className="text-3xl font-black text-slate-900">{selectedDoc.title}</h2>
+                                </div>
+                                
+                                <div className="p-8 space-y-8">
+                                    <div>
+                                        <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
+                                            <i className="fas fa-users mr-2"></i>参加者
+                                        </h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {selectedDoc.attendees.map((a, i) => (
+                                                <span key={i} className="px-3 py-1 bg-slate-100 rounded-full text-sm font-semibold text-slate-600">
+                                                    {a}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
+                                            <i className="fas fa-file-alt mr-2"></i>概要
+                                        </h3>
+                                        <p className="text-lg text-slate-700 leading-relaxed">{selectedDoc.summary}</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
+                                            <i className="fas fa-check-circle mr-2"></i>決定事項
+                                        </h3>
+                                        <div className="space-y-3">
+                                            {selectedDoc.decisions.map((d, i) => (
+                                                <div key={i} className="flex items-start space-x-3 p-4 bg-green-50 rounded-xl border border-green-200">
+                                                    <i className="fas fa-check text-green-600 mt-1"></i>
+                                                    <span className="text-slate-700 font-medium">{d}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="pt-6 border-t border-slate-100">
+                                        <p className="text-xs text-slate-400">
+                                            <i className="fas fa-folder mr-2"></i>
+                                            保存先: github_sim2/docs/meetings/{selectedDoc.id}.md
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="h-full overflow-y-auto">
+                    <div className="p-10 max-w-5xl mx-auto pb-20">
+                        <div className="flex items-center justify-between mb-8">
+                            <h2 className="text-4xl font-black text-slate-900">議事録・ドキュメント</h2>
+                            <div className="flex items-center space-x-2">
+                                <button
+                                    onClick={() => setFilterType('all')}
+                                    className={`px-4 py-2 rounded-xl font-bold text-sm transition-all ${filterType === 'all' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                                >
+                                    すべて
+                                </button>
+                                {Object.entries(typeLabels).map(([key, { label }]) => (
+                                    <button
+                                        key={key}
+                                        onClick={() => setFilterType(key)}
+                                        className={`px-4 py-2 rounded-xl font-bold text-sm transition-all ${filterType === key ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                                    >
+                                        {label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        
+                        {filteredDocs.length === 0 ? (
+                            <div className="text-center py-20">
+                                <i className="fas fa-file-alt text-6xl text-slate-200 mb-4"></i>
+                                <p className="text-xl text-slate-400 font-semibold">このプロジェクトにはまだ議事録がありません</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {filteredDocs.map(doc => {
+                                    const typeConfig = typeLabels[doc.type] || { label: doc.type, color: 'bg-slate-100 text-slate-700' };
+                                    return (
+                                        <button
+                                            key={doc.id}
+                                            onClick={() => setSelectedDoc(doc)}
+                                            className="w-full text-left bg-white rounded-2xl border-2 border-slate-100 p-6 hover:border-blue-300 hover:shadow-lg transition-all"
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center space-x-3 mb-2">
+                                                        <span className={`text-xs font-bold px-3 py-1 rounded-full border ${typeConfig.color}`}>
+                                                            {typeConfig.label}
+                                                        </span>
+                                                        <span className="text-sm text-slate-400">{doc.date}</span>
+                                                        {doc.relatedIssue && (
+                                                            <span className="text-xs font-bold px-2 py-1 rounded-lg bg-blue-50 text-blue-600 border border-blue-200">
+                                                                #{doc.relatedIssue}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <h3 className="text-xl font-bold text-slate-800 mb-2">{doc.title}</h3>
+                                                    <p className="text-sm text-slate-500 line-clamp-2">{doc.summary}</p>
+                                                </div>
+                                                <i className="fas fa-chevron-right text-slate-300 ml-4"></i>
+                                            </div>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
         // 成果物入力モーダル
         const DeliverableModal = ({ task, taskIndex, issueId, onSubmit, onClose }) => {
             const [deliverableType, setDeliverableType] = useState('url');
@@ -1362,6 +1602,7 @@
                         {view.tab === 'tree' && <TreeView strategyData={strategyData} onNavigate={(issue) => setView({ ...view, type: 'detail', issue })} />}
                         {view.tab === 'search' && <TaskSearchView strategyData={strategyData} onNavigate={(issue) => setView({ ...view, type: 'detail', issue })} />}
                         {view.tab === 'progress' && <ProgressView strategyData={strategyData} />}
+                        {view.tab === 'docs' && <DocsView currentProject={currentProject} />}
                     </React.Fragment>
                 );
             };
@@ -1427,6 +1668,12 @@
                                         className={`px-6 py-2 rounded-xl font-bold text-sm transition-all ${view.tab === 'progress' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                                     >
                                         <i className="fas fa-chart-line mr-2"></i>進捗率確認
+                                    </button>
+                                    <button 
+                                        onClick={() => setView({ ...view, tab: 'docs' })}
+                                        className={`px-6 py-2 rounded-xl font-bold text-sm transition-all ${view.tab === 'docs' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        <i className="fas fa-file-alt mr-2"></i>議事録
                                     </button>
                                 </div>
                             )}
