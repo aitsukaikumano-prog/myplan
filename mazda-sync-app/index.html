@@ -492,16 +492,15 @@
             );
         };
 
-        const TaskSearchView = ({ strategyData, onNavigate, onToggleTask }) => {
+        const TaskSearchView = ({ strategyData, onNavigate }) => {
             const [searchTerm, setSearchTerm] = useState('');
             
-            const allTasks = [];
+            // Issue単位で収集
+            const allIssues = [];
             const traverseTree = (node, path = []) => {
                 if (node.issues) {
                     node.issues.forEach(issue => {
-                        issue.tasks.forEach((task, idx) => {
-                            allTasks.push({ issue, task, taskIndex: idx, path: [...path, node.title] });
-                        });
+                        allIssues.push({ issue, path: [...path, node.title] });
                     });
                 }
                 if (node.children) {
@@ -510,10 +509,14 @@
             };
             traverseTree(strategyData);
             
-            const filteredTasks = allTasks.filter(item => 
-                item.task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.issue.title.toLowerCase().includes(searchTerm.toLowerCase())
-            );
+            // 検索フィルタリング（Issue単位）
+            const filteredIssues = allIssues.filter(item => {
+                const matchIssue = item.issue.title.toLowerCase().includes(searchTerm.toLowerCase());
+                const matchTask = item.issue.tasks.some(task => 
+                    task.title.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+                return matchIssue || matchTask;
+            });
             
             return (
                 <div className="h-full overflow-y-auto">
@@ -532,41 +535,63 @@
                             </div>
                         </div>
                         
-                        <div className="space-y-4 pb-10">
-                            {filteredTasks.map((item, idx) => {
-                                const status = item.task.status || TASK_STATUS.PENDING;
-                                const config = STATUS_CONFIG[status];
+                        <div className="space-y-6 pb-10">
+                            {filteredIssues.map((item, idx) => {
+                                const completedCount = item.issue.tasks.filter(t => (t.status || TASK_STATUS.PENDING) === TASK_STATUS.COMPLETED).length;
+                                const totalCount = item.issue.tasks.length;
+                                const progress = Math.round((completedCount / totalCount) * 100);
+                                
                                 return (
-                                    <div key={idx} className="bg-white rounded-3xl border-2 border-slate-100 p-6 hover:border-blue-200 transition-all">
-                                        <div className="flex items-start justify-between mb-3">
-                                            <div className="flex-1">
-                                                <div className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-2">
-                                                    {item.path.slice(1).join(' > ')}
-                                                </div>
+                                    <div key={idx} className="bg-white rounded-3xl border-2 border-slate-100 overflow-hidden hover:border-blue-200 transition-all">
+                                        {/* Issueヘッダー */}
+                                        <div className="p-6 border-b border-slate-100">
+                                            <div className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-2">
+                                                {item.path.slice(1).join(' > ')}
+                                            </div>
+                                            <div className="flex items-center justify-between">
                                                 <button 
                                                     onClick={() => onNavigate(item.issue)}
-                                                    className="text-lg font-bold text-blue-600 hover:text-blue-700 text-left mb-2"
+                                                    className="text-xl font-bold text-blue-600 hover:text-blue-700 text-left"
                                                 >
                                                     {item.issue.title} <i className="fas fa-external-link-alt text-xs ml-2"></i>
                                                 </button>
+                                                <div className="flex items-center space-x-3">
+                                                    <span className="text-sm font-bold text-slate-500">{completedCount}/{totalCount}</span>
+                                                    <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
+                                                        <div 
+                                                            className="h-full bg-blue-500 transition-all"
+                                                            style={{ width: `${progress}%` }}
+                                                        ></div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <span className={`text-[10px] font-bold px-3 py-1 rounded-full border ${config.color}`}>
-                                                <i className={`${config.icon} mr-1`}></i>{config.label}
-                                            </span>
                                         </div>
-                                        <div className="flex items-center space-x-4">
-                                            <div className={`w-6 h-6 rounded-lg flex items-center justify-center border-2 ${config.color}`}>
-                                                <i className={`${config.icon} text-xs`}></i>
-                                            </div>
-                                            <span className={`text-base font-semibold ${status === TASK_STATUS.COMPLETED ? 'text-slate-400 line-through' : 'text-slate-700'}`}>
-                                                {item.task.title}
-                                            </span>
+                                        
+                                        {/* タスク一覧 */}
+                                        <div className="p-4 space-y-2">
+                                            {item.issue.tasks.map((task, taskIdx) => {
+                                                const status = task.status || TASK_STATUS.PENDING;
+                                                const config = STATUS_CONFIG[status];
+                                                return (
+                                                    <div key={taskIdx} className="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
+                                                        <div className={`w-6 h-6 rounded-lg flex items-center justify-center border-2 shrink-0 ${config.color}`}>
+                                                            <i className={`${config.icon} text-xs`}></i>
+                                                        </div>
+                                                        <span className={`text-sm font-medium flex-1 ${status === TASK_STATUS.COMPLETED ? 'text-slate-400 line-through' : 'text-slate-700'}`}>
+                                                            {task.title}
+                                                        </span>
+                                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0 ${config.color}`}>
+                                                            {config.label}
+                                                        </span>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 );
                             })}
                             
-                            {filteredTasks.length === 0 && (
+                            {filteredIssues.length === 0 && (
                                 <div className="text-center py-20">
                                     <i className="fas fa-search text-6xl text-slate-200 mb-4"></i>
                                     <p className="text-xl text-slate-400 font-semibold">
@@ -1161,7 +1186,7 @@
                 return (
                     <React.Fragment>
                         {view.tab === 'tree' && <TreeView strategyData={strategyData} onNavigate={(issue) => setView({ ...view, type: 'detail', issue })} />}
-                        {view.tab === 'search' && <TaskSearchView strategyData={strategyData} onNavigate={(issue) => setView({ ...view, type: 'detail', issue })} onToggleTask={toggleTask} />}
+                        {view.tab === 'search' && <TaskSearchView strategyData={strategyData} onNavigate={(issue) => setView({ ...view, type: 'detail', issue })} />}
                         {view.tab === 'progress' && <ProgressView strategyData={strategyData} />}
                     </React.Fragment>
                 );
