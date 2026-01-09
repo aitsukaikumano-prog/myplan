@@ -69,9 +69,10 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+        const { useState, useEffect, useRef, useCallback } = React;
 
-        const STRATEGY_DATA = {
+        // 初期データ（マスターデータ）
+        const INITIAL_STRATEGY_DATA = {
             id: "purpose",
             title: "マツダのブランド価値を向上させる",
             level: "大目標 (Goal)",
@@ -234,7 +235,78 @@
             ]
         };
 
-        const TreeView = ({ onNavigate }) => {
+        // LocalStorageからタスク状態を読み込み/保存するユーティリティ
+        const STORAGE_KEY = 'mazda-sync-task-states';
+        
+        const loadTaskStates = () => {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                return saved ? JSON.parse(saved) : {};
+            } catch {
+                return {};
+            }
+        };
+        
+        const saveTaskStates = (states) => {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(states));
+        };
+        
+        // タスク状態をデータに適用
+        const applyTaskStates = (data, states) => {
+            const clone = JSON.parse(JSON.stringify(data));
+            
+            const traverse = (node) => {
+                if (node.issues) {
+                    node.issues.forEach(issue => {
+                        issue.tasks.forEach((task, idx) => {
+                            const key = `${issue.id}-${idx}`;
+                            if (states[key] !== undefined) {
+                                task.done = states[key];
+                            }
+                        });
+                    });
+                }
+                if (node.children) {
+                    node.children.forEach(child => traverse(child));
+                }
+            };
+            
+            traverse(clone);
+            return clone;
+        };
+        
+        // 変更されたファイルを検出
+        const getChangedFiles = (data, initialData) => {
+            const changes = [];
+            
+            const traverseBoth = (node, initNode) => {
+                if (node.issues && initNode.issues) {
+                    node.issues.forEach((issue, issueIdx) => {
+                        const initIssue = initNode.issues[issueIdx];
+                        const changedTasks = [];
+                        
+                        issue.tasks.forEach((task, taskIdx) => {
+                            const initTask = initIssue.tasks[taskIdx];
+                            if (task.done !== initTask.done) {
+                                changedTasks.push({ title: task.title, done: task.done, index: taskIdx });
+                            }
+                        });
+                        
+                        if (changedTasks.length > 0) {
+                            changes.push({ issue, changedTasks });
+                        }
+                    });
+                }
+                if (node.children && initNode.children) {
+                    node.children.forEach((child, idx) => traverseBoth(child, initNode.children[idx]));
+                }
+            };
+            
+            traverseBoth(data, initialData);
+            return changes;
+        };
+
+        const TreeView = ({ strategyData, onNavigate }) => {
             const [scale, setScale] = useState(1);
             const [initialized, setInitialized] = useState(false);
             const containerRef = useRef(null);
@@ -385,14 +457,14 @@
                                 transition: 'opacity 0.3s ease-out, transform 0.2s ease-out'
                             }}
                         >
-                            <Node node={STRATEGY_DATA} />
+                            <Node node={strategyData} />
                         </div>
                     </main>
                 </div>
             );
         };
 
-        const TaskSearchView = ({ onNavigate }) => {
+        const TaskSearchView = ({ strategyData, onNavigate, onToggleTask }) => {
             const [searchTerm, setSearchTerm] = useState('');
             
             const allTasks = [];
@@ -408,7 +480,7 @@
                     node.children.forEach(child => traverseTree(child, [...path, node.title]));
                 }
             };
-            traverseTree(STRATEGY_DATA);
+            traverseTree(strategyData);
             
             const filteredTasks = allTasks.filter(item => 
                 item.task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -454,9 +526,12 @@
                                         )}
                                     </div>
                                     <div className="flex items-center space-x-4">
-                                        <div className={`w-6 h-6 rounded-lg flex items-center justify-center border-2 ${item.task.done ? 'bg-blue-600 border-blue-600' : 'border-slate-300'}`}>
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); onToggleTask(item.issue.id, item.taskIndex); }}
+                                            className={`w-6 h-6 rounded-lg flex items-center justify-center border-2 transition-all hover:scale-110 ${item.task.done ? 'bg-blue-600 border-blue-600' : 'border-slate-300 hover:border-blue-400'}`}
+                                        >
                                             {item.task.done && <i className="fas fa-check text-xs text-white"></i>}
-                                        </div>
+                                        </button>
                                         <span className={`text-base font-semibold ${item.task.done ? 'text-slate-400 line-through' : 'text-slate-700'}`}>
                                             {item.task.title}
                                         </span>
@@ -478,7 +553,7 @@
             );
         };
 
-        const ProgressView = () => {
+        const ProgressView = ({ strategyData }) => {
             const calculateProgress = (node) => {
                 let total = 0;
                 let completed = 0;
@@ -501,7 +576,7 @@
                 return { total, completed, percentage: total > 0 ? Math.round((completed / total) * 100) : 0 };
             };
             
-            const overallProgress = calculateProgress(STRATEGY_DATA);
+            const overallProgress = calculateProgress(strategyData);
             
             return (
                 <div className="h-full overflow-y-auto">
@@ -527,7 +602,7 @@
                         </div>
                         
                         <div className="space-y-6">
-                            {STRATEGY_DATA.children.map(strategy => {
+                            {strategyData.children.map(strategy => {
                                 const progress = calculateProgress(strategy);
                                 return (
                                     <div key={strategy.id} className="bg-white rounded-3xl border-2 border-slate-100 p-8">
@@ -575,7 +650,7 @@
             );
         };
 
-        const DetailView = ({ issue, onBack }) => {
+        const DetailView = ({ issue, onBack, onToggleTask }) => {
             return (
                 <div className="h-full flex flex-col bg-white fade-in">
                     <header className="h-16 flex items-center justify-between px-10 border-b border-slate-100 shrink-0">
@@ -611,12 +686,18 @@
                                 <i className="fas fa-tasks mr-4 text-blue-600"></i>
                                 具体的な実行タスク (Tasks)
                             </h3>
+                            <p className="text-sm text-slate-500 mb-6 -mt-4">
+                                <i className="fas fa-info-circle mr-2"></i>チェックボックスをクリックしてタスクの状態を変更できます
+                            </p>
                             <div className="space-y-6">
                                 {issue.tasks.map((task, idx) => (
-                                    <div key={idx} className="flex items-center space-x-6 p-6 bg-white rounded-3xl border border-slate-200 shadow-sm">
-                                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center border-2 transition-all ${task.done ? 'bg-blue-600 border-blue-600' : 'border-slate-300'}`}>
+                                    <div key={idx} className="flex items-center space-x-6 p-6 bg-white rounded-3xl border border-slate-200 shadow-sm hover:border-blue-200 transition-all">
+                                        <button 
+                                            onClick={() => onToggleTask(issue.id, idx)}
+                                            className={`w-8 h-8 rounded-xl flex items-center justify-center border-2 transition-all hover:scale-110 cursor-pointer ${task.done ? 'bg-blue-600 border-blue-600' : 'border-slate-300 hover:border-blue-400'}`}
+                                        >
                                             {task.done && <i className="fas fa-check text-sm text-white"></i>}
-                                        </div>
+                                        </button>
                                         <span className={`text-xl font-semibold flex-1 ${task.done ? 'text-slate-400 line-through' : 'text-slate-700'}`}>
                                             {task.title}
                                         </span>
@@ -630,19 +711,170 @@
             );
         };
 
+        // GitHub反映モーダル
+        const SyncModal = ({ changes, onClose }) => {
+            const [copied, setCopied] = useState(false);
+            
+            const generateCommitMessage = () => {
+                const summaries = changes.map(c => `${c.issue.id}: ${c.changedTasks.length}件更新`).join(', ');
+                return `task: タスク状態を更新 (${summaries})`;
+            };
+            
+            const generateFileUpdates = () => {
+                return changes.map(change => {
+                    const tasksMarkdown = change.issue.tasks.map((t, i) => 
+                        `- [${t.done ? 'x' : ' '}] ${t.title}`
+                    ).join('\n');
+                    
+                    return {
+                        fileName: change.issue.fileName,
+                        path: `github_sim2/issues/${change.issue.fileName}`,
+                        tasks: tasksMarkdown
+                    };
+                });
+            };
+            
+            const copyCommand = () => {
+                const cmd = `cd /Users/daiki/plan && git add . && git commit -m "${generateCommitMessage()}" && git push origin main`;
+                navigator.clipboard.writeText(cmd);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+            };
+            
+            const fileUpdates = generateFileUpdates();
+            
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+                        <div className="p-8 border-b border-slate-100 flex justify-between items-center shrink-0">
+                            <div>
+                                <h3 className="text-2xl font-black text-slate-900">GitHubに変更を反映</h3>
+                                <p className="text-sm text-slate-500 mt-1">{changes.length}件のファイルに変更があります</p>
+                            </div>
+                            <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+                                <i className="fas fa-times text-2xl"></i>
+                            </button>
+                        </div>
+                        
+                        <div className="flex-1 overflow-y-auto p-8 space-y-6">
+                            <div className="bg-slate-50 rounded-2xl p-6">
+                                <h4 className="font-bold text-slate-700 mb-3"><i className="fas fa-code-branch mr-2 text-blue-600"></i>コミットメッセージ</h4>
+                                <code className="text-sm bg-slate-100 p-3 rounded-xl block">{generateCommitMessage()}</code>
+                            </div>
+                            
+                            {fileUpdates.map((file, idx) => (
+                                <div key={idx} className="bg-slate-50 rounded-2xl p-6">
+                                    <h4 className="font-bold text-slate-700 mb-2">
+                                        <i className="far fa-file-alt mr-2 text-green-600"></i>{file.fileName}
+                                    </h4>
+                                    <p className="text-xs text-slate-400 mb-3">{file.path}</p>
+                                    <pre className="text-sm bg-slate-100 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">{file.tasks}</pre>
+                                </div>
+                            ))}
+                            
+                            <div className="bg-blue-50 rounded-2xl p-6 border-2 border-blue-200">
+                                <h4 className="font-bold text-blue-700 mb-3"><i className="fas fa-terminal mr-2"></i>ターミナルで実行するコマンド</h4>
+                                <code className="text-sm bg-white p-4 rounded-xl block text-slate-700 break-all">
+                                    git add . && git commit -m "{generateCommitMessage()}" && git push origin main
+                                </code>
+                            </div>
+                        </div>
+                        
+                        <div className="p-8 bg-slate-50 border-t border-slate-100 flex justify-end space-x-4 shrink-0">
+                            <button onClick={onClose} className="px-6 py-3 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition-colors">
+                                閉じる
+                            </button>
+                            <button 
+                                onClick={copyCommand}
+                                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors flex items-center"
+                            >
+                                <i className={`fas ${copied ? 'fa-check' : 'fa-copy'} mr-2`}></i>
+                                {copied ? 'コピーしました！' : 'コマンドをコピー'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         function App() {
             const [view, setView] = useState({ type: 'main', tab: 'tree', issue: null });
+            const [taskStates, setTaskStates] = useState(loadTaskStates());
+            const [showSyncModal, setShowSyncModal] = useState(false);
+            
+            // タスク状態を適用したデータ
+            const strategyData = applyTaskStates(INITIAL_STRATEGY_DATA, taskStates);
+            
+            // 変更されたファイルを検出
+            const changedFiles = getChangedFiles(strategyData, INITIAL_STRATEGY_DATA);
+            const hasChanges = changedFiles.length > 0;
+            
+            // タスク状態をトグル
+            const toggleTask = useCallback((issueId, taskIndex) => {
+                setTaskStates(prev => {
+                    const key = `${issueId}-${taskIndex}`;
+                    const currentState = prev[key];
+                    
+                    // 現在の状態を取得（保存されていない場合は初期データから取得）
+                    let currentDone = currentState;
+                    if (currentDone === undefined) {
+                        // 初期データから探す
+                        const findTask = (node) => {
+                            if (node.issues) {
+                                for (const issue of node.issues) {
+                                    if (issue.id === issueId) {
+                                        return issue.tasks[taskIndex].done;
+                                    }
+                                }
+                            }
+                            if (node.children) {
+                                for (const child of node.children) {
+                                    const found = findTask(child);
+                                    if (found !== undefined) return found;
+                                }
+                            }
+                            return undefined;
+                        };
+                        currentDone = findTask(INITIAL_STRATEGY_DATA);
+                    }
+                    
+                    const newStates = { ...prev, [key]: !currentDone };
+                    saveTaskStates(newStates);
+                    return newStates;
+                });
+            }, []);
+            
+            // 現在のIssueの最新状態を取得
+            const getCurrentIssue = (originalIssue) => {
+                if (!originalIssue) return null;
+                const findIssue = (node) => {
+                    if (node.issues) {
+                        for (const issue of node.issues) {
+                            if (issue.id === originalIssue.id) return issue;
+                        }
+                    }
+                    if (node.children) {
+                        for (const child of node.children) {
+                            const found = findIssue(child);
+                            if (found) return found;
+                        }
+                    }
+                    return null;
+                };
+                return findIssue(strategyData);
+            };
 
             const renderContent = () => {
                 if (view.type === 'detail') {
-                    return <DetailView issue={view.issue} onBack={() => setView({ type: 'main', tab: view.tab, issue: null })} />;
+                    const currentIssue = getCurrentIssue(view.issue);
+                    return <DetailView issue={currentIssue} onBack={() => setView({ type: 'main', tab: view.tab, issue: null })} onToggleTask={toggleTask} />;
                 }
                 
                 return (
                     <React.Fragment>
-                        {view.tab === 'tree' && <TreeView onNavigate={(issue) => setView({ ...view, type: 'detail', issue })} />}
-                        {view.tab === 'search' && <TaskSearchView onNavigate={(issue) => setView({ ...view, type: 'detail', issue })} />}
-                        {view.tab === 'progress' && <ProgressView />}
+                        {view.tab === 'tree' && <TreeView strategyData={strategyData} onNavigate={(issue) => setView({ ...view, type: 'detail', issue })} />}
+                        {view.tab === 'search' && <TaskSearchView strategyData={strategyData} onNavigate={(issue) => setView({ ...view, type: 'detail', issue })} onToggleTask={toggleTask} />}
+                        {view.tab === 'progress' && <ProgressView strategyData={strategyData} />}
                     </React.Fragment>
                 );
             };
@@ -657,34 +889,53 @@
                             <span className="text-sm font-bold text-slate-500">2026年度 戦略ナビゲーター</span>
                         </div>
                         
-                        {view.type !== 'detail' && (
-                            <div className="flex items-center space-x-2 bg-slate-50 p-1 rounded-2xl border border-slate-200">
-                                <button 
-                                    onClick={() => setView({ ...view, tab: 'tree' })}
-                                    className={`px-6 py-2 rounded-xl font-bold text-sm transition-all ${view.tab === 'tree' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                                >
-                                    <i className="fas fa-sitemap mr-2"></i>ツリー表示
-                                </button>
-                                <button 
-                                    onClick={() => setView({ ...view, tab: 'search' })}
-                                    className={`px-6 py-2 rounded-xl font-bold text-sm transition-all ${view.tab === 'search' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                                >
-                                    <i className="fas fa-search mr-2"></i>タスク検索
-                                </button>
-                                <button 
-                                    onClick={() => setView({ ...view, tab: 'progress' })}
-                                    className={`px-6 py-2 rounded-xl font-bold text-sm transition-all ${view.tab === 'progress' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                                >
-                                    <i className="fas fa-chart-line mr-2"></i>進捗率確認
-                                </button>
-                            </div>
-                        )}
+                        <div className="flex items-center space-x-4">
+                            {view.type !== 'detail' && (
+                                <div className="flex items-center space-x-2 bg-slate-50 p-1 rounded-2xl border border-slate-200">
+                                    <button 
+                                        onClick={() => setView({ ...view, tab: 'tree' })}
+                                        className={`px-6 py-2 rounded-xl font-bold text-sm transition-all ${view.tab === 'tree' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        <i className="fas fa-sitemap mr-2"></i>ツリー表示
+                                    </button>
+                                    <button 
+                                        onClick={() => setView({ ...view, tab: 'search' })}
+                                        className={`px-6 py-2 rounded-xl font-bold text-sm transition-all ${view.tab === 'search' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        <i className="fas fa-search mr-2"></i>タスク検索
+                                    </button>
+                                    <button 
+                                        onClick={() => setView({ ...view, tab: 'progress' })}
+                                        className={`px-6 py-2 rounded-xl font-bold text-sm transition-all ${view.tab === 'progress' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        <i className="fas fa-chart-line mr-2"></i>進捗率確認
+                                    </button>
+                                </div>
+                            )}
+                            
+                            {/* GitHub同期ボタン */}
+                            <button 
+                                onClick={() => setShowSyncModal(true)}
+                                disabled={!hasChanges}
+                                className={`px-5 py-2 rounded-xl font-bold text-sm flex items-center transition-all ${
+                                    hasChanges 
+                                        ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-200' 
+                                        : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                                }`}
+                            >
+                                <i className="fab fa-github mr-2"></i>
+                                {hasChanges ? `変更を反映 (${changedFiles.length})` : '変更なし'}
+                            </button>
+                        </div>
                     </header>
 
-                    {/* Main Content - Takes remaining height and allows scroll */}
+                    {/* Main Content */}
                     <main className="flex-1 overflow-hidden bg-[#f8fafc]">
                         {renderContent()}
                     </main>
+                    
+                    {/* Sync Modal */}
+                    {showSyncModal && <SyncModal changes={changedFiles} onClose={() => setShowSyncModal(false)} />}
                 </div>
             );
         }
