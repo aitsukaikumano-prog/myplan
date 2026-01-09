@@ -26,22 +26,22 @@ plan/
 │   ├── README.md                # プロジェクト説明
 │   ├── STRATEGY.md              # 戦略定義
 │   ├── issues.yaml              # タスク一覧（YAML統合形式）
-│   └── output/                  # 成果物保存
-│       └── {IssueID}_{内容}.xlsx
+│   ├── output/                  # 成果物保存
+│   │   └── {IssueID}_{内容}.xlsx
+│   └── docs/                    # プロジェクト関連ドキュメント
+│       ├── meetings/            # 議事録
+│       ├── proposals/           # 企画書
+│       └── reports/             # レポート
 │
 ├── github_sim3/                 # 📊 プロジェクト: パワートレイン燃費改善
 │   ├── README.md                # プロジェクト説明
 │   ├── STRATEGY.md              # 戦略定義
 │   ├── issues.yaml              # タスク一覧
-│   └── output/                  # 成果物保存
-│
-├── docs/                        # 📝 共通ドキュメント
-│   ├── meetings/                # 議事録
-│   │   └── {YYYYMMDD}_{議題}.md
-│   ├── proposals/               # 企画書・提案書
-│   │   └── {YYYYMMDD}_{タイトル}.md
-│   └── reports/                 # 分析レポート
-│       └── {YYYYMMDD}_{タイトル}.md
+│   ├── output/                  # 成果物保存
+│   └── docs/                    # プロジェクト関連ドキュメント
+│       ├── meetings/            # 議事録
+│       ├── proposals/           # 企画書
+│       └── reports/             # レポート
 │
 └── proposals/                   # 過去の提案資料
 ```

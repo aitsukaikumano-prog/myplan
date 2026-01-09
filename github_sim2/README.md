@@ -17,8 +17,12 @@ github_sim2/
 ├── README.md         # ← このファイル
 ├── STRATEGY.md       # 戦略定義（中項目・小項目の階層）
 ├── issues.yaml       # 全Issue・タスク一覧（YAML統合形式）
-└── output/           # 成果物保存フォルダ
-    └── {IssueID}_{内容}.{拡張子}
+├── output/           # 成果物保存フォルダ
+│   └── {IssueID}_{内容}.{拡張子}
+└── docs/             # プロジェクト関連ドキュメント
+    ├── meetings/     # 議事録
+    ├── proposals/    # 企画書
+    └── reports/      # レポート
 ```
 
 ---
