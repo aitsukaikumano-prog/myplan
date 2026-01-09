@@ -1,0 +1,163 @@
+# ブランド価値向上プロジェクト - Issue一覧
+# github_sim2/issues.yaml
+
+version: 1
+project: brand_value
+updated_at: "2026-01-09"
+
+strategies:
+  - id: "2.1"
+    title: "カスタマー・エクスペリエンス（CX）の高度化"
+    categories:
+      - id: "2.1-A1"
+        title: "デジタル接点の融合 (MyMazda連携)"
+        issues:
+          - id: "2.1-A1-01"
+            title: "MyMazda連携におけるリアルタイム車両データの同期要件定義"
+            context: "顧客が店舗に来る前に車両の状態（走行距離、油脂類の状態、バッテリー健康度）を把握し、最適なタイミングでパーソナライズされた提案を行うための基盤が必要。"
+            assignee: "@daiki"
+            labels: ["Digital-CX", "Data-Infrastructure"]
+            success_criteria: "データの取得、転送、保存、CRM連携までの一貫した論理フロー図が完成していること。"
+            tasks:
+              - title: "車載コネクティッドユニットから取得可能なデータ項目の全リストアップ"
+                status: completed
+                deliverable: "output/2.1_A1_01_connected_data_list.xlsx"
+              - title: "プライバシーポリシーに準拠したデータ利用許諾フローのUX設計"
+                status: pending
+              - title: "サーバー負荷を考慮したデータ同期頻度（リアルタイム vs 1日1回）の決定"
+                status: pending
+              - title: "取得データをCRMへ自動連携するためのAPI仕様案作成"
+                status: completed
+
+          - id: "2.1-A1-02"
+            title: "「走る歓び」を可視化するドライブログ体験のUI/UX設計"
+            context: "マツダ車の価値は「運転中の心地よさ」にあるが、これを所有後もアプリで見返すことができれば、ブランドへの愛着（エンゲージメント）が深化する。"
+            assignee: "@kenji"
+            labels: ["Digital-CX", "App-Design"]
+            success_criteria: "オーナーが「毎日開きたくなる」アプリ画面のプロトタイプ（Figma等）が承認されること。"
+            tasks:
+              - title: "滑らかな運転スコアを算出するアルゴリズム案"
+                status: pending
+              - title: "ドライブフォトログ機能の画面遷移図作成"
+                status: pending
+              - title: "オーナー間コミュニティ機能のコンセプト設計"
+                status: pending
+              - title: "「楽しく走ったか」を評価する新指標の定義"
+                status: pending
+
+      - id: "2.1-A2"
+        title: "次世代店舗体験（マツダWay店舗）の標準化"
+        issues:
+          - id: "2.1-A2-01"
+            title: "次世代マツダ店舗向け「CX監査（Audit）」スコアカードの開発"
+            context: "店舗デザイン（ハード）だけでなく、接客や試乗体験（ソフト）の質を全国で均一化し、ブランド価値を担保するための定量的な評価基準が必要。"
+            assignee: "@mika"
+            labels: ["Store-Experience", "Standardization"]
+            success_criteria: "全国の販売店が「自店の弱点」を一目で把握できるダッシュボード形式のスコアカード案が完成すること。"
+            tasks:
+              - title: "既存CSIに代わる「ブランド体感度」質問項目の作成"
+                status: pending
+              - title: "試乗コースにおける「人馬一体」体感スポットの指定"
+                status: pending
+              - title: "エバンジェリスト制度の評価基準策定"
+                status: pending
+              - title: "デジタルと店舗の連携評価ロジック構築"
+                status: pending
+
+          - id: "2.1-A2-02"
+            title: "販売店スタッフ向け「ブランド・ストーリーテリング」研修動画の制作"
+            context: "カタログスペックの羅列ではなく、マツダの「心」や「技術の裏話」を自分の言葉で語れるスタッフを育成し、顧客の情緒的価値を高める。"
+            assignee: "@satoshi"
+            labels: ["Store-Experience", "Education"]
+            success_criteria: "パイロット店舗での視聴率80%以上、かつスタッフの「語れる自信」が向上すること。"
+            tasks:
+              - title: "開発主査や匠のインタビューから「キラーフレーズ」の抽出"
+                status: completed
+              - title: "車種ごとの「語るべき物語」の台本化"
+                status: completed
+              - title: "マイクロラーニング形式の動画構成案"
+                status: pending
+              - title: "理解度確認クイズとフィードバックループの設計"
+                status: pending
+
+  - id: "2.2"
+    title: "バリューチェーン・ブランディング"
+    categories:
+      - id: "2.2-B1"
+        title: "リセールバリュー管理戦略"
+        issues:
+          - id: "2.2-B1-01"
+            title: "北米・国内中古車市場におけるリセールバリュー予測・監視システム"
+            context: "ブランド価値を維持するためには、中古車価格（残価）の安定が不可欠。市場価格の変動をリアルタイムで捉え、新車のインセンティブ設定や流通量調整にフィードバックする仕組みを構築する。"
+            assignee: "@daiki"
+            labels: ["Value-Chain", "Finance"]
+            success_criteria: "週次で市場価格の変動レポートが経営層に自動共有され、具体的な流通調整アクションが実行可能になること。"
+            tasks:
+              - title: "主要オークションサイトの価格データ取得API選定"
+                status: pending
+              - title: "標準相場からの乖離検知アラートロジック開発"
+                status: pending
+              - title: "流通調整プロセスの策定"
+                status: pending
+              - title: "下取り価格保証の損益シミュレーションモデル構築"
+                status: pending
+
+      - id: "2.2-B2"
+        title: "認定中古車 (CPO) のブランド再定義"
+        issues:
+          - id: "2.2-B2-01"
+            title: "認定中古車（CPO）プレミアム化に向けた新保証プログラム設計"
+            context: "中古車を単なる「古本」ではなく、ブランドのエントリーモデルとして再定義する。プレミアムブランドに相応しい安心感（保証）と、購入しやすさ（ローン）をセットで提供する。"
+            assignee: "@satoshi"
+            labels: ["Value-Chain", "CPO"]
+            success_criteria: "新しいCPOプログラムの仕様書が確定し、提携ローン会社との基本合意が完了すること。"
+            tasks:
+              - title: "欧州プレミアムブランドのCPO保証ベンチマーク"
+                status: pending
+              - title: "100項目以上の精密点検・リフレッシュ基準策定"
+                status: pending
+              - title: "CPO版残価設定型ローンの設計"
+                status: pending
+              - title: "車両ヒストリー可視化UIの検討"
+                status: pending
+
+  - id: "2.3"
+    title: "エンゲージメント・マーケティング"
+    categories:
+      - id: "2.3-C1"
+        title: "オーナーコミュニティの活性化 (ファンベース)"
+        issues:
+          - id: "2.3-C1-01"
+            title: "マツダファンフェスタ連携型オンラインコミュニティ設計"
+            context: "リアルのイベント（ファンフェスタ）とデジタルのコミュニティをシームレスに繋ぎ、イベント終了後も熱量を維持し続ける「循環型」のファン形成を目指す。"
+            assignee: "@kenji"
+            labels: ["Engagement", "Fan-Base"]
+            success_criteria: "次回ファンフェスタにおいて、参加者の50%以上がオンラインコミュニティに新規登録またはアクティブ化すること。"
+            tasks:
+              - title: "限定デジタルコンテンツの配布設計"
+                status: pending
+              - title: "開発エンジニアとの「技術相談BBS」運営ルール"
+                status: pending
+              - title: "ファン自発オフ会のプラットフォーム要件定義"
+                status: pending
+              - title: "アンバサダー可視化とインセンティブ設計"
+                status: pending
+
+      - id: "2.3-C2"
+        title: "独自技術の「体験」への変換"
+        issues:
+          - id: "2.3-C2-01"
+            title: "試乗体験における「人馬一体」官能評価指標の導入"
+            context: "「人馬一体」という抽象的な言葉を、顧客が納得できる「体感」に落とし込む。試乗中に何に注目し、どう感じればよいのかを言語化・定量化する。"
+            assignee: "@mika"
+            labels: ["Engagement", "Sensory-Evaluation"]
+            success_criteria: "試乗後の成約率（または再来店率）が、新指標導入前のパイロット店舗で15%以上向上すること。"
+            tasks:
+              - title: "心地よさを説明する接客トークの開発"
+                status: pending
+              - title: "生体反応を用いた「ワクワク度」の簡易測定実験"
+                status: pending
+              - title: "全国試乗コースの選定基準作成"
+                status: pending
+              - title: "顧客フィードバック用官能評価シートの設計"
+                status: pending
