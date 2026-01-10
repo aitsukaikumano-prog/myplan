@@ -63,7 +63,6 @@ const Node = ({ node, onNavigate }: { node: StrategyNode; onNavigate: (issue: Is
 export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
   const [scale, setScale] = useState(1);
   const [treeDimensions, setTreeDimensions] = useState({ width: 0, height: 0 });
-  const [debugInfo, setDebugInfo] = useState('計算中...');
   const containerRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);
 
@@ -108,7 +107,6 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
     // 範囲制限
     newScale = Math.max(0.1, Math.min(1.0, newScale));
 
-    setDebugInfo(`Container: ${containerWidth}x${containerHeight} | Tree: ${Math.round(treeWidth)}x${Math.round(treeHeight)} | Scale: ${Math.round(newScale * 100)}%`);
     setScale(newScale);
   };
 
@@ -157,24 +155,6 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
         }}
       >
         <Node node={strategyData} onNavigate={() => {}} />
-      </div>
-
-      {/* デバッグ情報 */}
-      <div
-        style={{
-          position: 'fixed',
-          top: '80px',
-          left: '10px',
-          background: 'rgba(0,0,0,0.85)',
-          color: '#0f0',
-          padding: '8px 12px',
-          borderRadius: '8px',
-          fontSize: '12px',
-          fontFamily: 'monospace',
-          zIndex: 100
-        }}
-      >
-        {debugInfo}
       </div>
 
       {/* 表示用：スクロール可能なコンテンツ */}

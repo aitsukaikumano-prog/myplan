@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { ViewState, Issue } from './types';
-import { PROJECTS } from './data/strategyData';
+import { useGitHubData, PROJECTS } from './hooks/useGitHubData';
 import { useTaskStates, applyTaskStates, getChangedFiles } from './hooks/useTaskStates';
-import { 
-  TreeView, 
-  TaskSearchView, 
-  ProgressView, 
-  DocsView, 
-  DetailView, 
-  Header, 
-  SyncModal 
+import {
+  TreeView,
+  TaskSearchView,
+  ProgressView,
+  DocsView,
+  EmailsView,
+  DetailView,
+  Header,
+  SyncModal
 } from './components';
 
 function App() {
@@ -17,15 +18,43 @@ function App() {
   const [currentProject, setCurrentProject] = useState('brand');
   const [showSyncModal, setShowSyncModal] = useState(false);
   
+  const { strategyData: rawStrategyData, documents, emails, loading, error } = useGitHubData(currentProject);
   const { taskStates, updateTaskStatus, approveTask, hasChanges } = useTaskStates();
   
-  const selectedProjectData = PROJECTS[currentProject].data;
-  const strategyData = applyTaskStates(selectedProjectData, taskStates);
-  const changedFiles = getChangedFiles(selectedProjectData, taskStates, currentProject);
+  // タスク状態を適用
+  const strategyData = rawStrategyData ? applyTaskStates(rawStrategyData, taskStates) : null;
+  const changedFiles = rawStrategyData ? getChangedFiles(rawStrategyData, taskStates, currentProject) : [];
   
   const handleNavigate = (issue: Issue) => {
     setView({ ...view, type: 'detail', issue });
   };
+
+  // ローディング表示
+  if (loading) {
+    return (
+      <div className="h-screen flex flex-col items-center justify-center bg-slate-50">
+        <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mb-4"></div>
+        <p className="text-lg font-bold text-slate-600">GitHubからデータを取得中...</p>
+      </div>
+    );
+  }
+
+  // エラー表示
+  if (error || !strategyData) {
+    return (
+      <div className="h-screen flex flex-col items-center justify-center bg-slate-50">
+        <i className="fas fa-exclamation-triangle text-6xl text-amber-500 mb-4"></i>
+        <p className="text-xl font-bold text-slate-700 mb-2">データの取得に失敗しました</p>
+        <p className="text-sm text-slate-500 mb-6">{error}</p>
+        <button 
+          onClick={() => window.location.reload()}
+          className="px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors"
+        >
+          <i className="fas fa-redo mr-2"></i>再読み込み
+        </button>
+      </div>
+    );
+  }
 
   const renderContent = () => {
     if (view.type === 'detail' && view.issue) {
@@ -61,10 +90,16 @@ function App() {
         {view.tab === 'tree' && <TreeView strategyData={strategyData} onNavigate={handleNavigate} />}
         {view.tab === 'search' && <TaskSearchView strategyData={strategyData} onNavigate={handleNavigate} />}
         {view.tab === 'progress' && <ProgressView strategyData={strategyData} />}
-        {view.tab === 'docs' && <DocsView currentProject={currentProject} />}
+        {view.tab === 'docs' && <DocsView currentProject={currentProject} documents={documents} />}
+        {view.tab === 'emails' && <EmailsView currentProject={currentProject} emails={emails} />}
       </>
     );
   };
+
+  const projectsRecord = PROJECTS.reduce((acc, p) => {
+    acc[p.id] = { id: p.id, name: p.name, icon: p.icon, data: strategyData };
+    return acc;
+  }, {} as Record<string, any>);
 
   return (
     <div className="h-screen flex flex-col bg-slate-50">
@@ -72,8 +107,11 @@ function App() {
         view={view}
         setView={setView}
         currentProject={currentProject}
-        setCurrentProject={setCurrentProject}
-        projects={PROJECTS}
+        setCurrentProject={(id) => {
+          setCurrentProject(id);
+          setView({ type: 'main', tab: 'tree', issue: null });
+        }}
+        projects={projectsRecord}
         hasChanges={hasChanges}
         changedFilesCount={changedFiles.length}
         onSyncClick={() => setShowSyncModal(true)}

@@ -47,7 +47,7 @@ export interface StrategyNode {
   issues?: Issue[];
 }
 
-// ドキュメント
+// 議事録
 export interface Meeting {
   id: string;
   date: string;
@@ -57,6 +57,43 @@ export interface Meeting {
   summary: string;
   relatedIssue?: string;
   decisions: string[];
+  rawContent?: string;
+}
+
+// 統合ドキュメント型
+export type DocumentCategory = 'meeting' | 'proposal' | 'report';
+
+export interface Document {
+  id: string;
+  date: string;
+  title: string;
+  category: DocumentCategory;
+  type: string;  // meeting type, proposal type, etc.
+  author?: string;
+  summary: string;
+  relatedIssue?: string;
+  status?: 'draft' | 'review' | 'approved' | 'archived';
+  rawContent?: string;
+  // Meeting specific
+  attendees?: string[];
+  decisions?: string[];
+  // Proposal/Report specific
+  sections?: { title: string; content: string }[];
+}
+
+// メール
+export interface Email {
+  id: string;
+  date: string;
+  subject: string;
+  type: 'decision' | 'report' | 'request' | 'info';
+  from: string;
+  to: string[];
+  cc?: string[];
+  summary: string;
+  body: string;
+  relatedIssue?: string;
+  rawContent?: string;
 }
 
 // プロジェクト
@@ -70,7 +107,7 @@ export interface Project {
 // ビュー状態
 export interface ViewState {
   type: 'main' | 'detail';
-  tab: 'tree' | 'search' | 'progress' | 'docs';
+  tab: 'tree' | 'search' | 'progress' | 'docs' | 'emails';
   issue: Issue | null;
 }
 
