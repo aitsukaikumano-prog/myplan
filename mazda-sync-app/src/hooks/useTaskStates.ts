@@ -90,10 +90,10 @@ export const getChangedFiles = (
     return lines;
   };
   
-  const yamlContent = `# ブランド価値向上プロジェクト Issues\n\nissues:\n${collectIssues(applyTaskStates(originalData, taskStates)).join('\n')}`;
-
+  const yamlContent = `# ${projectId === 'brand' ? 'ブランド価値向上' : '燃費改善'}プロジェクト Issues\n\nissues:\n${collectIssues(applyTaskStates(originalData, taskStates)).join('\n')}`;
+  
   changes.push({
-    path: `github_sim2/issues.yaml`,
+    path: `github_sim${projectId === 'brand' ? '2' : '3'}/issues.yaml`,
     content: yamlContent
   });
   

@@ -39,7 +39,7 @@
 |------|-----|
 | Excel | `2.1_A1_01_connected_data_list.xlsx` |
 | PDF | `2.1_A2_02_storytelling_script.pdf` |
-| 画像 | `2.3_C1_01_community_survey_result.png` |
+| 画像 | `1.3_C1_01_aero_test_result.png` |
 
 ### 2.3 コード・設定ファイル
 
@@ -72,7 +72,7 @@
 ### 例
 ```
 2.1-A1-01  = プロジェクト2 > 戦略1 > カテゴリA-1 > Issue01
-2.2-B2-01  = プロジェクト2 > 戦略2 > カテゴリB-2 > Issue01
+1.2-B2-01  = プロジェクト1 > 戦略2 > カテゴリB-2 > Issue01
 ```
 
 ---
@@ -100,7 +100,7 @@ github_sim2/
 | 番号 | プロジェクト名（日本語） | フォルダ名 | 略称 |
 |------|----------------------|-----------|------|
 | 2 | ブランド価値向上 | `github_sim2` | `brand` |
-| 3 | マツダ救済 | `github_sim3` | `rescue` |
+| 3 | パワートレイン燃費改善 | `github_sim3` | `powertrain` |
 
 ---
 

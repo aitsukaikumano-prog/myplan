@@ -168,68 +168,52 @@ export const STRATEGY_DATA_BRAND: StrategyNode = {
   ]
 };
 
-// マツダ救済プロジェクトのデータ
-export const STRATEGY_DATA_RESCUE: StrategyNode = {
+// パワートレイン燃費改善プロジェクトのデータ
+export const STRATEGY_DATA_POWERTRAIN: StrategyNode = {
   id: 'root',
-  title: 'マツダからAIコンサル案件を獲得する',
-  icon: 'fas fa-rocket',
+  title: 'パワートレインの燃費改善',
+  icon: 'fas fa-gas-pump',
   children: [
     {
-      id: '3.1',
-      title: '3.1 提案準備',
-      icon: 'fas fa-file-alt',
+      id: '1.1',
+      title: '1.1 エンジン効率の最適化',
+      icon: 'fas fa-cogs',
       children: [
         {
-          id: '3.1-A',
-          title: 'A. マツダの課題分析',
-          icon: 'fas fa-search',
-          issues: [
+          id: '1.1-A',
+          title: 'A. 燃焼効率の向上',
+          icon: 'fas fa-fire',
+          children: [
             {
-              id: '3.1-A1-01',
-              title: 'マツダ財務・業績分析',
-              tasks: [
-                { title: '最新決算資料の収集・分析' },
-                { title: '過去5年間の業績推移まとめ' },
-                { title: '主要KPIの抽出と課題リスト作成' }
+              id: '1.1-A1',
+              title: 'A-1. SKYACTIV技術の進化',
+              icon: 'fas fa-rocket',
+              issues: [
+                {
+                  id: '1.1-A1-01',
+                  title: 'SKYACTIV-X Gen2 開発',
+                  tasks: [
+                    { title: '圧縮比最適化シミュレーション' },
+                    { title: 'SPCCI燃焼制御の高度化' },
+                    { title: '排気システムの熱効率改善' }
+                  ]
+                }
               ]
             },
             {
-              id: '3.1-A1-02',
-              title: '競合比較分析',
-              tasks: [
-                { title: '競合他社のAI活用状況調査' },
-                { title: '比較分析レポート作成' }
-              ]
-            }
-          ]
-        },
-        {
-          id: '3.1-B',
-          title: 'B. AI活用提案書作成',
-          icon: 'fas fa-lightbulb',
-          issues: [
-            {
-              id: '3.1-B1-01',
-              title: '業務効率化AI提案',
-              tasks: [
-                { title: '業務プロセス改善余地の洗い出し' },
-                { title: 'AI導入による効果試算' },
-                { title: '提案書ドラフト作成' }
-              ]
-            }
-          ]
-        },
-        {
-          id: '3.1-C',
-          title: 'C. 実績・ポートフォリオ整備',
-          icon: 'fas fa-briefcase',
-          issues: [
-            {
-              id: '3.1-C1-01',
-              title: 'ポートフォリオ作成',
-              tasks: [
-                { title: '過去案件の実績整理' },
-                { title: 'マツダ向けデモ・サンプル作成' }
+              id: '1.1-A2',
+              title: 'A-2. フリクション低減',
+              icon: 'fas fa-oil-can',
+              issues: [
+                {
+                  id: '1.1-A2-01',
+                  title: 'エンジン内部フリクション低減プロジェクト',
+                  tasks: [
+                    { title: '低粘度オイル対応設計の検証' },
+                    { title: 'ピストンリング摩擦低減コーティング評価' },
+                    { title: 'ベアリング最適化テスト' }
+                  ]
+                }
               ]
             }
           ]
@@ -237,52 +221,45 @@ export const STRATEGY_DATA_RESCUE: StrategyNode = {
       ]
     },
     {
-      id: '3.2',
-      title: '3.2 アプローチ・関係構築',
-      icon: 'fas fa-handshake',
+      id: '1.2',
+      title: '1.2 軽量化技術の推進',
+      icon: 'fas fa-feather-alt',
       children: [
         {
-          id: '3.2-A',
-          title: 'A. キーパーソン特定',
-          icon: 'fas fa-user-tie',
-          issues: [
+          id: '1.2-B',
+          title: 'B. 車体軽量化',
+          icon: 'fas fa-car-side',
+          children: [
             {
-              id: '3.2-A1-01',
-              title: '意思決定者マッピング',
-              tasks: [
-                { title: '経営陣・部門長のリストアップ' },
-                { title: 'キーパーソンマップ作成' }
+              id: '1.2-B1',
+              title: 'B-1. 高張力鋼板の採用拡大',
+              icon: 'fas fa-layer-group',
+              issues: [
+                {
+                  id: '1.2-B1-01',
+                  title: '超高張力鋼板適用範囲拡大',
+                  tasks: [
+                    { title: '1.5GPa級鋼板のプレス成形技術開発' },
+                    { title: '衝突安全性能との両立検証' },
+                    { title: 'コスト試算と量産計画' }
+                  ]
+                }
               ]
-            }
-          ]
-        },
-        {
-          id: '3.2-B',
-          title: 'B. 接点づくり',
-          icon: 'fas fa-network-wired',
-          issues: [
+            },
             {
-              id: '3.2-B1-01',
-              title: 'アプローチルート開拓',
-              tasks: [
-                { title: '業界イベント・カンファレンス調査' },
-                { title: '紹介可能な人脈の棚卸し' },
-                { title: 'LinkedIn等でのコンタクトリスト作成' }
-              ]
-            }
-          ]
-        },
-        {
-          id: '3.2-C',
-          title: 'C. 信頼関係構築',
-          icon: 'fas fa-heart',
-          issues: [
-            {
-              id: '3.2-C1-01',
-              title: '継続的価値提供',
-              tasks: [
-                { title: '業界レポート・知見の定期発信' },
-                { title: '小さな相談への迅速対応' }
+              id: '1.2-B2',
+              title: 'B-2. マルチマテリアル設計',
+              icon: 'fas fa-puzzle-piece',
+              issues: [
+                {
+                  id: '1.2-B2-01',
+                  title: 'アルミ・CFRP複合構造の開発',
+                  tasks: [
+                    { title: '異種材料接合技術の確立' },
+                    { title: '耐久性・信頼性評価' },
+                    { title: 'リサイクル性の検討' }
+                  ]
+                }
               ]
             }
           ]
@@ -290,52 +267,29 @@ export const STRATEGY_DATA_RESCUE: StrategyNode = {
       ]
     },
     {
-      id: '3.3',
-      title: '3.3 案件獲得・実行',
-      icon: 'fas fa-trophy',
+      id: '1.3',
+      title: '1.3 空力性能の改善',
+      icon: 'fas fa-wind',
       children: [
         {
-          id: '3.3-A',
-          title: 'A. 初期案件の提案',
-          icon: 'fas fa-seedling',
-          issues: [
+          id: '1.3-C',
+          title: 'C. 空気抵抗低減',
+          icon: 'fas fa-drafting-compass',
+          children: [
             {
-              id: '3.3-A1-01',
-              title: 'スモールスタート案件提案',
-              tasks: [
-                { title: '初期案件候補のリストアップ' },
-                { title: '提案資料作成' }
-              ]
-            }
-          ]
-        },
-        {
-          id: '3.3-B',
-          title: 'B. パイロット実施',
-          icon: 'fas fa-flask',
-          issues: [
-            {
-              id: '3.3-B1-01',
-              title: '実証実験の実施',
-              tasks: [
-                { title: 'パイロット計画策定' },
-                { title: '実施・効果測定' },
-                { title: '成果レポート作成' }
-              ]
-            }
-          ]
-        },
-        {
-          id: '3.3-C',
-          title: 'C. 本格契約へ拡大',
-          icon: 'fas fa-chart-line',
-          issues: [
-            {
-              id: '3.3-C1-01',
-              title: '本格提案・契約獲得',
-              tasks: [
-                { title: '本格提案書作成' },
-                { title: '契約交渉・締結' }
+              id: '1.3-C1',
+              title: 'C-1. アクティブエアロダイナミクス',
+              icon: 'fas fa-adjust',
+              issues: [
+                {
+                  id: '1.3-C1-01',
+                  title: 'アクティブグリルシャッター最適化',
+                  tasks: [
+                    { title: '速度別開閉制御ロジックの最適化' },
+                    { title: '冷却性能との両立テスト' },
+                    { title: '実走行燃費改善効果の測定' }
+                  ]
+                }
               ]
             }
           ]
@@ -353,10 +307,10 @@ export const PROJECTS: Record<string, Project> = {
     icon: 'fas fa-gem',
     data: STRATEGY_DATA_BRAND
   },
-  rescue: {
-    id: 'rescue',
-    name: 'マツダ救済',
-    icon: 'fas fa-rocket',
-    data: STRATEGY_DATA_RESCUE
+  powertrain: {
+    id: 'powertrain',
+    name: '燃費改善',
+    icon: 'fas fa-gas-pump',
+    data: STRATEGY_DATA_POWERTRAIN
   }
 };

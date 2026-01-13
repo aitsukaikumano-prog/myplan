@@ -35,13 +35,13 @@ const PROJECTS: ProjectConfig[] = [
     reportsFolder: 'github_sim2/docs/reports'
   },
   {
-    id: 'rescue',
-    name: 'マツダ救済',
-    icon: 'fas fa-rocket',
+    id: 'powertrain',
+    name: '燃費改善',
+    icon: 'fas fa-gas-pump',
     folder: 'github_sim3',
     issuesFile: 'github_sim3/issues.yaml',
-    rootTitle: 'マツダからAIコンサル案件を獲得する',
-    rootIcon: 'fas fa-rocket',
+    rootTitle: 'パワートレインの燃費を改善する',
+    rootIcon: 'fas fa-gas-pump',
     emailsFolder: 'github_sim3/docs/emails',
     meetingsFolder: 'github_sim3/docs/meetings',
     proposalsFolder: 'github_sim3/docs/proposals',

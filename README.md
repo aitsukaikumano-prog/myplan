@@ -33,12 +33,15 @@ plan/
 │       ├── proposals/           # 企画書
 │       └── reports/             # レポート
 │
-├── github_sim3/                 # 📊 プロジェクト: マツダ救済
+├── github_sim3/                 # 📊 プロジェクト: パワートレイン燃費改善
 │   ├── README.md                # プロジェクト説明
 │   ├── STRATEGY.md              # 戦略定義
 │   ├── issues.yaml              # タスク一覧
 │   ├── output/                  # 成果物保存
 │   └── docs/                    # プロジェクト関連ドキュメント
+│       ├── meetings/            # 議事録
+│       ├── proposals/           # 企画書
+│       └── reports/             # レポート
 │
 └── proposals/                   # 過去の提案資料
 ```
@@ -84,7 +87,7 @@ open mazda-sync-app/index.html
 |-------------|-------------|
 | タスク状態を更新 | 「CRM連携タスクを完了にして」 |
 | 資料を作成 | 「データリストのExcelを作って」 |
-| 検索 | 「CRM関連のタスクを教えて」 |
+| 検索 | 「燃費関連のタスクを教えて」 |
 | 分析 | 「進捗が遅れているIssueは？」 |
 | レビュー | 「この戦略に抜け漏れない？」 |
 
@@ -104,7 +107,7 @@ extension:yaml completed
 | ID | プロジェクト名 | フォルダ | 状態 |
 |----|--------------|---------|------|
 | 2 | ブランド価値向上 | `github_sim2/` | 🟢 Active |
-| 3 | マツダ救済 | `github_sim3/` | 🟢 Active |
+| 3 | パワートレイン燃費改善 | `github_sim3/` | 🟢 Active |
 
 ---
 
