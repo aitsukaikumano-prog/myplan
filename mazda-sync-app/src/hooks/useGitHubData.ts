@@ -298,7 +298,8 @@ const buildStrategyFromYaml = (yamlData: any, project: ProjectConfig): StrategyN
             title: task.title,
             status: task.status || TASK_STATUS.PENDING,
             deliverable: task.deliverable,
-            subtasks: task.subtasks || []
+            subtasks: task.subtasks || [],
+            outputs: task.outputs || []
           }))
         }))
       }))
