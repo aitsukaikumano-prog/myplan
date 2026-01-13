@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { StrategyNode, Issue, Subtask, SubtaskItem } from '../types';
+import { StrategyNode, Issue, Subtask, SubtaskItem, TaskOutput } from '../types';
 import './TreeView.css';
 
 interface TreeViewProps {
@@ -10,7 +10,7 @@ interface TreeViewProps {
 // 成果物表示用の型
 interface SelectedTask {
   title: string;
-  outputs: string[];
+  outputs: (string | TaskOutput)[];
 }
 
 // SubTaskCard: タスクカード（5階層目以降）- outputsは展開しない
@@ -128,7 +128,7 @@ const SubIssueCard = ({
   index,
   onSelectTask
 }: {
-  task: { title: string; status?: string; subtasks?: (string | Subtask)[]; outputs?: string[] };
+  task: { title: string; status?: string; subtasks?: (string | Subtask)[]; outputs?: (string | TaskOutput)[] };
   issueId: string;
   index: number;
   onSelectTask?: (task: SelectedTask) => void;
@@ -302,9 +302,20 @@ const Node = ({
 };
 
 // 成果物からファイルパスを抽出
-const extractFilePath = (output: string): string | null => {
+const extractFilePath = (output: string | TaskOutput): string | null => {
+  if (typeof output === 'object') {
+    return output.file || null;
+  }
   const match = output.match(/^(docs\/[^\s]+\.md)/);
   return match ? match[1] : null;
+};
+
+// 成果物のタイトルを取得
+const getOutputTitle = (output: string | TaskOutput): string => {
+  if (typeof output === 'object') {
+    return output.title;
+  }
+  return output;
 };
 
 // GitHub URL を構築
@@ -320,7 +331,12 @@ const DetailPanel = ({
   task: SelectedTask;
   onClose: () => void;
 }) => {
-  const handleOutputClick = (output: string) => {
+  const handleOutputClick = (output: string | TaskOutput) => {
+    // URLがある場合はそのまま開く
+    if (typeof output === 'object' && output.url) {
+      window.open(output.url, '_blank');
+      return;
+    }
     const filePath = extractFilePath(output);
     if (filePath) {
       window.open(getGitHubUrl(filePath), '_blank');
@@ -398,7 +414,9 @@ const DetailPanel = ({
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {task.outputs.map((output, idx) => {
             const filePath = extractFilePath(output);
-            const isLink = !!filePath;
+            const hasUrl = typeof output === 'object' && output.url;
+            const isLink = !!filePath || hasUrl;
+            const title = getOutputTitle(output);
 
             return (
               <div
@@ -431,7 +449,10 @@ const DetailPanel = ({
               >
                 <div>
                   <span style={{ marginRight: '8px', opacity: 0.6 }}>📎</span>
-                  {output}
+                  {title}
+                  {filePath && (
+                    <span style={{ marginLeft: '8px', fontSize: '11px', opacity: 0.6 }}>({filePath})</span>
+                  )}
                 </div>
                 {isLink && (
                   <i className="fas fa-external-link-alt" style={{ opacity: 0.5, fontSize: '11px' }}></i>

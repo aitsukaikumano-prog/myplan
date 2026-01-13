@@ -24,10 +24,34 @@ export interface Deliverable {
   submittedAt?: string;
 }
 
+// タスクの成果物（構造化）
+export interface TaskOutput {
+  type?: 'document' | 'link' | 'file';
+  file?: string;    // ファイルパス (docs/xxx.md)
+  url?: string;     // 外部URL
+  title: string;
+  summary?: string; // 成果物のサマリ
+}
+
+// タスク詳細ファイルのデータ構造
+export interface TaskDetailData {
+  successCriteria?: string[];
+  completedDate?: string;
+  outputs?: TaskOutput[];
+  description?: string;  // Markdown本文から抽出
+  notes?: string;        // Markdown本文から抽出
+}
+
+// タスクのリンク
+export interface TaskLink {
+  url: string;
+  title: string;
+}
+
 // サブタスクアイテム（6階層目対応）
 export interface SubtaskItem {
   title: string;
-  outputs?: string[];  // 6階層目の成果物
+  outputs?: (string | TaskOutput)[];  // 文字列とオブジェクト両方サポート
 }
 
 // サブタスク（5階層目対応）
@@ -38,11 +62,17 @@ export interface Subtask {
 
 // タスク
 export interface Task {
+  id?: string;                          // タスクID（オプション）
   title: string;
   status?: TaskStatusType;
   deliverable?: Deliverable;
-  subtasks?: (string | Subtask)[];  // 文字列とオブジェクト両方サポート
-  outputs?: string[];  // タスク直下の成果物
+  subtasks?: (string | Subtask)[];      // 文字列とオブジェクト両方サポート
+  outputs?: (string | TaskOutput)[];    // 成果物（文字列とオブジェクト両対応）
+  links?: TaskLink[];                   // 参考リンク
+  notes?: string;                       // メモ・備考
+  description?: string;                 // 詳細説明
+  successCriteria?: string[];           // 完了条件（チェックリスト）
+  completedDate?: string;               // 完了日
 }
 
 // Issue

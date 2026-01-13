@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import yaml from 'js-yaml';
-import { StrategyNode, Meeting, Email, Document, TASK_STATUS } from '../types';
+import { StrategyNode, Meeting, Email, Document, TASK_STATUS, TaskDetailData, TaskOutput } from '../types';
 
 // ベースパス（Viteの設定と一致させる）
 const BASE_PATH = import.meta.env.BASE_URL;
@@ -18,6 +18,7 @@ interface ProjectConfig {
   meetingsFolder: string;
   proposalsFolder: string;
   reportsFolder: string;
+  tasksFolder: string;
 }
 
 const PROJECTS: ProjectConfig[] = [
@@ -32,7 +33,8 @@ const PROJECTS: ProjectConfig[] = [
     emailsFolder: 'github_sim3/docs/emails',
     meetingsFolder: 'github_sim3/docs/meetings',
     proposalsFolder: 'github_sim3/docs/proposals',
-    reportsFolder: 'github_sim3/docs/reports'
+    reportsFolder: 'github_sim3/docs/reports',
+    tasksFolder: 'github_sim3/tasks'
   },
   {
     id: 'brand',
@@ -45,7 +47,8 @@ const PROJECTS: ProjectConfig[] = [
     emailsFolder: 'github_sim2/docs/emails',
     meetingsFolder: 'github_sim2/docs/meetings',
     proposalsFolder: 'github_sim2/docs/proposals',
-    reportsFolder: 'github_sim2/docs/reports'
+    reportsFolder: 'github_sim2/docs/reports',
+    tasksFolder: 'github_sim2/tasks'
   }
 ];
 
@@ -63,12 +66,12 @@ export const useGitHubData = (projectId: string) => {
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // ローカルのpublicフォルダからissues.yamlを取得
       const issuesUrl = `${BASE_PATH}data/${project.issuesFile}`;
       console.log('Fetching issues from:', issuesUrl);
-      
+
       const issuesRes = await fetch(issuesUrl);
       if (!issuesRes.ok) {
         throw new Error(`issues.yaml の取得に失敗しました (${issuesRes.status})`);
@@ -76,8 +79,11 @@ export const useGitHubData = (projectId: string) => {
       const issuesText = await issuesRes.text();
       const issuesYaml = yaml.load(issuesText) as any;
 
-      // YAMLから完全にツリー構造を構築
-      const data = buildStrategyFromYaml(issuesYaml, project);
+      // タスク詳細ファイルを取得
+      const taskDetails = await fetchTaskDetails(project.tasksFolder);
+
+      // YAMLから完全にツリー構造を構築（タスク詳細をマージ）
+      const data = buildStrategyFromYaml(issuesYaml, project, taskDetails);
       setStrategyData(data);
 
       // 議事録、ドキュメント、メールを取得
@@ -93,7 +99,46 @@ export const useGitHubData = (projectId: string) => {
     } finally {
       setLoading(false);
     }
-  }, [project.id, project.issuesFile, project.rootTitle, project.rootIcon, project.meetingsFolder, project.emailsFolder, project.proposalsFolder, project.reportsFolder]);
+  }, [project.id, project.issuesFile, project.rootTitle, project.rootIcon, project.meetingsFolder, project.emailsFolder, project.proposalsFolder, project.reportsFolder, project.tasksFolder]);
+
+  const fetchTaskDetails = async (tasksFolder: string): Promise<Map<string, TaskDetailData>> => {
+    const taskDetailsMap = new Map<string, TaskDetailData>();
+
+    try {
+      // index.yaml からタスクファイル一覧を取得
+      const indexUrl = `${BASE_PATH}data/${tasksFolder}/index.yaml`;
+      const indexRes = await fetch(indexUrl);
+      if (!indexRes.ok) {
+        console.warn('タスクインデックスが見つかりません');
+        return taskDetailsMap;
+      }
+
+      const indexText = await indexRes.text();
+      const indexData = yaml.load(indexText) as { files?: string[] };
+      const taskFiles = indexData?.files || [];
+
+      // 各タスクファイルを読み込み
+      for (const file of taskFiles) {
+        try {
+          const url = `${BASE_PATH}data/${tasksFolder}/${file}.md`;
+          const res = await fetch(url);
+          if (res.ok) {
+            const text = await res.text();
+            const detail = parseTaskDetailMd(text);
+            if (detail) {
+              taskDetailsMap.set(file, detail);
+            }
+          }
+        } catch {
+          // 個別のファイル取得エラーは無視
+        }
+      }
+    } catch (err) {
+      console.error('タスク詳細取得エラー:', err);
+    }
+
+    return taskDetailsMap;
+  };
 
   const fetchMeetings = async (meetingsFolder: string) => {
     try {
@@ -265,9 +310,13 @@ export const useGitHubData = (projectId: string) => {
 };
 
 // YAMLからStrategyNodeを完全に動的に構築
-const buildStrategyFromYaml = (yamlData: any, project: ProjectConfig): StrategyNode => {
+const buildStrategyFromYaml = (
+  yamlData: any,
+  project: ProjectConfig,
+  taskDetails: Map<string, TaskDetailData>
+): StrategyNode => {
   const strategies = yamlData?.strategies || [];
-  
+
   // アイコンマッピング（レベルに基づいて適切なアイコンを割り当て）
   const getIcon = (_id: string, level: number): string => {
     if (level === 1) return 'fas fa-bullseye'; // 戦略
@@ -294,17 +343,70 @@ const buildStrategyFromYaml = (yamlData: any, project: ProjectConfig): StrategyN
           assignee: issue.assignee,
           labels: issue.labels || [],
           success_criteria: issue.success_criteria,
-          tasks: (issue.tasks || []).map((task: any) => ({
-            title: task.title,
-            status: task.status || TASK_STATUS.PENDING,
-            deliverable: task.deliverable,
-            subtasks: task.subtasks || [],
-            outputs: task.outputs || []
-          }))
+          tasks: (issue.tasks || []).map((task: any) => {
+            // タスク詳細ファイルからデータをマージ
+            const detail = task.id ? taskDetails.get(task.id) : undefined;
+            return {
+              id: task.id,
+              title: task.title,
+              status: task.status || TASK_STATUS.PENDING,
+              deliverable: task.deliverable,
+              subtasks: task.subtasks || [],
+              // 詳細ファイルのデータを優先、なければissues.yamlのデータ
+              outputs: detail?.outputs || task.outputs || [],
+              links: task.links || [],
+              notes: detail?.notes || task.notes,
+              description: detail?.description || task.description,
+              successCriteria: detail?.successCriteria || task.successCriteria || [],
+              completedDate: detail?.completedDate || task.completedDate
+            };
+          })
         }))
       }))
     }))
   };
+};
+
+// タスク詳細Markdownをパース
+const parseTaskDetailMd = (text: string): TaskDetailData | null => {
+  try {
+    // Frontmatterを抽出（---で囲まれた部分）
+    const frontmatterMatch = text.match(/^---\n([\s\S]*?)\n---/);
+    if (!frontmatterMatch) {
+      return null;
+    }
+
+    const frontmatterText = frontmatterMatch[1];
+    const frontmatter = yaml.load(frontmatterText) as any;
+
+    // 本文を抽出
+    const bodyText = text.slice(frontmatterMatch[0].length).trim();
+
+    // 詳細説明を抽出（## 詳細説明 セクション）
+    const descriptionMatch = bodyText.match(/## 詳細説明\n([\s\S]*?)(?=\n## |$)/);
+    const description = descriptionMatch?.[1]?.trim();
+
+    // メモを抽出（## メモ セクション）
+    const notesMatch = bodyText.match(/## メモ\n([\s\S]*?)(?=\n## |$)/);
+    const notes = notesMatch?.[1]?.trim();
+
+    return {
+      successCriteria: frontmatter.successCriteria || [],
+      completedDate: frontmatter.completedDate,
+      outputs: (frontmatter.outputs || []).map((o: any) => ({
+        type: o.type || 'document',
+        file: o.file,
+        url: o.url,
+        title: o.title,
+        summary: o.summary
+      })) as TaskOutput[],
+      description,
+      notes
+    };
+  } catch (err) {
+    console.error('タスク詳細パースエラー:', err);
+    return null;
+  }
 };
 
 // Markdownから議事録データをパース

@@ -16,12 +16,12 @@ strategies:
             title: "提供価値の明確化"
             context: "何を売るのかの仮説を立てる（詳細は顧客接点後に検証）"
             tasks:
-              - title: "自分のスキル棚卸し（Web/AI/業務改善）"
+              - id: "1-A-01-1"
+                title: "自分のスキル棚卸し（Web/AI/業務改善）"
                 status: "completed"
-                outputs:
-                  - "docs/web-app-experience.md - 開発経験の整理文書"
-                  - "docs/portfolio-web.md - ポートフォリオ用テキスト"
-              - title: "製造業の一般的な課題リサーチ"
+                # 詳細は tasks/1-A-01-1.md を参照
+              - id: "1-A-01-2"
+                title: "製造業の一般的な課題リサーチ"
                 status: "pending"
                 subtasks:
                   - "製造業DXの動向調査"
