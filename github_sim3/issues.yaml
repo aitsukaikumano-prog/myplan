@@ -28,9 +28,21 @@ strategies:
                           - "髪型生成アプリ（Firebase+Stripe）- 課金システム込み公開中"
                           - "OCRアプリ（Dify）- 画像→テキスト変換"
                           - "業務ワークスペース（React+GitHub+Claude）- マツダ課題から着想"
-                      - "使用技術スタック一覧化"
-                      - "業務効率化事例の抽出"
-                      - "製造業応用可能スキルの特定"
+                      - title: "使用技術スタック一覧化"
+                        outputs:
+                          - "フロントエンド: React, Vite"
+                          - "バックエンド: Firebase"
+                          - "AI/ML: Dify, n8n, Claude"
+                          - "API: LINE API, Stripe, OpenAI API"
+                          - "インフラ: GitHub"
+                      - title: "業務効率化事例の抽出"
+                        outputs:
+                          - "マツダ経験: 資料作成2ヶ月→本来1日で可能"
+                          - "承認後50%が中止になる無駄の発見"
+                      - title: "製造業応用可能スキルの特定"
+                        outputs:
+                          - "RAG+コード照合のハイブリッド設計 → 部品検索・マニュアル検索に応用可"
+                          - "AI駆動業務環境 → 目標管理・進捗可視化に応用可"
                   - title: "AI関連スキルの洗い出し"
                     items:
                       - title: "AI/MLツール経験"
