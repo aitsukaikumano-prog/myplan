@@ -10,13 +10,16 @@ interface TreeViewProps {
 // SubTaskCard: 最下層のカード（5階層目）- 成果物表示
 const SubTaskCard = ({
   item,
+  parentTitle,
 }: {
   item: string;
   parentId: string;
   index: number;
+  parentTitle: string;
 }) => {
   return (
     <div className="issue-card subtask-card">
+      <div className="text-[9px] text-slate-500 mb-1 truncate">📋 {parentTitle}</div>
       <div className="flex items-center gap-2 mb-1">
         <span className="text-[9px] px-1.5 py-0.5 bg-purple-100 text-purple-600 rounded font-bold">成果物</span>
       </div>
@@ -78,6 +81,7 @@ const TaskCard = ({
                   item={item}
                   parentId={cardId}
                   index={idx}
+                  parentTitle={title}
                 />
               </div>
             ))}
