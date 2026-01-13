@@ -396,6 +396,7 @@ const TaskDetailPanel = ({
 
   return (
     <div
+      onClick={(e) => e.stopPropagation()}
       style={{
         position: 'fixed',
         top: 0,
