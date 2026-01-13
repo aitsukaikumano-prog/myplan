@@ -1,16 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { StrategyNode, Issue, Subtask, SubtaskItem, TaskOutput } from '../types';
+import { StrategyNode, Issue, Subtask, SubtaskItem, TaskOutput, Task, TASK_STATUS, STATUS_CONFIG } from '../types';
 import './TreeView.css';
 
 interface TreeViewProps {
   strategyData: StrategyNode;
   onNavigate: (issue: Issue) => void;
-}
-
-// 成果物表示用の型
-interface SelectedTask {
-  title: string;
-  outputs: (string | TaskOutput)[];
 }
 
 // SubTaskCard: タスクカード（5階層目以降）- outputsは展開しない
@@ -21,7 +15,7 @@ const SubTaskCard = ({
   item: string | SubtaskItem;
   parentId: string;
   index: number;
-  onSelectTask?: (task: SelectedTask) => void;
+  onSelectTask?: (task: Task) => void;
 }) => {
   // itemがオブジェクトかどうかを判定
   const isObject = typeof item === 'object';
@@ -29,9 +23,10 @@ const SubTaskCard = ({
   const outputs = isObject ? item.outputs : undefined;
   const hasOutputs = outputs && outputs.length > 0;
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (hasOutputs && onSelectTask) {
-      onSelectTask({ title, outputs: outputs! });
+      onSelectTask({ title, outputs: outputs! } as Task);
     }
   };
 
@@ -65,7 +60,7 @@ const TaskCard = ({
   subtask: string | Subtask;
   parentId: string;
   index: number;
-  onSelectTask?: (task: SelectedTask) => void;
+  onSelectTask?: (task: Task) => void;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const cardId = `${parentId}-${index + 1}`;
@@ -76,7 +71,8 @@ const TaskCard = ({
   const items = isObject ? subtask.items : undefined;
   const hasItems = items && items.length > 0;
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (hasItems) {
       setExpanded(!expanded);
     }
@@ -128,20 +124,21 @@ const SubIssueCard = ({
   index,
   onSelectTask
 }: {
-  task: { title: string; status?: string; subtasks?: (string | Subtask)[]; outputs?: (string | TaskOutput)[] };
+  task: Task;
   issueId: string;
   index: number;
-  onSelectTask?: (task: SelectedTask) => void;
+  onSelectTask?: (task: Task) => void;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const hasSubtasks = task.subtasks && task.subtasks.length > 0;
-  const hasOutputs = task.outputs && task.outputs.length > 0;
+  const hasDetails = task.outputs || task.description || task.successCriteria;
   const cardId = `${issueId}-${index + 1}`;
 
-  const handleClick = () => {
-    // outputsがある場合は詳細パネルを開く
-    if (hasOutputs && onSelectTask) {
-      onSelectTask({ title: task.title, outputs: task.outputs! });
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // 詳細情報がある場合は詳細パネルを開く
+    if (hasDetails && onSelectTask) {
+      onSelectTask(task);
     } else if (hasSubtasks) {
       setExpanded(!expanded);
     }
@@ -151,13 +148,13 @@ const SubIssueCard = ({
     <div className="tree-node">
       <div
         onClick={handleClick}
-        className={`issue-card sub-issue-card ${expanded ? 'issue-card-expanded' : ''} ${(hasSubtasks || hasOutputs) ? 'cursor-pointer' : ''}`}
+        className={`issue-card sub-issue-card ${expanded ? 'issue-card-expanded' : ''} ${(hasSubtasks || hasDetails) ? 'cursor-pointer' : ''}`}
       >
         <div className="flex items-center justify-between mb-1">
           <span className="text-[10px] font-bold text-blue-500">#{cardId}</span>
-          {hasOutputs ? (
-            <span className="text-[10px] text-purple-500 font-bold">
-              📎 {task.outputs!.length}
+          {hasDetails ? (
+            <span className="text-[10px] text-blue-500 font-bold">
+              <i className="fas fa-info-circle"></i>
             </span>
           ) : hasSubtasks ? (
             <span className="text-[10px] text-slate-400">
@@ -168,7 +165,7 @@ const SubIssueCard = ({
         <div className="text-xs font-semibold text-slate-700 leading-tight">{task.title}</div>
       </div>
 
-      {expanded && hasSubtasks && !hasOutputs && (
+      {expanded && hasSubtasks && !hasDetails && (
         <div className="tree-children">
           <div className="connector-vertical"></div>
           <div className={`children-container ${task.subtasks!.length > 1 ? 'has-multiple' : ''}`}>
@@ -197,12 +194,13 @@ const IssueCard = ({
 }: {
   issue: Issue;
   onNavigate: (issue: Issue) => void;
-  onSelectTask?: (task: SelectedTask) => void;
+  onSelectTask?: (task: Task) => void;
 }) => {
   const [expanded, setExpanded] = useState(false);
   // _onNavigate は将来の詳細表示機能用に保持
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setExpanded(!expanded);
   };
 
@@ -250,7 +248,7 @@ const Node = ({
 }: {
   node: StrategyNode;
   onNavigate: (issue: Issue) => void;
-  onSelectTask?: (task: SelectedTask) => void;
+  onSelectTask?: (task: Task) => void;
 }) => {
   const hasChildren = node.children && node.children.length > 0;
   const hasIssues = node.issues && node.issues.length > 0;
@@ -318,30 +316,37 @@ const getOutputTitle = (output: string | TaskOutput): string => {
   return output;
 };
 
-// GitHub URL を構築
-const getGitHubUrl = (filePath: string): string => {
-  return `https://github.com/aitsukaikumano-prog/myplan/blob/main/github_sim3/${filePath}`;
+// 成果物のサマリを取得
+const getOutputSummary = (output: string | TaskOutput): string | undefined => {
+  if (typeof output === 'string') {
+    return undefined;
+  }
+  return output.summary;
 };
 
-// 詳細パネル: 成果物を表示
-const DetailPanel = ({
-  task,
-  onClose
-}: {
-  task: SelectedTask;
-  onClose: () => void;
-}) => {
-  const handleOutputClick = (output: string | TaskOutput) => {
-    // URLがある場合はそのまま開く
-    if (typeof output === 'object' && output.url) {
-      window.open(output.url, '_blank');
-      return;
-    }
-    const filePath = extractFilePath(output);
-    if (filePath) {
-      window.open(getGitHubUrl(filePath), '_blank');
-    }
-  };
+// VSCode で開くためのURLを生成
+const getVSCodeUrl = (filePath: string): string => {
+  const basePath = '/Users/daiki/myplan/github_sim3';
+  return `vscode://file${basePath}/${filePath}`;
+};
+
+// 成果物をクリックした時の処理
+const handleOutputClick = (output: string | TaskOutput) => {
+  // URLがある場合はそのまま開く
+  if (typeof output === 'object' && output.url) {
+    window.open(output.url, '_blank');
+    return;
+  }
+  const filePath = extractFilePath(output);
+  if (filePath) {
+    window.open(getVSCodeUrl(filePath), '_blank');
+  }
+};
+
+// タスク詳細サイドパネル
+const TaskDetailPanel = ({ task, onClose }: { task: Task; onClose: () => void }) => {
+  const status = task.status || TASK_STATUS.PENDING;
+  const config = STATUS_CONFIG[status];
 
   return (
     <div
@@ -350,7 +355,7 @@ const DetailPanel = ({
         top: 0,
         right: 0,
         bottom: 0,
-        width: '360px',
+        width: '400px',
         background: 'white',
         boxShadow: '-4px 0 20px rgba(0,0,0,0.1)',
         zIndex: 100,
@@ -359,108 +364,153 @@ const DetailPanel = ({
       }}
     >
       {/* ヘッダー */}
-      <div style={{
-        padding: '16px 20px',
-        borderBottom: '1px solid #e2e8f0',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        background: '#f8fafc'
-      }}>
-        <div>
-          <span className="text-[10px] px-2 py-0.5 bg-purple-100 text-purple-600 rounded font-bold">成果物</span>
-          <h3 style={{
-            fontSize: '14px',
-            fontWeight: 700,
-            color: '#1e293b',
-            marginTop: '8px',
-            lineHeight: 1.4
-          }}>
-            {task.title}
-          </h3>
+      <div className="p-6 border-b border-slate-100">
+        <div className="flex items-start justify-between mb-3">
+          <span className={`text-xs font-bold px-2 py-1 rounded-full border ${config.color}`}>
+            {config.label}
+          </span>
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-600 p-1"
+          >
+            <i className="fas fa-times"></i>
+          </button>
         </div>
-        <button
-          onClick={onClose}
-          style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '8px',
-            background: '#f1f5f9',
-            border: 'none',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#64748b'
-          }}
-        >
-          <i className="fas fa-times"></i>
-        </button>
+        <h3 className="text-xl font-bold text-slate-800 leading-tight">{task.title}</h3>
+        {task.completedDate && (
+          <div className="mt-2 text-sm text-slate-500">
+            <i className="fas fa-calendar-check mr-2 text-green-500"></i>
+            {task.completedDate} 完了
+          </div>
+        )}
       </div>
 
-      {/* 成果物リスト */}
-      <div style={{
-        flex: 1,
-        overflow: 'auto',
-        padding: '16px'
-      }}>
-        <div style={{
-          fontSize: '12px',
-          color: '#64748b',
-          marginBottom: '12px'
-        }}>
-          {task.outputs.length}件の成果物
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {task.outputs.map((output, idx) => {
-            const filePath = extractFilePath(output);
-            const hasUrl = typeof output === 'object' && output.url;
-            const isLink = !!filePath || hasUrl;
-            const title = getOutputTitle(output);
+      {/* コンテンツ */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        {/* 詳細説明 */}
+        {task.description && (
+          <div>
+            <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
+              <i className="fas fa-align-left mr-2 text-blue-500"></i>
+              詳細説明
+            </div>
+            <div className="text-sm text-slate-700 bg-slate-50 p-4 rounded-xl leading-relaxed">
+              {task.description}
+            </div>
+          </div>
+        )}
 
-            return (
-              <div
-                key={idx}
-                onClick={() => isLink && handleOutputClick(output)}
-                style={{
-                  padding: '12px 14px',
-                  background: '#faf5ff',
-                  borderRadius: '10px',
-                  border: '1px solid #e9d5ff',
-                  fontSize: '13px',
-                  color: '#581c87',
-                  lineHeight: 1.5,
-                  cursor: isLink ? 'pointer' : 'default',
-                  transition: 'all 0.2s',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
-                }}
-                onMouseEnter={(e) => {
-                  if (isLink) {
-                    e.currentTarget.style.background = '#f3e8ff';
-                    e.currentTarget.style.borderColor = '#c084fc';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = '#faf5ff';
-                  e.currentTarget.style.borderColor = '#e9d5ff';
-                }}
-              >
-                <div>
-                  <span style={{ marginRight: '8px', opacity: 0.6 }}>📎</span>
-                  {title}
-                  {filePath && (
-                    <span style={{ marginLeft: '8px', fontSize: '11px', opacity: 0.6 }}>({filePath})</span>
-                  )}
+        {/* 完了条件 */}
+        {task.successCriteria && task.successCriteria.length > 0 && (
+          <div>
+            <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
+              <i className="fas fa-check-circle mr-2 text-amber-500"></i>
+              完了条件
+            </div>
+            <div className="space-y-2">
+              {task.successCriteria.map((criteria, i) => (
+                <div
+                  key={i}
+                  className="flex items-start space-x-3 text-sm bg-amber-50 p-3 rounded-xl border border-amber-100"
+                >
+                  <i className={`fas ${status === TASK_STATUS.COMPLETED ? 'fa-check-square text-green-500' : 'fa-square text-slate-300'} mt-0.5`}></i>
+                  <span className={status === TASK_STATUS.COMPLETED ? 'text-slate-500' : 'text-slate-700'}>
+                    {criteria}
+                  </span>
                 </div>
-                {isLink && (
-                  <i className="fas fa-external-link-alt" style={{ opacity: 0.5, fontSize: '11px' }}></i>
-                )}
-              </div>
-            );
-          })}
-        </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 成果物 */}
+        {task.outputs && task.outputs.length > 0 && (
+          <div>
+            <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
+              <i className="fas fa-file-alt mr-2 text-emerald-500"></i>
+              成果物
+            </div>
+            <div className="space-y-2">
+              {task.outputs.map((output, i) => {
+                const summary = getOutputSummary(output);
+                return (
+                  <div
+                    key={i}
+                    onClick={() => handleOutputClick(output)}
+                    className="p-3 bg-emerald-50 rounded-xl border border-emerald-100 cursor-pointer hover:bg-emerald-100 transition-colors"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <i className="fas fa-file-alt text-emerald-500"></i>
+                        <div>
+                          <div className="text-sm font-medium text-slate-700">{getOutputTitle(output)}</div>
+                          {extractFilePath(output) && (
+                            <div className="text-xs text-slate-400">{extractFilePath(output)}</div>
+                          )}
+                        </div>
+                      </div>
+                      <i className="fas fa-external-link-alt text-emerald-400"></i>
+                    </div>
+                    {summary && (
+                      <div className="mt-2 text-xs text-slate-600 bg-white/50 p-2 rounded-lg">
+                        {summary}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* リンク */}
+        {task.links && task.links.length > 0 && (
+          <div>
+            <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
+              <i className="fas fa-link mr-2 text-purple-500"></i>
+              参考リンク
+            </div>
+            <div className="space-y-2">
+              {task.links.map((link, i) => (
+                <a
+                  key={i}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3 bg-purple-50 rounded-xl border border-purple-100 hover:bg-purple-100 transition-colors"
+                >
+                  <div className="flex items-center space-x-3">
+                    <i className="fas fa-external-link-alt text-purple-500"></i>
+                    <span className="text-sm font-medium text-slate-700">{link.title}</span>
+                  </div>
+                  <i className="fas fa-chevron-right text-purple-300"></i>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* メモ */}
+        {task.notes && (
+          <div>
+            <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
+              <i className="fas fa-sticky-note mr-2 text-slate-400"></i>
+              メモ
+            </div>
+            <div className="text-sm text-slate-600 bg-slate-50 p-4 rounded-xl">
+              {task.notes}
+            </div>
+          </div>
+        )}
+
+        {/* 何も情報がない場合 */}
+        {!task.description && (!task.successCriteria || task.successCriteria.length === 0) &&
+         (!task.outputs || task.outputs.length === 0) && (!task.links || task.links.length === 0) && !task.notes && (
+          <div className="text-center py-10">
+            <i className="fas fa-info-circle text-4xl text-slate-200 mb-3"></i>
+            <p className="text-slate-400">詳細情報がありません</p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -469,7 +519,7 @@ const DetailPanel = ({
 export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
   const [scale, setScale] = useState(1);
   const [treeDimensions, setTreeDimensions] = useState({ width: 0, height: 0 });
-  const [selectedTask, setSelectedTask] = useState<SelectedTask | null>(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);
   const userZoomedRef = useRef(false); // ユーザーが手動でズームしたかどうか
@@ -583,6 +633,7 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
   return (
     <div
       ref={containerRef}
+      onClick={() => setSelectedTask(null)}
       style={{
         width: '100%',
         height: '100%',
@@ -641,7 +692,7 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
 
       {/* 詳細パネル */}
       {selectedTask && (
-        <DetailPanel task={selectedTask} onClose={() => setSelectedTask(null)} />
+        <TaskDetailPanel task={selectedTask} onClose={() => setSelectedTask(null)} />
       )}
 
       {/* ズームコントロール */}
