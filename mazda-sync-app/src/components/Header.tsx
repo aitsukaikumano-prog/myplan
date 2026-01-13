@@ -7,9 +7,6 @@ interface HeaderProps {
   currentProject: string;
   setCurrentProject: (id: string) => void;
   projects: Record<string, Project>;
-  hasChanges: boolean;
-  changedFilesCount: number;
-  onSyncClick: () => void;
 }
 
 export const Header = ({
@@ -17,10 +14,7 @@ export const Header = ({
   setView,
   currentProject,
   setCurrentProject,
-  projects,
-  hasChanges,
-  changedFilesCount,
-  onSyncClick
+  projects
 }: HeaderProps) => {
   const [showProjectDropdown, setShowProjectDropdown] = useState(false);
 
@@ -67,19 +61,6 @@ export const Header = ({
           </div>
         </div>
 
-        {/* GitHub同期ボタン */}
-        <button
-          onClick={onSyncClick}
-          disabled={!hasChanges}
-          className={`px-4 py-1.5 rounded-lg font-bold text-sm flex items-center transition-all ${
-            hasChanges
-              ? 'bg-green-600 hover:bg-green-700 text-white shadow-md shadow-green-200'
-              : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-          }`}
-        >
-          <i className="fab fa-github mr-2"></i>
-          {hasChanges ? `変更を反映 (${changedFilesCount})` : '変更なし'}
-        </button>
       </div>
 
       {/* 2行目: ナビゲーションタブ */}

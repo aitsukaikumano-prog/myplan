@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ViewState, Issue } from './types';
 import { useGitHubData, PROJECTS } from './hooks/useGitHubData';
-import { useTaskStates, applyTaskStates, getChangedFiles } from './hooks/useTaskStates';
+import { useTaskStates, applyTaskStates } from './hooks/useTaskStates';
 import {
   TreeView,
   TaskSearchView,
@@ -9,21 +9,18 @@ import {
   DocsView,
   EmailsView,
   DetailView,
-  Header,
-  SyncModal
+  Header
 } from './components';
 
 function App() {
   const [view, setView] = useState<ViewState>({ type: 'main', tab: 'tree', issue: null });
   const [currentProject, setCurrentProject] = useState('rescue');
-  const [showSyncModal, setShowSyncModal] = useState(false);
 
   const { strategyData: rawStrategyData, documents, emails, loading, error } = useGitHubData(currentProject);
-  const { taskStates, updateTaskStatus, approveTask, hasChanges } = useTaskStates();
+  const { taskStates, updateTaskStatus, approveTask } = useTaskStates();
 
   // タスク状態を適用
   const strategyData = rawStrategyData ? applyTaskStates(rawStrategyData, taskStates) : null;
-  const changedFiles = rawStrategyData ? getChangedFiles(rawStrategyData, taskStates, currentProject) : [];
 
   const handleNavigate = (issue: Issue) => {
     setView({ ...view, type: 'detail', issue });
@@ -112,21 +109,11 @@ function App() {
           setView({ type: 'main', tab: 'tree', issue: null });
         }}
         projects={projectsRecord}
-        hasChanges={hasChanges}
-        changedFilesCount={changedFiles.length}
-        onSyncClick={() => setShowSyncModal(true)}
       />
 
       <div className="flex-1 overflow-hidden">
         {renderContent()}
       </div>
-
-      {showSyncModal && (
-        <SyncModal
-          changedFiles={changedFiles}
-          onClose={() => setShowSyncModal(false)}
-        />
-      )}
     </div>
   );
 }
