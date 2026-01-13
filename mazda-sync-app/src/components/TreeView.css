@@ -136,3 +136,14 @@
   border-color: #3b82f6;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
+
+.issue-card-expanded {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+
+/* Sub-Issue カード（Issue カードと同じ形式） */
+.sub-issue-card {
+  min-width: 140px;
+  max-width: 180px;
+}

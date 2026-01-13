@@ -29,6 +29,7 @@ export interface Task {
   title: string;
   status?: TaskStatusType;
   deliverable?: Deliverable;
+  subtasks?: string[];
 }
 
 // Issue

@@ -47,7 +47,7 @@ export const applyTaskStates = (data: StrategyNode, taskStates: TaskStates): Str
 export const getChangedFiles = (
   originalData: StrategyNode,
   taskStates: TaskStates,
-  projectId: string
+  _projectId: string
 ): { path: string; content: string }[] => {
   const changes: { path: string; content: string }[] = [];
   

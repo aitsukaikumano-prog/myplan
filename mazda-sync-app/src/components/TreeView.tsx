@@ -7,32 +7,94 @@ interface TreeViewProps {
   onNavigate: (issue: Issue) => void;
 }
 
-const IssueCard = ({ issue, onNavigate }: { issue: Issue; onNavigate: (issue: Issue) => void }) => (
-  <button
-    onClick={() => onNavigate(issue)}
-    className="issue-card"
-  >
-    <div className="text-[10px] font-bold text-blue-500 mb-1">#{issue.id}</div>
-    <div className="text-xs font-semibold text-slate-700 leading-tight mb-2">{issue.title}</div>
-    <div className="space-y-1">
-      {issue.tasks.map((task, idx) => (
-        <div
-          key={idx}
-          className="flex items-start gap-1.5 text-[10px] text-slate-500"
-        >
-          <span className="text-slate-300 mt-0.5">☐</span>
-          <span className="leading-tight">{task.title}</span>
+const SubIssueCard = ({
+  task,
+  issueId,
+  index
+}: {
+  task: { title: string; status?: string; subtasks?: string[] };
+  issueId: string;
+  index: number;
+}) => {
+  return (
+    <div className="issue-card sub-issue-card">
+      <div className="text-[10px] font-bold text-blue-500 mb-1">#{issueId}-{index + 1}</div>
+      <div className="text-xs font-semibold text-slate-700 leading-tight">{task.title}</div>
+      {task.subtasks && task.subtasks.length > 0 && (
+        <div className="mt-2 space-y-1">
+          {task.subtasks.map((subtask, idx) => (
+            <div key={idx} className="flex items-start gap-1.5 text-[10px] text-slate-500">
+              <span className="text-slate-300 mt-0.5">☐</span>
+              <span className="leading-tight">{subtask}</span>
+            </div>
+          ))}
         </div>
-      ))}
+      )}
     </div>
-  </button>
-);
+  );
+};
 
-const Node = ({ node, onNavigate }: { node: StrategyNode; onNavigate: (issue: Issue) => void }) => {
+const IssueCard = ({
+  issue,
+  onNavigate: _onNavigate,
+}: {
+  issue: Issue;
+  onNavigate: (issue: Issue) => void;
+}) => {
+  const [expanded, setExpanded] = useState(false);
+  // _onNavigate は将来の詳細表示機能用に保持
+
+  const handleClick = () => {
+    setExpanded(!expanded);
+  };
+
+  return (
+    <div className="tree-node">
+      <div
+        onClick={handleClick}
+        className={`issue-card ${expanded ? 'issue-card-expanded' : ''}`}
+      >
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[10px] font-bold text-blue-500">#{issue.id}</span>
+          <span className="text-[10px] text-slate-400">
+            {expanded ? '▼' : '▶'} {issue.tasks.length}
+          </span>
+        </div>
+        <div className="text-xs font-semibold text-slate-700 leading-tight">{issue.title}</div>
+      </div>
+
+      {expanded && issue.tasks.length > 0 && (
+        <div className="tree-children">
+          <div className="connector-vertical"></div>
+          <div className={`children-container ${issue.tasks.length > 1 ? 'has-multiple' : ''}`}>
+            {issue.tasks.map((task, idx) => (
+              <div key={idx} className="child-wrapper">
+                <div className="connector-vertical"></div>
+                <SubIssueCard
+                  task={task}
+                  issueId={issue.id}
+                  index={idx}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const Node = ({
+  node,
+  onNavigate
+}: {
+  node: StrategyNode;
+  onNavigate: (issue: Issue) => void;
+}) => {
   const hasChildren = node.children && node.children.length > 0;
   const hasIssues = node.issues && node.issues.length > 0;
   const hasChildElements = hasChildren || hasIssues;
-  
+
   const allChildren = [
     ...(node.children || []).map(c => ({ type: 'node' as const, id: c.id, data: c })),
     ...(node.issues || []).map(i => ({ type: 'issue' as const, id: i.id, data: i }))
@@ -57,9 +119,15 @@ const Node = ({ node, onNavigate }: { node: StrategyNode; onNavigate: (issue: Is
               <div key={child.id} className="child-wrapper">
                 <div className="connector-vertical"></div>
                 {child.type === 'node' ? (
-                  <Node node={child.data} onNavigate={onNavigate} />
+                  <Node
+                    node={child.data}
+                    onNavigate={onNavigate}
+                  />
                 ) : (
-                  <IssueCard issue={child.data} onNavigate={onNavigate} />
+                  <IssueCard
+                    issue={child.data}
+                    onNavigate={onNavigate}
+                  />
                 )}
               </div>
             ))}
@@ -85,9 +153,7 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
     const measure = measureRef.current;
     if (!container || !measure) return;
 
-    // getBoundingClientRect で正確なサイズを取得
     const rect = measure.getBoundingClientRect();
-    // scrollWidth/scrollHeight も考慮してより大きい方を使用
     const treeWidth = Math.max(rect.width, measure.scrollWidth);
     const treeHeight = Math.max(rect.height, measure.scrollHeight);
     const containerWidth = container.clientWidth;
@@ -98,23 +164,17 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
       return;
     }
 
-    // ツリーサイズを保存
     setTreeDimensions({ width: treeWidth, height: treeHeight });
 
-    // 利用可能なスペース（パディングを両側から引く + スクロールバー分）
     const scrollBarWidth = 20;
     const availableWidth = containerWidth - (PADDING * 2) - scrollBarWidth;
     const availableHeight = containerHeight - (PADDING * 2);
 
-    // スケール計算：利用可能スペースに収まるように
     const scaleX = availableWidth / treeWidth;
     const scaleY = availableHeight / treeHeight;
     let newScale = Math.min(scaleX, scaleY);
 
-    // 安全マージン（10%縮小）
     newScale = newScale * 0.90;
-
-    // 範囲制限
     newScale = Math.max(0.1, Math.min(1.0, newScale));
 
     setScale(newScale);
@@ -138,13 +198,12 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
     };
   }, [strategyData]);
 
-  // 2本指スクロール（ピンチ）でのズーム（カーソル位置中心）
+  // ピンチズーム
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const handleWheel = (e: WheelEvent) => {
-      // ctrlKeyが押されている = ピンチジェスチャー（トラックパッド）
       if (e.ctrlKey) {
         e.preventDefault();
 
@@ -154,19 +213,16 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
 
         if (oldScale === newScale) return;
 
-        // カーソル位置（コンテナ内の座標）
         const rect = container.getBoundingClientRect();
         const cursorX = e.clientX - rect.left + container.scrollLeft;
         const cursorY = e.clientY - rect.top + container.scrollTop;
 
-        // スケール変更後のスクロール位置を計算
         const scaleRatio = newScale / oldScale;
         const newScrollLeft = cursorX * scaleRatio - (e.clientX - rect.left);
         const newScrollTop = cursorY * scaleRatio - (e.clientY - rect.top);
 
         setScale(newScale);
 
-        // 次のフレームでスクロール位置を更新
         requestAnimationFrame(() => {
           container.scrollLeft = newScrollLeft;
           container.scrollTop = newScrollTop;
@@ -186,7 +242,7 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
   };
 
   return (
-    <div 
+    <div
       ref={containerRef}
       style={{
         width: '100%',
@@ -221,7 +277,6 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
           textAlign: 'center'
         }}
       >
-        {/* スケール後のサイズを持つラッパー */}
         <div
           style={{
             display: 'inline-block',
@@ -244,9 +299,9 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
           </div>
         </div>
       </div>
-      
+
       {/* ズームコントロール */}
-      <div 
+      <div
         style={{
           position: 'fixed',
           bottom: '16px',
@@ -262,7 +317,7 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
           zIndex: 50
         }}
       >
-        <button 
+        <button
           onClick={() => handleZoom(-0.05)}
           style={{
             width: '36px',
@@ -279,17 +334,17 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
         >
           <i className="fas fa-minus"></i>
         </button>
-        <span style={{ 
-          padding: '0 8px', 
-          fontSize: '13px', 
-          fontWeight: 'bold', 
+        <span style={{
+          padding: '0 8px',
+          fontSize: '13px',
+          fontWeight: 'bold',
           color: '#475569',
           minWidth: '45px',
           textAlign: 'center'
         }}>
           {Math.round(scale * 100)}%
         </span>
-        <button 
+        <button
           onClick={() => handleZoom(0.05)}
           style={{
             width: '36px',
@@ -307,7 +362,7 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
           <i className="fas fa-plus"></i>
         </button>
         <div style={{ width: '1px', height: '24px', background: '#e2e8f0', margin: '0 4px' }}></div>
-        <button 
+        <button
           onClick={calculateFit}
           style={{
             width: '36px',

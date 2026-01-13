@@ -17,14 +17,14 @@ function App() {
   const [view, setView] = useState<ViewState>({ type: 'main', tab: 'tree', issue: null });
   const [currentProject, setCurrentProject] = useState('rescue');
   const [showSyncModal, setShowSyncModal] = useState(false);
-  
+
   const { strategyData: rawStrategyData, documents, emails, loading, error } = useGitHubData(currentProject);
   const { taskStates, updateTaskStatus, approveTask, hasChanges } = useTaskStates();
-  
+
   // タスク状態を適用
   const strategyData = rawStrategyData ? applyTaskStates(rawStrategyData, taskStates) : null;
   const changedFiles = rawStrategyData ? getChangedFiles(rawStrategyData, taskStates, currentProject) : [];
-  
+
   const handleNavigate = (issue: Issue) => {
     setView({ ...view, type: 'detail', issue });
   };
@@ -46,7 +46,7 @@ function App() {
         <i className="fas fa-exclamation-triangle text-6xl text-amber-500 mb-4"></i>
         <p className="text-xl font-bold text-slate-700 mb-2">データの取得に失敗しました</p>
         <p className="text-sm text-slate-500 mb-6">{error}</p>
-        <button 
+        <button
           onClick={() => window.location.reload()}
           className="px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors"
         >
@@ -74,9 +74,9 @@ function App() {
         };
         return findIssue(strategyData) || view.issue;
       })();
-      
+
       return (
-        <DetailView 
+        <DetailView
           issue={currentIssue}
           onBack={() => setView({ type: 'main', tab: view.tab, issue: null })}
           onUpdateTaskStatus={updateTaskStatus}
@@ -84,7 +84,7 @@ function App() {
         />
       );
     }
-    
+
     return (
       <>
         {view.tab === 'tree' && <TreeView strategyData={strategyData} onNavigate={handleNavigate} />}
@@ -116,11 +116,11 @@ function App() {
         changedFilesCount={changedFiles.length}
         onSyncClick={() => setShowSyncModal(true)}
       />
-      
+
       <div className="flex-1 overflow-hidden">
         {renderContent()}
       </div>
-      
+
       {showSyncModal && (
         <SyncModal
           changedFiles={changedFiles}

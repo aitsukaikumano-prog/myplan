@@ -188,8 +188,21 @@ export const STRATEGY_DATA_RESCUE: StrategyNode = {
               id: '1-A-01',
               title: '提供価値の明確化',
               tasks: [
-                { title: '自分のスキル棚卸し（Web/AI/業務改善）' },
-                { title: '製造業の一般的な課題リサーチ' },
+                {
+                  title: '自分のスキル棚卸し（Web/AI/業務改善）',
+                  subtasks: [
+                    'Webアプリ開発経験の整理',
+                    'AI関連スキルの洗い出し',
+                    '業務改善ツールの実績まとめ'
+                  ]
+                },
+                {
+                  title: '製造業の一般的な課題リサーチ',
+                  subtasks: [
+                    '製造業DXの動向調査',
+                    'よくある課題パターンの整理'
+                  ]
+                },
                 { title: '仮説としてのサービス案3つ作成' }
               ]
             },
