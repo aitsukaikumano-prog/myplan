@@ -316,37 +316,68 @@ const getOutputTitle = (output: string | TaskOutput): string => {
   return output;
 };
 
-// 成果物のサマリを取得
-const getOutputSummary = (output: string | TaskOutput): string | undefined => {
-  if (typeof output === 'string') {
-    return undefined;
-  }
-  return output.summary;
-};
-
-// VSCode で開くためのURLを生成
-const getVSCodeUrl = (filePath: string): string => {
-  const basePath = '/Users/daiki/myplan/github_sim3';
-  return `vscode://file${basePath}/${filePath}`;
-};
-
-// 成果物をクリックした時の処理
-const handleOutputClick = (output: string | TaskOutput) => {
-  // URLがある場合はそのまま開く
-  if (typeof output === 'object' && output.url) {
-    window.open(output.url, '_blank');
-    return;
-  }
-  const filePath = extractFilePath(output);
-  if (filePath) {
-    window.open(getVSCodeUrl(filePath), '_blank');
-  }
-};
+// ベースパス
+const BASE_PATH = import.meta.env.BASE_URL;
 
 // タスク詳細サイドパネル
-const TaskDetailPanel = ({ task, onClose }: { task: Task; onClose: () => void }) => {
+const TaskDetailPanel = ({
+  task,
+  onClose,
+  width,
+  onResizeStart
+}: {
+  task: Task;
+  onClose: () => void;
+  width: number;
+  onResizeStart: (e: React.MouseEvent) => void;
+}) => {
   const status = task.status || TASK_STATUS.PENDING;
   const config = STATUS_CONFIG[status];
+
+  // 成果物の展開状態と内容を管理
+  const [expandedOutputs, setExpandedOutputs] = useState<Set<number>>(new Set());
+  const [outputContents, setOutputContents] = useState<Record<number, string>>({});
+  const [loadingOutputs, setLoadingOutputs] = useState<Set<number>>(new Set());
+
+  // 成果物の内容を取得
+  const fetchOutputContent = async (index: number, filePath: string) => {
+    if (outputContents[index] || loadingOutputs.has(index)) return;
+
+    setLoadingOutputs(prev => new Set(prev).add(index));
+    try {
+      const url = `${BASE_PATH}data/github_sim3/${filePath}`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const text = await res.text();
+        setOutputContents(prev => ({ ...prev, [index]: text }));
+      }
+    } catch (err) {
+      console.error('成果物の取得に失敗:', err);
+    } finally {
+      setLoadingOutputs(prev => {
+        const next = new Set(prev);
+        next.delete(index);
+        return next;
+      });
+    }
+  };
+
+  // 成果物の展開/折りたたみ
+  const toggleOutputExpand = (index: number, filePath: string | null) => {
+    const isExpanded = expandedOutputs.has(index);
+    if (isExpanded) {
+      setExpandedOutputs(prev => {
+        const next = new Set(prev);
+        next.delete(index);
+        return next;
+      });
+    } else {
+      setExpandedOutputs(prev => new Set(prev).add(index));
+      if (filePath) {
+        fetchOutputContent(index, filePath);
+      }
+    }
+  };
 
   return (
     <div
@@ -355,7 +386,7 @@ const TaskDetailPanel = ({ task, onClose }: { task: Task; onClose: () => void })
         top: 0,
         right: 0,
         bottom: 0,
-        width: '400px',
+        width: `${width}px`,
         background: 'white',
         boxShadow: '-4px 0 20px rgba(0,0,0,0.1)',
         zIndex: 100,
@@ -363,6 +394,21 @@ const TaskDetailPanel = ({ task, onClose }: { task: Task; onClose: () => void })
         flexDirection: 'column'
       }}
     >
+      {/* リサイズハンドル */}
+      <div
+        onMouseDown={onResizeStart}
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: '6px',
+          cursor: 'col-resize',
+          background: 'transparent',
+          zIndex: 10
+        }}
+        className="hover:bg-blue-400 transition-colors"
+      />
       {/* ヘッダー */}
       <div className="p-6 border-b border-slate-100">
         <div className="flex items-start justify-between mb-3">
@@ -400,6 +446,19 @@ const TaskDetailPanel = ({ task, onClose }: { task: Task; onClose: () => void })
           </div>
         )}
 
+        {/* 成果物サマリー */}
+        {task.outputsSummary && (
+          <div>
+            <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
+              <i className="fas fa-clipboard-check mr-2 text-emerald-500"></i>
+              成果物サマリー
+            </div>
+            <div className="text-sm text-slate-700 bg-emerald-50 p-4 rounded-xl leading-relaxed border border-emerald-100">
+              {task.outputsSummary}
+            </div>
+          </div>
+        )}
+
         {/* 完了条件 */}
         {task.successCriteria && task.successCriteria.length > 0 && (
           <div>
@@ -432,28 +491,43 @@ const TaskDetailPanel = ({ task, onClose }: { task: Task; onClose: () => void })
             </div>
             <div className="space-y-2">
               {task.outputs.map((output, i) => {
-                const summary = getOutputSummary(output);
+                const filePath = extractFilePath(output);
+                const isExpanded = expandedOutputs.has(i);
+                const isLoading = loadingOutputs.has(i);
+                const content = outputContents[i];
+
                 return (
-                  <div
-                    key={i}
-                    onClick={() => handleOutputClick(output)}
-                    className="p-3 bg-emerald-50 rounded-xl border border-emerald-100 cursor-pointer hover:bg-emerald-100 transition-colors"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <i className="fas fa-file-alt text-emerald-500"></i>
-                        <div>
-                          <div className="text-sm font-medium text-slate-700">{getOutputTitle(output)}</div>
-                          {extractFilePath(output) && (
-                            <div className="text-xs text-slate-400">{extractFilePath(output)}</div>
-                          )}
-                        </div>
+                  <div key={i}>
+                    {/* ヘッダー（クリックで展開/折りたたみ） */}
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleOutputExpand(i, filePath);
+                      }}
+                      className={`flex items-center p-3 bg-emerald-50 rounded-xl border border-emerald-100 cursor-pointer hover:bg-emerald-100 transition-colors ${isExpanded ? 'rounded-b-none border-b-0' : ''}`}
+                    >
+                      <i className={`fas ${isExpanded ? 'fa-chevron-down' : 'fa-chevron-right'} text-emerald-500 w-4 mr-3`}></i>
+                      <div>
+                        <div className="text-sm font-medium text-slate-700">{getOutputTitle(output)}</div>
+                        {filePath && (
+                          <div className="text-xs text-slate-400">{filePath}</div>
+                        )}
                       </div>
-                      <i className="fas fa-external-link-alt text-emerald-400"></i>
                     </div>
-                    {summary && (
-                      <div className="mt-2 text-xs text-slate-600 bg-white/50 p-2 rounded-lg">
-                        {summary}
+
+                    {/* 展開時の内容表示 */}
+                    {isExpanded && (
+                      <div className="p-4 bg-white border border-emerald-100 rounded-b-xl border-t-0 max-h-80 overflow-y-auto">
+                        {isLoading ? (
+                          <div className="flex items-center justify-center py-4 text-slate-400">
+                            <i className="fas fa-spinner fa-spin mr-2"></i>
+                            読み込み中...
+                          </div>
+                        ) : content ? (
+                          <pre className="whitespace-pre-wrap text-sm text-slate-700 font-mono leading-relaxed">{content}</pre>
+                        ) : (
+                          <div className="text-sm text-slate-400">内容を取得できませんでした</div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -520,9 +594,38 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
   const [scale, setScale] = useState(1);
   const [treeDimensions, setTreeDimensions] = useState({ width: 0, height: 0 });
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [panelWidth, setPanelWidth] = useState(400);
+  const [isResizing, setIsResizing] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);
   const userZoomedRef = useRef(false); // ユーザーが手動でズームしたかどうか
+
+  // パネルリサイズ処理
+  const handleResizeStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  };
+
+  useEffect(() => {
+    if (!isResizing) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const newWidth = window.innerWidth - e.clientX;
+      setPanelWidth(Math.min(window.innerWidth * 0.75, Math.max(400, newWidth)));
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing]);
 
   // パディング設定（定数）
   const PADDING = 40;
@@ -692,7 +795,27 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
 
       {/* 詳細パネル */}
       {selectedTask && (
-        <TaskDetailPanel task={selectedTask} onClose={() => setSelectedTask(null)} />
+        <TaskDetailPanel
+          task={selectedTask}
+          onClose={() => setSelectedTask(null)}
+          width={panelWidth}
+          onResizeStart={handleResizeStart}
+        />
+      )}
+
+      {/* リサイズ中のオーバーレイ */}
+      {isResizing && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            cursor: 'col-resize',
+            zIndex: 150
+          }}
+        />
       )}
 
       {/* ズームコントロール */}

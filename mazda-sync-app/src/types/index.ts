@@ -38,6 +38,7 @@ export interface TaskDetailData {
   successCriteria?: string[];
   completedDate?: string;
   outputs?: TaskOutput[];
+  outputsSummary?: string;  // 成果物全体のサマリー
   description?: string;  // Markdown本文から抽出
   notes?: string;        // Markdown本文から抽出
 }
@@ -68,6 +69,7 @@ export interface Task {
   deliverable?: Deliverable;
   subtasks?: (string | Subtask)[];      // 文字列とオブジェクト両方サポート
   outputs?: (string | TaskOutput)[];    // 成果物（文字列とオブジェクト両対応）
+  outputsSummary?: string;              // 成果物全体のサマリー
   links?: TaskLink[];                   // 参考リンク
   notes?: string;                       // メモ・備考
   description?: string;                 // 詳細説明

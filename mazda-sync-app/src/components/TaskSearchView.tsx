@@ -33,37 +33,58 @@ const getOutputPath = (output: string | TaskOutput): string | undefined => {
   return output.file || output.url;
 };
 
-// 成果物のサマリを取得
-const getOutputSummary = (output: string | TaskOutput): string | undefined => {
-  if (typeof output === 'string') {
-    return undefined;
-  }
-  return output.summary;
-};
-
-// VSCode で開くためのURLを生成
-const getVSCodeUrl = (filePath: string): string => {
-  const basePath = '/Users/daiki/myplan/github_sim3';
-  return `vscode://file${basePath}/${filePath}`;
-};
-
-// 成果物をクリックした時の処理
-const handleOutputClick = (output: string | TaskOutput) => {
-  const path = getOutputPath(output);
-  if (!path) return;
-
-  if (path.startsWith('http://') || path.startsWith('https://')) {
-    window.open(path, '_blank');
-    return;
-  }
-
-  window.open(getVSCodeUrl(path), '_blank');
-};
+// ベースパス
+const BASE_PATH = import.meta.env.BASE_URL;
 
 // タスク詳細サイドパネル
 const TaskDetailPanel = ({ task, onClose }: { task: Task; onClose: () => void }) => {
   const status = task.status || TASK_STATUS.PENDING;
   const config = STATUS_CONFIG[status];
+
+  // 成果物の展開状態と内容を管理
+  const [expandedOutputs, setExpandedOutputs] = useState<Set<number>>(new Set());
+  const [outputContents, setOutputContents] = useState<Record<number, string>>({});
+  const [loadingOutputs, setLoadingOutputs] = useState<Set<number>>(new Set());
+
+  // 成果物の内容を取得
+  const fetchOutputContent = async (index: number, filePath: string) => {
+    if (outputContents[index] || loadingOutputs.has(index)) return;
+
+    setLoadingOutputs(prev => new Set(prev).add(index));
+    try {
+      const url = `${BASE_PATH}data/github_sim3/${filePath}`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const text = await res.text();
+        setOutputContents(prev => ({ ...prev, [index]: text }));
+      }
+    } catch (err) {
+      console.error('成果物の取得に失敗:', err);
+    } finally {
+      setLoadingOutputs(prev => {
+        const next = new Set(prev);
+        next.delete(index);
+        return next;
+      });
+    }
+  };
+
+  // 成果物の展開/折りたたみ
+  const toggleOutputExpand = (index: number, filePath: string | null) => {
+    const isExpanded = expandedOutputs.has(index);
+    if (isExpanded) {
+      setExpandedOutputs(prev => {
+        const next = new Set(prev);
+        next.delete(index);
+        return next;
+      });
+    } else {
+      setExpandedOutputs(prev => new Set(prev).add(index));
+      if (filePath) {
+        fetchOutputContent(index, filePath);
+      }
+    }
+  };
 
   return (
     <div className="h-full flex flex-col bg-white border-l-2 border-slate-200">
@@ -104,6 +125,19 @@ const TaskDetailPanel = ({ task, onClose }: { task: Task; onClose: () => void })
           </div>
         )}
 
+        {/* 成果物サマリー */}
+        {task.outputsSummary && (
+          <div>
+            <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
+              <i className="fas fa-clipboard-check mr-2 text-emerald-500"></i>
+              成果物サマリー
+            </div>
+            <div className="text-sm text-slate-700 bg-emerald-50 p-4 rounded-xl leading-relaxed border border-emerald-100">
+              {task.outputsSummary}
+            </div>
+          </div>
+        )}
+
         {/* 完了条件 */}
         {task.successCriteria && task.successCriteria.length > 0 && (
           <div>
@@ -136,28 +170,43 @@ const TaskDetailPanel = ({ task, onClose }: { task: Task; onClose: () => void })
             </div>
             <div className="space-y-2">
               {task.outputs.map((output, i) => {
-                const summary = getOutputSummary(output);
+                const filePath = getOutputPath(output);
+                const isExpanded = expandedOutputs.has(i);
+                const isLoading = loadingOutputs.has(i);
+                const content = outputContents[i];
+
                 return (
-                  <div
-                    key={i}
-                    onClick={() => handleOutputClick(output)}
-                    className="p-3 bg-emerald-50 rounded-xl border border-emerald-100 cursor-pointer hover:bg-emerald-100 transition-colors"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <i className="fas fa-file-alt text-emerald-500"></i>
-                        <div>
-                          <div className="text-sm font-medium text-slate-700">{getOutputTitle(output)}</div>
-                          {getOutputPath(output) && (
-                            <div className="text-xs text-slate-400">{getOutputPath(output)}</div>
-                          )}
-                        </div>
+                  <div key={i}>
+                    {/* ヘッダー（クリックで展開/折りたたみ） */}
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleOutputExpand(i, filePath || null);
+                      }}
+                      className={`flex items-center p-3 bg-emerald-50 rounded-xl border border-emerald-100 cursor-pointer hover:bg-emerald-100 transition-colors ${isExpanded ? 'rounded-b-none border-b-0' : ''}`}
+                    >
+                      <i className={`fas ${isExpanded ? 'fa-chevron-down' : 'fa-chevron-right'} text-emerald-500 w-4 mr-3`}></i>
+                      <div>
+                        <div className="text-sm font-medium text-slate-700">{getOutputTitle(output)}</div>
+                        {filePath && (
+                          <div className="text-xs text-slate-400">{filePath}</div>
+                        )}
                       </div>
-                      <i className="fas fa-external-link-alt text-emerald-400"></i>
                     </div>
-                    {summary && (
-                      <div className="mt-2 text-xs text-slate-600 bg-white/50 p-2 rounded-lg">
-                        {summary}
+
+                    {/* 展開時の内容表示 */}
+                    {isExpanded && (
+                      <div className="p-4 bg-white border border-emerald-100 rounded-b-xl border-t-0 max-h-80 overflow-y-auto">
+                        {isLoading ? (
+                          <div className="flex items-center justify-center py-4 text-slate-400">
+                            <i className="fas fa-spinner fa-spin mr-2"></i>
+                            読み込み中...
+                          </div>
+                        ) : content ? (
+                          <pre className="whitespace-pre-wrap text-sm text-slate-700 font-mono leading-relaxed">{content}</pre>
+                        ) : (
+                          <div className="text-sm text-slate-400">内容を取得できませんでした</div>
+                        )}
                       </div>
                     )}
                   </div>

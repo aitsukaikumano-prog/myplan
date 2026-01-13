@@ -354,6 +354,7 @@ const buildStrategyFromYaml = (
               subtasks: task.subtasks || [],
               // 詳細ファイルのデータを優先、なければissues.yamlのデータ
               outputs: detail?.outputs || task.outputs || [],
+              outputsSummary: detail?.outputsSummary || task.outputsSummary,
               links: task.links || [],
               notes: detail?.notes || task.notes,
               description: detail?.description || task.description,
@@ -400,6 +401,7 @@ const parseTaskDetailMd = (text: string): TaskDetailData | null => {
         title: o.title,
         summary: o.summary
       })) as TaskOutput[],
+      outputsSummary: frontmatter.outputsSummary,
       description,
       notes
     };
