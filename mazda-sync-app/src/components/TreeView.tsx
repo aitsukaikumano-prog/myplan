@@ -122,17 +122,20 @@ const SubIssueCard = ({
   task,
   issueId,
   index,
-  onSelectTask
+  onSelectTask,
+  highlightCompleted
 }: {
   task: Task;
   issueId: string;
   index: number;
   onSelectTask?: (task: Task) => void;
+  highlightCompleted?: boolean;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const hasSubtasks = task.subtasks && task.subtasks.length > 0;
   const hasDetails = task.outputs || task.description || task.successCriteria;
   const cardId = `${issueId}-${index + 1}`;
+  const isCompleted = task.status === TASK_STATUS.COMPLETED;
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -144,11 +147,16 @@ const SubIssueCard = ({
     }
   };
 
+  // 完了ハイライト時のスタイル
+  const completedStyle = highlightCompleted && isCompleted
+    ? 'bg-green-100 border-green-400 ring-2 ring-green-300'
+    : '';
+
   return (
     <div className="tree-node">
       <div
         onClick={handleClick}
-        className={`issue-card sub-issue-card ${expanded ? 'issue-card-expanded' : ''} ${(hasSubtasks || hasDetails) ? 'cursor-pointer' : ''}`}
+        className={`issue-card sub-issue-card ${expanded ? 'issue-card-expanded' : ''} ${(hasSubtasks || hasDetails) ? 'cursor-pointer' : ''} ${completedStyle}`}
       >
         <div className="flex items-center justify-between mb-1">
           <span className="text-[10px] font-bold text-blue-500">#{cardId}</span>
@@ -190,11 +198,13 @@ const SubIssueCard = ({
 const IssueCard = ({
   issue,
   onNavigate: _onNavigate,
-  onSelectTask
+  onSelectTask,
+  highlightCompleted
 }: {
   issue: Issue;
   onNavigate: (issue: Issue) => void;
   onSelectTask?: (task: Task) => void;
+  highlightCompleted?: boolean;
 }) => {
   const [expanded, setExpanded] = useState(false);
   // _onNavigate は将来の詳細表示機能用に保持
@@ -231,6 +241,7 @@ const IssueCard = ({
                   issueId={issue.id}
                   index={idx}
                   onSelectTask={onSelectTask}
+                  highlightCompleted={highlightCompleted}
                 />
               </div>
             ))}
@@ -244,11 +255,13 @@ const IssueCard = ({
 const Node = ({
   node,
   onNavigate,
-  onSelectTask
+  onSelectTask,
+  highlightCompleted
 }: {
   node: StrategyNode;
   onNavigate: (issue: Issue) => void;
   onSelectTask?: (task: Task) => void;
+  highlightCompleted?: boolean;
 }) => {
   const hasChildren = node.children && node.children.length > 0;
   const hasIssues = node.issues && node.issues.length > 0;
@@ -282,12 +295,14 @@ const Node = ({
                     node={child.data}
                     onNavigate={onNavigate}
                     onSelectTask={onSelectTask}
+                    highlightCompleted={highlightCompleted}
                   />
                 ) : (
                   <IssueCard
                     issue={child.data}
                     onNavigate={onNavigate}
                     onSelectTask={onSelectTask}
+                    highlightCompleted={highlightCompleted}
                   />
                 )}
               </div>
@@ -596,6 +611,7 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [panelWidth, setPanelWidth] = useState(400);
   const [isResizing, setIsResizing] = useState(false);
+  const [highlightCompleted, setHighlightCompleted] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);
   const userZoomedRef = useRef(false); // ユーザーが手動でズームしたかどうか
@@ -766,6 +782,7 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
           minWidth: '100%',
           minHeight: '100%',
           padding: PADDING,
+          paddingBottom: PADDING + 80,
           boxSizing: 'border-box',
           textAlign: 'center'
         }}
@@ -788,7 +805,7 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
               left: 0
             }}
           >
-            <Node node={strategyData} onNavigate={onNavigate} onSelectTask={setSelectedTask} />
+            <Node node={strategyData} onNavigate={onNavigate} onSelectTask={setSelectedTask} highlightCompleted={highlightCompleted} />
           </div>
         </div>
       </div>
@@ -897,6 +914,30 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
           title="画面にフィット"
         >
           <i className="fas fa-expand"></i>
+        </button>
+        <div style={{ width: '1px', height: '24px', background: '#e2e8f0', margin: '0 4px' }}></div>
+        <button
+          onClick={() => setHighlightCompleted(!highlightCompleted)}
+          style={{
+            height: '36px',
+            borderRadius: '10px',
+            background: highlightCompleted ? '#10b981' : '#f1f5f9',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '0 12px',
+            gap: '6px',
+            color: highlightCompleted ? 'white' : '#475569',
+            fontSize: '12px',
+            fontWeight: 'bold',
+            transition: 'all 0.2s'
+          }}
+          title="完了タスクをハイライト"
+        >
+          <i className="fas fa-check-circle"></i>
+          <span>完了</span>
         </button>
       </div>
     </div>
