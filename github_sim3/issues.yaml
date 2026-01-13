@@ -21,10 +21,11 @@ strategies:
                 subtasks:
                   - title: "Webアプリ開発経験の整理"
                     items:
-                      - "開発プロジェクトのリストアップ"
-                      - "使用技術スタック（React/Node等）の一覧化"
-                      - "業務効率化に貢献した事例の抽出"
-                      - "製造業に応用可能なスキルの特定"
+                      - "LINE チャットbot（Dify）"
+                      - "LINE チャットブリッジ（n8n）"
+                      - "髪型生成Webアプリ（NanoBanana+AI）"
+                      - "OCRアプリ（Dify）"
+                      - "業務ワークスペース（VSCode+GitHub+React）"
                   - "AI関連スキルの洗い出し"
                   - "業務改善ツールの実績まとめ"
               - title: "製造業の一般的な課題リサーチ"
