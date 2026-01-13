@@ -293,6 +293,17 @@ const Node = ({
   );
 };
 
+// 成果物からファイルパスを抽出
+const extractFilePath = (output: string): string | null => {
+  const match = output.match(/^(docs\/[^\s]+\.md)/);
+  return match ? match[1] : null;
+};
+
+// GitHub URL を構築
+const getGitHubUrl = (filePath: string): string => {
+  return `https://github.com/aitsukaikumano-prog/myplan/blob/main/github_sim3/${filePath}`;
+};
+
 // 詳細パネル: 成果物を表示
 const DetailPanel = ({
   task,
@@ -301,6 +312,13 @@ const DetailPanel = ({
   task: SelectedTask;
   onClose: () => void;
 }) => {
+  const handleOutputClick = (output: string) => {
+    const filePath = extractFilePath(output);
+    if (filePath) {
+      window.open(getGitHubUrl(filePath), '_blank');
+    }
+  };
+
   return (
     <div
       style={{
@@ -370,23 +388,49 @@ const DetailPanel = ({
           {task.outputs.length}件の成果物
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {task.outputs.map((output, idx) => (
-            <div
-              key={idx}
-              style={{
-                padding: '12px 14px',
-                background: '#faf5ff',
-                borderRadius: '10px',
-                border: '1px solid #e9d5ff',
-                fontSize: '13px',
-                color: '#581c87',
-                lineHeight: 1.5
-              }}
-            >
-              <span style={{ marginRight: '8px', opacity: 0.6 }}>📎</span>
-              {output}
-            </div>
-          ))}
+          {task.outputs.map((output, idx) => {
+            const filePath = extractFilePath(output);
+            const isLink = !!filePath;
+
+            return (
+              <div
+                key={idx}
+                onClick={() => isLink && handleOutputClick(output)}
+                style={{
+                  padding: '12px 14px',
+                  background: '#faf5ff',
+                  borderRadius: '10px',
+                  border: '1px solid #e9d5ff',
+                  fontSize: '13px',
+                  color: '#581c87',
+                  lineHeight: 1.5,
+                  cursor: isLink ? 'pointer' : 'default',
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}
+                onMouseEnter={(e) => {
+                  if (isLink) {
+                    e.currentTarget.style.background = '#f3e8ff';
+                    e.currentTarget.style.borderColor = '#c084fc';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#faf5ff';
+                  e.currentTarget.style.borderColor = '#e9d5ff';
+                }}
+              >
+                <div>
+                  <span style={{ marginRight: '8px', opacity: 0.6 }}>📎</span>
+                  {output}
+                </div>
+                {isLink && (
+                  <i className="fas fa-external-link-alt" style={{ opacity: 0.5, fontSize: '11px' }}></i>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
