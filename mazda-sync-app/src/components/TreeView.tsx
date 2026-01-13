@@ -7,11 +7,9 @@ interface TreeViewProps {
   onNavigate: (issue: Issue) => void;
 }
 
-// SubTaskCard: 最下層のカード（5階層目）
+// SubTaskCard: 最下層のカード（5階層目）- 成果物表示
 const SubTaskCard = ({
   item,
-  parentId,
-  index
 }: {
   item: string;
   parentId: string;
@@ -19,7 +17,9 @@ const SubTaskCard = ({
 }) => {
   return (
     <div className="issue-card subtask-card">
-      <div className="text-[10px] font-bold text-purple-500 mb-1">#{parentId}-{index + 1}</div>
+      <div className="flex items-center gap-2 mb-1">
+        <span className="text-[9px] px-1.5 py-0.5 bg-purple-100 text-purple-600 rounded font-bold">成果物</span>
+      </div>
       <div className="text-xs font-semibold text-slate-700 leading-tight">{item}</div>
     </div>
   );
