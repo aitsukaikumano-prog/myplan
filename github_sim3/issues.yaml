@@ -14,13 +14,13 @@ strategies:
         issues:
           - id: "1-A-01"
             title: "提供価値の明確化"
-            context: "何を売るのかを具体的に定義する"
+            context: "何を売るのかの仮説を立てる（詳細は顧客接点後に検証）"
             tasks:
               - title: "自分のスキル棚卸し（Web/AI/業務改善）"
                 status: "pending"
-              - title: "ターゲット（製造業）の課題リサーチ"
+              - title: "製造業の一般的な課題リサーチ"
                 status: "pending"
-              - title: "提供サービスメニュー作成（3つ程度に絞る）"
+              - title: "仮説としてのサービス案3つ作成"
                 status: "pending"
           - id: "1-A-02"
             title: "営業ツール整備"

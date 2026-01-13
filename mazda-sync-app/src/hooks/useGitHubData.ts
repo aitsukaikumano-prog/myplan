@@ -22,19 +22,6 @@ interface ProjectConfig {
 
 const PROJECTS: ProjectConfig[] = [
   {
-    id: 'brand',
-    name: 'ブランド価値向上',
-    icon: 'fas fa-gem',
-    folder: 'github_sim2',
-    issuesFile: 'github_sim2/issues.yaml',
-    rootTitle: 'マツダのブランド価値を向上させる',
-    rootIcon: 'fas fa-star',
-    emailsFolder: 'github_sim2/docs/emails',
-    meetingsFolder: 'github_sim2/docs/meetings',
-    proposalsFolder: 'github_sim2/docs/proposals',
-    reportsFolder: 'github_sim2/docs/reports'
-  },
-  {
     id: 'rescue',
     name: 'マツダ救済',
     icon: 'fas fa-rocket',
@@ -46,6 +33,19 @@ const PROJECTS: ProjectConfig[] = [
     meetingsFolder: 'github_sim3/docs/meetings',
     proposalsFolder: 'github_sim3/docs/proposals',
     reportsFolder: 'github_sim3/docs/reports'
+  },
+  {
+    id: 'brand',
+    name: 'ブランド価値向上',
+    icon: 'fas fa-gem',
+    folder: 'github_sim2',
+    issuesFile: 'github_sim2/issues.yaml',
+    rootTitle: 'マツダのブランド価値を向上させる',
+    rootIcon: 'fas fa-star',
+    emailsFolder: 'github_sim2/docs/emails',
+    meetingsFolder: 'github_sim2/docs/meetings',
+    proposalsFolder: 'github_sim2/docs/proposals',
+    reportsFolder: 'github_sim2/docs/reports'
   }
 ];
 

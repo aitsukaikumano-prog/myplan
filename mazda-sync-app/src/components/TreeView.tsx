@@ -13,8 +13,18 @@ const IssueCard = ({ issue, onNavigate }: { issue: Issue; onNavigate: (issue: Is
     className="issue-card"
   >
     <div className="text-[10px] font-bold text-blue-500 mb-1">#{issue.id}</div>
-    <div className="text-xs font-semibold text-slate-700 leading-tight">{issue.title}</div>
-    <div className="mt-2 text-[10px] text-slate-400">{issue.tasks.length} tasks</div>
+    <div className="text-xs font-semibold text-slate-700 leading-tight mb-2">{issue.title}</div>
+    <div className="space-y-1">
+      {issue.tasks.map((task, idx) => (
+        <div
+          key={idx}
+          className="flex items-start gap-1.5 text-[10px] text-slate-500"
+        >
+          <span className="text-slate-300 mt-0.5">☐</span>
+          <span className="leading-tight">{task.title}</span>
+        </div>
+      ))}
+    </div>
   </button>
 );
 

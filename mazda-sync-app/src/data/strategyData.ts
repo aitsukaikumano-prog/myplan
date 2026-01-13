@@ -189,8 +189,8 @@ export const STRATEGY_DATA_RESCUE: StrategyNode = {
               title: '提供価値の明確化',
               tasks: [
                 { title: '自分のスキル棚卸し（Web/AI/業務改善）' },
-                { title: 'ターゲット（製造業）の課題リサーチ' },
-                { title: '提供サービスメニュー作成（3つ程度に絞る）' }
+                { title: '製造業の一般的な課題リサーチ' },
+                { title: '仮説としてのサービス案3つ作成' }
               ]
             },
             {

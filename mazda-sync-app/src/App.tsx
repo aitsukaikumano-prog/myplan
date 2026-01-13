@@ -15,7 +15,7 @@ import {
 
 function App() {
   const [view, setView] = useState<ViewState>({ type: 'main', tab: 'tree', issue: null });
-  const [currentProject, setCurrentProject] = useState('brand');
+  const [currentProject, setCurrentProject] = useState('rescue');
   const [showSyncModal, setShowSyncModal] = useState(false);
   
   const { strategyData: rawStrategyData, documents, emails, loading, error } = useGitHubData(currentProject);
