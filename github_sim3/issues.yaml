@@ -1,111 +1,139 @@
-# パワートレイン燃費改善プロジェクト - Issue一覧
-# github_sim3/issues.yaml
+# マツダ救済プロジェクト Issues
+# 最終更新: 2026-01-13
 
 version: 1
-project: powertrain
-updated_at: "2026-01-09"
+project: mazda_rescue
 
 strategies:
-  - id: "1.1"
-    title: "エンジン効率の最適化"
+  - id: "3.1"
+    title: "提案準備"
     categories:
-      - id: "1.1-A1"
-        title: "燃焼技術の革新"
+      - id: "3.1-A"
+        title: "A. マツダの課題分析"
         issues:
-          - id: "1.1-A1-01"
-            title: "SKYACTIV-X Gen2 圧縮着火制御の最適化"
-            context: "SKYACTIV-X第2世代エンジンにおいて、SPCCI（火花点火制御圧縮着火）の制御精度をさらに向上させ、より広い運転領域で圧縮着火を実現することで燃費性能を10%以上改善する。"
-            assignee: "@engine-team"
-            labels: ["Powertrain", "SKYACTIV-X", "High-Priority"]
-            success_criteria: "圧縮着火適用領域が現行比30%拡大、WLTC燃費で10%以上改善。"
+          - id: "3.1-A1-01"
+            title: "マツダ財務・業績分析"
+            context: "IR資料、決算情報からマツダの経営課題を特定"
             tasks:
-              - title: "現行Gen1エンジンの圧縮着火成功率マップの作成"
-                status: pending
-              - title: "点火時期・燃料噴射タイミングの最適化シミュレーション"
-                status: pending
-              - title: "冷間始動時の圧縮着火安定性テスト"
-                status: pending
-              - title: "EGR率と圧縮着火率の相関分析"
-                status: pending
+              - title: "最新決算資料の収集・分析"
+                status: "pending"
+              - title: "過去5年間の業績推移まとめ"
+                status: "pending"
+              - title: "主要KPIの抽出と課題リスト作成"
+                status: "pending"
+          - id: "3.1-A1-02"
+            title: "競合比較分析"
+            context: "トヨタ・ホンダ等との比較から差異を分析"
+            tasks:
+              - title: "競合他社のAI活用状況調査"
+                status: "pending"
+              - title: "比較分析レポート作成"
+                status: "pending"
 
-      - id: "1.1-A2"
-        title: "損失低減技術"
+      - id: "3.1-B"
+        title: "B. AI活用提案書作成"
         issues:
-          - id: "1.1-A2-01"
-            title: "フリクション低減オイル適合性評価"
-            context: "エンジン内部のフリクションロスを低減するため、低粘度オイル（0W-8相当）の適用可能性を評価し、耐久性とのバランスを検証する。"
-            assignee: "@lubricant-team"
-            labels: ["Powertrain", "Friction", "Testing"]
-            success_criteria: "フリクション損失が現行比15%低減、10万km耐久試験で異常摩耗なし。"
+          - id: "3.1-B1-01"
+            title: "業務効率化AI提案"
+            context: "コスト削減につながるAI施策を提案"
             tasks:
-              - title: "現行オイル仕様でのフリクション損失の詳細測定"
-                status: pending
-              - title: "低粘度オイル候補3種の摩耗試験実施"
-                status: pending
-              - title: "高温・高負荷条件での油膜厚さシミュレーション"
-                status: pending
-              - title: "10万km相当耐久試験計画の策定"
-                status: pending
+              - title: "業務プロセス改善余地の洗い出し"
+                status: "pending"
+              - title: "AI導入による効果試算"
+                status: "pending"
+              - title: "提案書ドラフト作成"
+                status: "pending"
 
-  - id: "1.2"
-    title: "軽量化技術の推進"
+      - id: "3.1-C"
+        title: "C. 実績・ポートフォリオ整備"
+        issues:
+          - id: "3.1-C1-01"
+            title: "ポートフォリオ作成"
+            context: "過去実績とマツダ向けデモを準備"
+            tasks:
+              - title: "過去案件の実績整理"
+                status: "pending"
+              - title: "マツダ向けデモ・サンプル作成"
+                status: "pending"
+
+  - id: "3.2"
+    title: "アプローチ・関係構築"
     categories:
-      - id: "1.2-B1"
-        title: "材料技術開発"
+      - id: "3.2-A"
+        title: "A. キーパーソン特定"
         issues:
-          - id: "1.2-B1-01"
-            title: "超高張力鋼板の適用拡大評価"
-            context: "車体軽量化のため、1.5GPa級超高張力鋼板の適用部位を拡大し、剛性を維持しながら車体重量を50kg削減することを目指す。"
-            assignee: "@body-engineering"
-            labels: ["Lightweight", "Materials", "Safety"]
-            success_criteria: "車体重量50kg削減の設計案完成、衝突安全性能が現行同等以上。"
+          - id: "3.2-A1-01"
+            title: "意思決定者マッピング"
+            context: "マツダ社内の意思決定者・影響者を特定"
             tasks:
-              - title: "現行車体の部位別重量・強度マップ作成"
-                status: pending
-              - title: "超高張力鋼板適用候補部位の選定（CAE解析）"
-                status: pending
-              - title: "ホットスタンプ成形条件の最適化"
-                status: pending
-              - title: "衝突安全性能シミュレーション"
-                status: pending
+              - title: "経営陣・部門長のリストアップ"
+                status: "pending"
+              - title: "キーパーソンマップ作成"
+                status: "pending"
 
-      - id: "1.2-B2"
-        title: "構造最適化"
+      - id: "3.2-B"
+        title: "B. 接点づくり"
         issues:
-          - id: "1.2-B2-01"
-            title: "マルチマテリアル接合技術の量産検証"
-            context: "アルミニウムと鋼板の異種材接合技術を確立し、適材適所の材料配置による軽量化と生産性の両立を図る。"
-            assignee: "@production-engineering"
-            labels: ["Lightweight", "Manufacturing", "Innovation"]
-            success_criteria: "接合強度が溶接同等以上、量産タクトタイム内での接合が可能。"
+          - id: "3.2-B1-01"
+            title: "アプローチルート開拓"
+            context: "マツダへの接触機会を創出"
             tasks:
-              - title: "FSW（摩擦撹拌接合）の接合強度評価"
-                status: pending
-              - title: "SPR（セルフピアスリベット）の量産ライン適用検討"
-                status: pending
-              - title: "電食防止コーティングの耐久性試験"
-                status: pending
-              - title: "接合部の品質検査手法の確立"
-                status: pending
+              - title: "業界イベント・カンファレンス調査"
+                status: "pending"
+              - title: "紹介可能な人脈の棚卸し"
+                status: "pending"
+              - title: "LinkedIn等でのコンタクトリスト作成"
+                status: "pending"
 
-  - id: "1.3"
-    title: "空力性能の改善"
+      - id: "3.2-C"
+        title: "C. 信頼関係構築"
+        issues:
+          - id: "3.2-C1-01"
+            title: "継続的価値提供"
+            context: "信頼を築くための情報提供・支援"
+            tasks:
+              - title: "業界レポート・知見の定期発信"
+                status: "pending"
+              - title: "小さな相談への迅速対応"
+                status: "pending"
+
+  - id: "3.3"
+    title: "案件獲得・実行"
     categories:
-      - id: "1.3-C1"
-        title: "空力デバイス開発"
+      - id: "3.3-A"
+        title: "A. 初期案件の提案"
         issues:
-          - id: "1.3-C1-01"
-            title: "アクティブエアロシステムの効果検証"
-            context: "高速走行時の空気抵抗を低減するため、可変式エアロパーツ（アクティブグリルシャッター、リトラクタブルスポイラー）の効果を検証し、燃費向上と冷却性能のバランスを最適化する。"
-            assignee: "@aero-team"
-            labels: ["Aerodynamics", "Fuel-Efficiency", "Active-Systems"]
-            success_criteria: "高速燃費（100km/h定常）で5%以上改善、冷却性能に悪影響なし。"
+          - id: "3.3-A1-01"
+            title: "スモールスタート案件提案"
+            context: "低リスクで始められる案件から着手"
             tasks:
-              - title: "風洞試験によるCd値測定（シャッター開閉時）"
-                status: pending
-              - title: "エンジン冷却水温と空力デバイスの制御ロジック策定"
-                status: pending
-              - title: "実走行モードでの燃費改善効果測定"
-                status: pending
-              - title: "コスト対効果分析（投資回収期間算出）"
-                status: pending
+              - title: "初期案件候補のリストアップ"
+                status: "pending"
+              - title: "提案資料作成"
+                status: "pending"
+
+      - id: "3.3-B"
+        title: "B. パイロット実施"
+        issues:
+          - id: "3.3-B1-01"
+            title: "実証実験の実施"
+            context: "小規模な実証で効果を証明"
+            tasks:
+              - title: "パイロット計画策定"
+                status: "pending"
+              - title: "実施・効果測定"
+                status: "pending"
+              - title: "成果レポート作成"
+                status: "pending"
+
+      - id: "3.3-C"
+        title: "C. 本格契約へ拡大"
+        issues:
+          - id: "3.3-C1-01"
+            title: "本格提案・契約獲得"
+            context: "パイロット成果をもとに本格契約へ"
+            tasks:
+              - title: "本格提案書作成"
+                status: "pending"
+              - title: "契約交渉・締結"
+                status: "pending"

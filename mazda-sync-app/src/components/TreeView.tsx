@@ -160,22 +160,22 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
       {/* 表示用：スクロール可能なコンテンツ */}
       <div
         style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'flex-start',
+          display: 'inline-block',
           minWidth: '100%',
           minHeight: '100%',
           padding: PADDING,
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          textAlign: 'center'
         }}
       >
         {/* スケール後のサイズを持つラッパー */}
         <div
           style={{
+            display: 'inline-block',
             width: treeDimensions.width * scale,
             height: treeDimensions.height * scale,
             position: 'relative',
-            flexShrink: 0
+            textAlign: 'left'
           }}
         >
           <div
