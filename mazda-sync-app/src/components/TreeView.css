@@ -147,3 +147,30 @@
   min-width: 140px;
   max-width: 180px;
 }
+
+/* Task カード（最下層） */
+.task-card {
+  min-width: 120px;
+  max-width: 160px;
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+.task-card:hover {
+  border-color: #22c55e;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+}
+
+/* SubTask カード（5階層目・最下層） */
+.subtask-card {
+  min-width: 100px;
+  max-width: 140px;
+  background: #faf5ff;
+  border-color: #d8b4fe;
+  cursor: default;
+}
+
+.subtask-card:hover {
+  border-color: #a855f7;
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2);
+}

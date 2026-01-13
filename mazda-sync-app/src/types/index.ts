@@ -24,12 +24,18 @@ export interface Deliverable {
   submittedAt?: string;
 }
 
+// サブタスク（5階層目対応）
+export interface Subtask {
+  title: string;
+  items?: string[];  // 5階層目のアイテム
+}
+
 // タスク
 export interface Task {
   title: string;
   status?: TaskStatusType;
   deliverable?: Deliverable;
-  subtasks?: string[];
+  subtasks?: (string | Subtask)[];  // 文字列とオブジェクト両方サポート
 }
 
 // Issue

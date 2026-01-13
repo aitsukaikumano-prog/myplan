@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { StrategyNode, Issue } from '../types';
+import { StrategyNode, Issue, Subtask } from '../types';
 import './TreeView.css';
 
 interface TreeViewProps {
@@ -7,27 +7,139 @@ interface TreeViewProps {
   onNavigate: (issue: Issue) => void;
 }
 
+// SubTaskCard: 最下層のカード（5階層目）
+const SubTaskCard = ({
+  item,
+  parentId,
+  index
+}: {
+  item: string;
+  parentId: string;
+  index: number;
+}) => {
+  return (
+    <div className="issue-card subtask-card">
+      <div className="text-[10px] font-bold text-purple-500 mb-1">#{parentId}-{index + 1}</div>
+      <div className="text-xs font-semibold text-slate-700 leading-tight">{item}</div>
+    </div>
+  );
+};
+
+// TaskCard: 展開可能なカード（4階層目）
+const TaskCard = ({
+  subtask,
+  parentId,
+  index
+}: {
+  subtask: string | Subtask;
+  parentId: string;
+  index: number;
+}) => {
+  const [expanded, setExpanded] = useState(false);
+  const cardId = `${parentId}-${index + 1}`;
+
+  // subtaskがオブジェクトかどうかを判定
+  const isObject = typeof subtask === 'object';
+  const title = isObject ? subtask.title : subtask;
+  const items = isObject ? subtask.items : undefined;
+  const hasItems = items && items.length > 0;
+
+  const handleClick = () => {
+    if (hasItems) {
+      setExpanded(!expanded);
+    }
+  };
+
+  return (
+    <div className="tree-node">
+      <div
+        onClick={handleClick}
+        className={`issue-card task-card ${expanded ? 'issue-card-expanded' : ''} ${hasItems ? 'cursor-pointer' : ''}`}
+      >
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[10px] font-bold text-emerald-500">#{cardId}</span>
+          {hasItems && (
+            <span className="text-[10px] text-slate-400">
+              {expanded ? '▼' : '▶'} {items!.length}
+            </span>
+          )}
+        </div>
+        <div className="text-xs font-semibold text-slate-700 leading-tight">{title}</div>
+      </div>
+
+      {expanded && hasItems && (
+        <div className="tree-children">
+          <div className="connector-vertical"></div>
+          <div className={`children-container ${items!.length > 1 ? 'has-multiple' : ''}`}>
+            {items!.map((item, idx) => (
+              <div key={idx} className="child-wrapper">
+                <div className="connector-vertical"></div>
+                <SubTaskCard
+                  item={item}
+                  parentId={cardId}
+                  index={idx}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// SubIssueCard: 展開可能なカード（3階層目）
 const SubIssueCard = ({
   task,
   issueId,
   index
 }: {
-  task: { title: string; status?: string; subtasks?: string[] };
+  task: { title: string; status?: string; subtasks?: (string | Subtask)[] };
   issueId: string;
   index: number;
 }) => {
+  const [expanded, setExpanded] = useState(false);
+  const hasSubtasks = task.subtasks && task.subtasks.length > 0;
+  const cardId = `${issueId}-${index + 1}`;
+
+  const handleClick = () => {
+    if (hasSubtasks) {
+      setExpanded(!expanded);
+    }
+  };
+
   return (
-    <div className="issue-card sub-issue-card">
-      <div className="text-[10px] font-bold text-blue-500 mb-1">#{issueId}-{index + 1}</div>
-      <div className="text-xs font-semibold text-slate-700 leading-tight">{task.title}</div>
-      {task.subtasks && task.subtasks.length > 0 && (
-        <div className="mt-2 space-y-1">
-          {task.subtasks.map((subtask, idx) => (
-            <div key={idx} className="flex items-start gap-1.5 text-[10px] text-slate-500">
-              <span className="text-slate-300 mt-0.5">☐</span>
-              <span className="leading-tight">{subtask}</span>
-            </div>
-          ))}
+    <div className="tree-node">
+      <div
+        onClick={handleClick}
+        className={`issue-card sub-issue-card ${expanded ? 'issue-card-expanded' : ''} ${hasSubtasks ? 'cursor-pointer' : ''}`}
+      >
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[10px] font-bold text-blue-500">#{cardId}</span>
+          {hasSubtasks && (
+            <span className="text-[10px] text-slate-400">
+              {expanded ? '▼' : '▶'} {task.subtasks!.length}
+            </span>
+          )}
+        </div>
+        <div className="text-xs font-semibold text-slate-700 leading-tight">{task.title}</div>
+      </div>
+
+      {expanded && hasSubtasks && (
+        <div className="tree-children">
+          <div className="connector-vertical"></div>
+          <div className={`children-container ${task.subtasks!.length > 1 ? 'has-multiple' : ''}`}>
+            {task.subtasks!.map((subtask, idx) => (
+              <div key={idx} className="child-wrapper">
+                <div className="connector-vertical"></div>
+                <TaskCard
+                  subtask={subtask}
+                  parentId={cardId}
+                  index={idx}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -143,12 +255,15 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
   const [treeDimensions, setTreeDimensions] = useState({ width: 0, height: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);
+  const userZoomedRef = useRef(false); // ユーザーが手動でズームしたかどうか
 
   // パディング設定（定数）
   const PADDING = 40;
 
   // 自動フィット計算
-  const calculateFit = () => {
+  const calculateFit = (force = false) => {
+    // ユーザーが手動でズームした場合は自動フィットしない（forceでない限り）
+    if (userZoomedRef.current && !force) return;
     const container = containerRef.current;
     const measure = measureRef.current;
     if (!container || !measure) return;
@@ -222,6 +337,7 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
         const newScrollTop = cursorY * scaleRatio - (e.clientY - rect.top);
 
         setScale(newScale);
+        userZoomedRef.current = true; // ユーザーが手動でズーム
 
         requestAnimationFrame(() => {
           container.scrollLeft = newScrollLeft;
@@ -238,7 +354,13 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
   }, [scale]);
 
   const handleZoom = (delta: number) => {
+    userZoomedRef.current = true; // ユーザーが手動でズーム
     setScale(prev => Math.max(0.1, Math.min(1.5, prev + delta)));
+  };
+
+  const handleFit = () => {
+    userZoomedRef.current = false; // フィットボタンでリセット
+    calculateFit(true);
   };
 
   return (
@@ -363,7 +485,7 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
         </button>
         <div style={{ width: '1px', height: '24px', background: '#e2e8f0', margin: '0 4px' }}></div>
         <button
-          onClick={calculateFit}
+          onClick={handleFit}
           style={{
             width: '36px',
             height: '36px',
