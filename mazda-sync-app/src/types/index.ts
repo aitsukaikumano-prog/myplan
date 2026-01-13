@@ -24,10 +24,16 @@ export interface Deliverable {
   submittedAt?: string;
 }
 
+// サブタスクアイテム（6階層目対応）
+export interface SubtaskItem {
+  title: string;
+  outputs?: string[];  // 6階層目の成果物
+}
+
 // サブタスク（5階層目対応）
 export interface Subtask {
   title: string;
-  items?: string[];  // 5階層目のアイテム
+  items?: (string | SubtaskItem)[];  // 文字列とオブジェクト両方サポート
 }
 
 // タスク

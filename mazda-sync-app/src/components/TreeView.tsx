@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { StrategyNode, Issue, Subtask } from '../types';
+import { StrategyNode, Issue, Subtask, SubtaskItem } from '../types';
 import './TreeView.css';
 
 interface TreeViewProps {
@@ -7,23 +7,70 @@ interface TreeViewProps {
   onNavigate: (issue: Issue) => void;
 }
 
-// SubTaskCard: 最下層のカード（5階層目）- 成果物表示
-const SubTaskCard = ({
-  item,
-  parentTitle,
-}: {
-  item: string;
-  parentId: string;
-  index: number;
-  parentTitle: string;
-}) => {
+// OutputCard: 最下層のカード（6階層目）- 成果物表示
+const OutputCard = ({ item }: { item: string }) => {
   return (
-    <div className="issue-card subtask-card">
-      <div className="text-[9px] text-slate-500 mb-1 truncate">📋 {parentTitle}</div>
+    <div className="issue-card output-card">
       <div className="flex items-center gap-2 mb-1">
         <span className="text-[9px] px-1.5 py-0.5 bg-purple-100 text-purple-600 rounded font-bold">成果物</span>
       </div>
       <div className="text-xs font-semibold text-slate-700 leading-tight">{item}</div>
+    </div>
+  );
+};
+
+// SubTaskCard: 展開可能なカード（5階層目）- タスク表示
+const SubTaskCard = ({
+  item,
+}: {
+  item: string | SubtaskItem;
+  parentId: string;
+  index: number;
+}) => {
+  const [expanded, setExpanded] = useState(false);
+
+  // itemがオブジェクトかどうかを判定
+  const isObject = typeof item === 'object';
+  const title = isObject ? item.title : item;
+  const outputs = isObject ? item.outputs : undefined;
+  const hasOutputs = outputs && outputs.length > 0;
+
+  const handleClick = () => {
+    if (hasOutputs) {
+      setExpanded(!expanded);
+    }
+  };
+
+  return (
+    <div className="tree-node">
+      <div
+        onClick={handleClick}
+        className={`issue-card subtask-card ${expanded ? 'issue-card-expanded' : ''} ${hasOutputs ? 'cursor-pointer' : ''}`}
+      >
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[9px] px-1.5 py-0.5 bg-emerald-100 text-emerald-600 rounded font-bold">タスク</span>
+          {hasOutputs && (
+            <span className="text-[10px] text-slate-400">
+              {expanded ? '▼' : '▶'} {outputs!.length}
+            </span>
+          )}
+        </div>
+        <div className="text-xs font-semibold text-slate-700 leading-tight">{title}</div>
+      </div>
+
+      {expanded && hasOutputs && (
+        <div className="tree-children">
+          <div className="connector-vertical"></div>
+          <div className={`children-container ${outputs!.length > 1 ? 'has-multiple' : ''}`}>
+            {outputs!.map((output, idx) => (
+              <div key={idx} className="child-wrapper">
+                <div className="connector-vertical"></div>
+                <OutputCard item={output} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -81,7 +128,6 @@ const TaskCard = ({
                   item={item}
                   parentId={cardId}
                   index={idx}
-                  parentTitle={title}
                 />
               </div>
             ))}

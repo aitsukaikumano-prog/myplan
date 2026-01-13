@@ -161,16 +161,29 @@
   box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
 }
 
-/* SubTask カード（5階層目・最下層） */
+/* SubTask カード（5階層目）- タスク */
 .subtask-card {
   min-width: 100px;
-  max-width: 140px;
+  max-width: 160px;
+  background: #ecfdf5;
+  border-color: #6ee7b7;
+}
+
+.subtask-card:hover {
+  border-color: #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+/* Output カード（6階層目・最下層）- 成果物 */
+.output-card {
+  min-width: 100px;
+  max-width: 160px;
   background: #faf5ff;
   border-color: #d8b4fe;
   cursor: default;
 }
 
-.subtask-card:hover {
+.output-card:hover {
   border-color: #a855f7;
   box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2);
 }
