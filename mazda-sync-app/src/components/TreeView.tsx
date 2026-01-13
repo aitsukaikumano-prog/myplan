@@ -128,17 +128,21 @@ const SubIssueCard = ({
   index,
   onSelectTask
 }: {
-  task: { title: string; status?: string; subtasks?: (string | Subtask)[] };
+  task: { title: string; status?: string; subtasks?: (string | Subtask)[]; outputs?: string[] };
   issueId: string;
   index: number;
   onSelectTask?: (task: SelectedTask) => void;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const hasSubtasks = task.subtasks && task.subtasks.length > 0;
+  const hasOutputs = task.outputs && task.outputs.length > 0;
   const cardId = `${issueId}-${index + 1}`;
 
   const handleClick = () => {
-    if (hasSubtasks) {
+    // outputsがある場合は詳細パネルを開く
+    if (hasOutputs && onSelectTask) {
+      onSelectTask({ title: task.title, outputs: task.outputs! });
+    } else if (hasSubtasks) {
       setExpanded(!expanded);
     }
   };
@@ -147,20 +151,24 @@ const SubIssueCard = ({
     <div className="tree-node">
       <div
         onClick={handleClick}
-        className={`issue-card sub-issue-card ${expanded ? 'issue-card-expanded' : ''} ${hasSubtasks ? 'cursor-pointer' : ''}`}
+        className={`issue-card sub-issue-card ${expanded ? 'issue-card-expanded' : ''} ${(hasSubtasks || hasOutputs) ? 'cursor-pointer' : ''}`}
       >
         <div className="flex items-center justify-between mb-1">
           <span className="text-[10px] font-bold text-blue-500">#{cardId}</span>
-          {hasSubtasks && (
+          {hasOutputs ? (
+            <span className="text-[10px] text-purple-500 font-bold">
+              📎 {task.outputs!.length}
+            </span>
+          ) : hasSubtasks ? (
             <span className="text-[10px] text-slate-400">
               {expanded ? '▼' : '▶'} {task.subtasks!.length}
             </span>
-          )}
+          ) : null}
         </div>
         <div className="text-xs font-semibold text-slate-700 leading-tight">{task.title}</div>
       </div>
 
-      {expanded && hasSubtasks && (
+      {expanded && hasSubtasks && !hasOutputs && (
         <div className="tree-children">
           <div className="connector-vertical"></div>
           <div className={`children-container ${task.subtasks!.length > 1 ? 'has-multiple' : ''}`}>

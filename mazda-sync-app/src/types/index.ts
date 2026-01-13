@@ -42,6 +42,7 @@ export interface Task {
   status?: TaskStatusType;
   deliverable?: Deliverable;
   subtasks?: (string | Subtask)[];  // 文字列とオブジェクト両方サポート
+  outputs?: string[];  // タスク直下の成果物
 }
 
 // Issue
