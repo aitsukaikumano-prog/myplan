@@ -7,28 +7,22 @@ interface TreeViewProps {
   onNavigate: (issue: Issue) => void;
 }
 
-// OutputCard: 最下層のカード（6階層目）- 成果物表示
-const OutputCard = ({ item }: { item: string }) => {
-  return (
-    <div className="issue-card output-card">
-      <div className="flex items-center gap-2 mb-1">
-        <span className="text-[9px] px-1.5 py-0.5 bg-purple-100 text-purple-600 rounded font-bold">成果物</span>
-      </div>
-      <div className="text-xs font-semibold text-slate-700 leading-tight">{item}</div>
-    </div>
-  );
-};
+// 成果物表示用の型
+interface SelectedTask {
+  title: string;
+  outputs: string[];
+}
 
-// SubTaskCard: 展開可能なカード（5階層目）- タスク表示
+// SubTaskCard: タスクカード（5階層目以降）- outputsは展開しない
 const SubTaskCard = ({
   item,
+  onSelectTask,
 }: {
   item: string | SubtaskItem;
   parentId: string;
   index: number;
+  onSelectTask?: (task: SelectedTask) => void;
 }) => {
-  const [expanded, setExpanded] = useState(false);
-
   // itemがオブジェクトかどうかを判定
   const isObject = typeof item === 'object';
   const title = isObject ? item.title : item;
@@ -36,8 +30,8 @@ const SubTaskCard = ({
   const hasOutputs = outputs && outputs.length > 0;
 
   const handleClick = () => {
-    if (hasOutputs) {
-      setExpanded(!expanded);
+    if (hasOutputs && onSelectTask) {
+      onSelectTask({ title, outputs: outputs! });
     }
   };
 
@@ -45,32 +39,18 @@ const SubTaskCard = ({
     <div className="tree-node">
       <div
         onClick={handleClick}
-        className={`issue-card subtask-card ${expanded ? 'issue-card-expanded' : ''} ${hasOutputs ? 'cursor-pointer' : ''}`}
+        className={`issue-card subtask-card ${hasOutputs ? 'cursor-pointer' : ''}`}
       >
         <div className="flex items-center justify-between mb-1">
           <span className="text-[9px] px-1.5 py-0.5 bg-emerald-100 text-emerald-600 rounded font-bold">タスク</span>
           {hasOutputs && (
-            <span className="text-[10px] text-slate-400">
-              {expanded ? '▼' : '▶'} {outputs!.length}
+            <span className="text-[10px] text-purple-500 font-bold">
+              📎 {outputs!.length}
             </span>
           )}
         </div>
         <div className="text-xs font-semibold text-slate-700 leading-tight">{title}</div>
       </div>
-
-      {expanded && hasOutputs && (
-        <div className="tree-children">
-          <div className="connector-vertical"></div>
-          <div className={`children-container ${outputs!.length > 1 ? 'has-multiple' : ''}`}>
-            {outputs!.map((output, idx) => (
-              <div key={idx} className="child-wrapper">
-                <div className="connector-vertical"></div>
-                <OutputCard item={output} />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
@@ -79,11 +59,13 @@ const SubTaskCard = ({
 const TaskCard = ({
   subtask,
   parentId,
-  index
+  index,
+  onSelectTask
 }: {
   subtask: string | Subtask;
   parentId: string;
   index: number;
+  onSelectTask?: (task: SelectedTask) => void;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const cardId = `${parentId}-${index + 1}`;
@@ -128,6 +110,7 @@ const TaskCard = ({
                   item={item}
                   parentId={cardId}
                   index={idx}
+                  onSelectTask={onSelectTask}
                 />
               </div>
             ))}
@@ -142,11 +125,13 @@ const TaskCard = ({
 const SubIssueCard = ({
   task,
   issueId,
-  index
+  index,
+  onSelectTask
 }: {
   task: { title: string; status?: string; subtasks?: (string | Subtask)[] };
   issueId: string;
   index: number;
+  onSelectTask?: (task: SelectedTask) => void;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const hasSubtasks = task.subtasks && task.subtasks.length > 0;
@@ -186,6 +171,7 @@ const SubIssueCard = ({
                   subtask={subtask}
                   parentId={cardId}
                   index={idx}
+                  onSelectTask={onSelectTask}
                 />
               </div>
             ))}
@@ -199,9 +185,11 @@ const SubIssueCard = ({
 const IssueCard = ({
   issue,
   onNavigate: _onNavigate,
+  onSelectTask
 }: {
   issue: Issue;
   onNavigate: (issue: Issue) => void;
+  onSelectTask?: (task: SelectedTask) => void;
 }) => {
   const [expanded, setExpanded] = useState(false);
   // _onNavigate は将来の詳細表示機能用に保持
@@ -236,6 +224,7 @@ const IssueCard = ({
                   task={task}
                   issueId={issue.id}
                   index={idx}
+                  onSelectTask={onSelectTask}
                 />
               </div>
             ))}
@@ -248,10 +237,12 @@ const IssueCard = ({
 
 const Node = ({
   node,
-  onNavigate
+  onNavigate,
+  onSelectTask
 }: {
   node: StrategyNode;
   onNavigate: (issue: Issue) => void;
+  onSelectTask?: (task: SelectedTask) => void;
 }) => {
   const hasChildren = node.children && node.children.length > 0;
   const hasIssues = node.issues && node.issues.length > 0;
@@ -284,11 +275,13 @@ const Node = ({
                   <Node
                     node={child.data}
                     onNavigate={onNavigate}
+                    onSelectTask={onSelectTask}
                   />
                 ) : (
                   <IssueCard
                     issue={child.data}
                     onNavigate={onNavigate}
+                    onSelectTask={onSelectTask}
                   />
                 )}
               </div>
@@ -300,9 +293,110 @@ const Node = ({
   );
 };
 
+// 詳細パネル: 成果物を表示
+const DetailPanel = ({
+  task,
+  onClose
+}: {
+  task: SelectedTask;
+  onClose: () => void;
+}) => {
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        width: '360px',
+        background: 'white',
+        boxShadow: '-4px 0 20px rgba(0,0,0,0.1)',
+        zIndex: 100,
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+    >
+      {/* ヘッダー */}
+      <div style={{
+        padding: '16px 20px',
+        borderBottom: '1px solid #e2e8f0',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        background: '#f8fafc'
+      }}>
+        <div>
+          <span className="text-[10px] px-2 py-0.5 bg-purple-100 text-purple-600 rounded font-bold">成果物</span>
+          <h3 style={{
+            fontSize: '14px',
+            fontWeight: 700,
+            color: '#1e293b',
+            marginTop: '8px',
+            lineHeight: 1.4
+          }}>
+            {task.title}
+          </h3>
+        </div>
+        <button
+          onClick={onClose}
+          style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '8px',
+            background: '#f1f5f9',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#64748b'
+          }}
+        >
+          <i className="fas fa-times"></i>
+        </button>
+      </div>
+
+      {/* 成果物リスト */}
+      <div style={{
+        flex: 1,
+        overflow: 'auto',
+        padding: '16px'
+      }}>
+        <div style={{
+          fontSize: '12px',
+          color: '#64748b',
+          marginBottom: '12px'
+        }}>
+          {task.outputs.length}件の成果物
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {task.outputs.map((output, idx) => (
+            <div
+              key={idx}
+              style={{
+                padding: '12px 14px',
+                background: '#faf5ff',
+                borderRadius: '10px',
+                border: '1px solid #e9d5ff',
+                fontSize: '13px',
+                color: '#581c87',
+                lineHeight: 1.5
+              }}
+            >
+              <span style={{ marginRight: '8px', opacity: 0.6 }}>📎</span>
+              {output}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
   const [scale, setScale] = useState(1);
   const [treeDimensions, setTreeDimensions] = useState({ width: 0, height: 0 });
+  const [selectedTask, setSelectedTask] = useState<SelectedTask | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);
   const userZoomedRef = useRef(false); // ユーザーが手動でズームしたかどうか
@@ -435,7 +529,7 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
           top: 0
         }}
       >
-        <Node node={strategyData} onNavigate={() => {}} />
+        <Node node={strategyData} onNavigate={() => {}} onSelectTask={() => {}} />
       </div>
 
       {/* 表示用：スクロール可能なコンテンツ */}
@@ -467,10 +561,15 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
               left: 0
             }}
           >
-            <Node node={strategyData} onNavigate={onNavigate} />
+            <Node node={strategyData} onNavigate={onNavigate} onSelectTask={setSelectedTask} />
           </div>
         </div>
       </div>
+
+      {/* 詳細パネル */}
+      {selectedTask && (
+        <DetailPanel task={selectedTask} onClose={() => setSelectedTask(null)} />
+      )}
 
       {/* ズームコントロール */}
       <div
