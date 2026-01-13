@@ -175,61 +175,56 @@ export const STRATEGY_DATA_RESCUE: StrategyNode = {
   icon: 'fas fa-rocket',
   children: [
     {
-      id: '3.1',
-      title: '3.1 提案準備',
-      icon: 'fas fa-file-alt',
+      id: '1',
+      title: '1. 基盤構築（月1-2）',
+      icon: 'fas fa-hammer',
       children: [
         {
-          id: '3.1-A',
-          title: 'A. マツダの課題分析',
-          icon: 'fas fa-search',
+          id: '1-A',
+          title: 'A. 自己ブランディング確立',
+          icon: 'fas fa-id-card',
           issues: [
             {
-              id: '3.1-A1-01',
-              title: 'マツダ財務・業績分析',
+              id: '1-A-01',
+              title: '提供価値の明確化',
               tasks: [
-                { title: '最新決算資料の収集・分析' },
-                { title: '過去5年間の業績推移まとめ' },
-                { title: '主要KPIの抽出と課題リスト作成' }
+                { title: '自分のスキル棚卸し（Web/AI/業務改善）' },
+                { title: 'ターゲット（製造業）の課題リサーチ' },
+                { title: '提供サービスメニュー作成（3つ程度に絞る）' }
               ]
             },
             {
-              id: '3.1-A1-02',
-              title: '競合比較分析',
+              id: '1-A-02',
+              title: '営業ツール整備',
               tasks: [
-                { title: '競合他社のAI活用状況調査' },
-                { title: '比較分析レポート作成' }
+                { title: '屋号決定・名刺デザイン・印刷' },
+                { title: 'ポートフォリオWebサイト作成' },
+                { title: '1分エレベーターピッチ作成' }
               ]
             }
           ]
         },
         {
-          id: '3.1-B',
-          title: 'B. AI活用提案書作成',
-          icon: 'fas fa-lightbulb',
+          id: '1-B',
+          title: 'B. ターゲット企業リサーチ',
+          icon: 'fas fa-search',
           issues: [
             {
-              id: '3.1-B1-01',
-              title: '業務効率化AI提案',
+              id: '1-B-01',
+              title: 'マツダサプライヤー調査',
               tasks: [
-                { title: '業務プロセス改善余地の洗い出し' },
-                { title: 'AI導入による効果試算' },
-                { title: '提案書ドラフト作成' }
+                { title: 'マツダTier1サプライヤーリスト作成（上位20社）' },
+                { title: '各社のAI/DX取り組み状況調査' },
+                { title: 'アプローチ優先順位付け（規模・課題・接点可能性）' }
               ]
-            }
-          ]
-        },
-        {
-          id: '3.1-C',
-          title: 'C. 実績・ポートフォリオ整備',
-          icon: 'fas fa-briefcase',
-          issues: [
+            },
             {
-              id: '3.1-C1-01',
-              title: 'ポートフォリオ作成',
+              id: '1-B-02',
+              title: '広島製造業コミュニティ調査',
               tasks: [
-                { title: '過去案件の実績整理' },
-                { title: 'マツダ向けデモ・サンプル作成' }
+                { title: '製造業向けセミナー・イベント一覧作成' },
+                { title: '商工会議所・産業支援機関のリストアップ' },
+                { title: '参加すべきイベント3つ決定' }
               ]
             }
           ]
@@ -237,105 +232,111 @@ export const STRATEGY_DATA_RESCUE: StrategyNode = {
       ]
     },
     {
-      id: '3.2',
-      title: '3.2 アプローチ・関係構築',
-      icon: 'fas fa-handshake',
-      children: [
-        {
-          id: '3.2-A',
-          title: 'A. キーパーソン特定',
-          icon: 'fas fa-user-tie',
-          issues: [
-            {
-              id: '3.2-A1-01',
-              title: '意思決定者マッピング',
-              tasks: [
-                { title: '経営陣・部門長のリストアップ' },
-                { title: 'キーパーソンマップ作成' }
-              ]
-            }
-          ]
-        },
-        {
-          id: '3.2-B',
-          title: 'B. 接点づくり',
-          icon: 'fas fa-network-wired',
-          issues: [
-            {
-              id: '3.2-B1-01',
-              title: 'アプローチルート開拓',
-              tasks: [
-                { title: '業界イベント・カンファレンス調査' },
-                { title: '紹介可能な人脈の棚卸し' },
-                { title: 'LinkedIn等でのコンタクトリスト作成' }
-              ]
-            }
-          ]
-        },
-        {
-          id: '3.2-C',
-          title: 'C. 信頼関係構築',
-          icon: 'fas fa-heart',
-          issues: [
-            {
-              id: '3.2-C1-01',
-              title: '継続的価値提供',
-              tasks: [
-                { title: '業界レポート・知見の定期発信' },
-                { title: '小さな相談への迅速対応' }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: '3.3',
-      title: '3.3 案件獲得・実行',
+      id: '2',
+      title: '2. 実績構築（月2-6）',
       icon: 'fas fa-trophy',
       children: [
         {
-          id: '3.3-A',
-          title: 'A. 初期案件の提案',
-          icon: 'fas fa-seedling',
+          id: '2-A',
+          title: 'A. サプライヤーへのアプローチ',
+          icon: 'fas fa-handshake',
           issues: [
             {
-              id: '3.3-A1-01',
-              title: 'スモールスタート案件提案',
+              id: '2-A-01',
+              title: 'アプローチ活動',
               tasks: [
-                { title: '初期案件候補のリストアップ' },
-                { title: '提案資料作成' }
+                { title: 'イベント・セミナーへの参加（月2回以上）' },
+                { title: '飛び込み営業リスト消化（週5社）' },
+                { title: 'LinkedInでの製造業関係者とのつながり構築' }
+              ]
+            },
+            {
+              id: '2-A-02',
+              title: '無料診断・相談の提供',
+              tasks: [
+                { title: '無料AI活用診断サービスの設計' },
+                { title: '診断レポートテンプレート作成' },
+                { title: '無料診断5社実施' }
               ]
             }
           ]
         },
         {
-          id: '3.3-B',
-          title: 'B. パイロット実施',
-          icon: 'fas fa-flask',
+          id: '2-B',
+          title: 'B. 初期案件獲得・実行',
+          icon: 'fas fa-tasks',
           issues: [
             {
-              id: '3.3-B1-01',
-              title: '実証実験の実施',
+              id: '2-B-01',
+              title: '有償案件獲得',
               tasks: [
-                { title: 'パイロット計画策定' },
-                { title: '実施・効果測定' },
-                { title: '成果レポート作成' }
+                { title: '有償案件1社目獲得' },
+                { title: '案件実行・成果創出' },
+                { title: '有償案件2社目獲得' }
+              ]
+            },
+            {
+              id: '2-B-02',
+              title: '成果のドキュメント化',
+              tasks: [
+                { title: 'ケーススタディ作成（Before/After/数値成果）' },
+                { title: '顧客の声（推薦文）取得' },
+                { title: 'ポートフォリオサイト更新' }
               ]
             }
           ]
         },
         {
-          id: '3.3-C',
-          title: 'C. 本格契約へ拡大',
-          icon: 'fas fa-chart-line',
+          id: '2-C',
+          title: 'C. マツダへの布石',
+          icon: 'fas fa-chess',
           issues: [
             {
-              id: '3.3-C1-01',
-              title: '本格提案・契約獲得',
+              id: '2-C-01',
+              title: 'サプライヤー経由のルート開拓',
               tasks: [
-                { title: '本格提案書作成' },
-                { title: '契約交渉・締結' }
+                { title: 'サプライヤー担当者にマツダとの接点をヒアリング' },
+                { title: '紹介可能なキーパーソンの特定' },
+                { title: 'マツダ関係者との接点イベント調査' }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: '3',
+      title: '3. マツダアプローチ（月6-10）',
+      icon: 'fas fa-bullseye',
+      children: [
+        {
+          id: '3-A',
+          title: 'A. キーパーソン特定・接点づくり',
+          icon: 'fas fa-user-tie',
+          issues: [
+            {
+              id: '3-A-01',
+              title: '意思決定者へのアクセス',
+              tasks: [
+                { title: 'サプライヤー経由の紹介依頼' },
+                { title: 'マツダ向け提案書作成（実績ベース）' },
+                { title: '初回面談獲得' }
+              ]
+            }
+          ]
+        },
+        {
+          id: '3-B',
+          title: 'B. 提案・契約獲得',
+          icon: 'fas fa-file-signature',
+          issues: [
+            {
+              id: '3-B-01',
+              title: 'パイロット案件獲得',
+              tasks: [
+                { title: 'スモールスタート案件の提案' },
+                { title: 'パイロット実施・成果創出' },
+                { title: '本格契約への拡大提案' }
               ]
             }
           ]

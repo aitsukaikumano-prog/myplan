@@ -128,6 +128,49 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
     };
   }, [strategyData]);
 
+  // 2本指スクロール（ピンチ）でのズーム（カーソル位置中心）
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      // ctrlKeyが押されている = ピンチジェスチャー（トラックパッド）
+      if (e.ctrlKey) {
+        e.preventDefault();
+
+        const delta = -e.deltaY * 0.01;
+        const oldScale = scale;
+        const newScale = Math.max(0.1, Math.min(1.5, oldScale + delta));
+
+        if (oldScale === newScale) return;
+
+        // カーソル位置（コンテナ内の座標）
+        const rect = container.getBoundingClientRect();
+        const cursorX = e.clientX - rect.left + container.scrollLeft;
+        const cursorY = e.clientY - rect.top + container.scrollTop;
+
+        // スケール変更後のスクロール位置を計算
+        const scaleRatio = newScale / oldScale;
+        const newScrollLeft = cursorX * scaleRatio - (e.clientX - rect.left);
+        const newScrollTop = cursorY * scaleRatio - (e.clientY - rect.top);
+
+        setScale(newScale);
+
+        // 次のフレームでスクロール位置を更新
+        requestAnimationFrame(() => {
+          container.scrollLeft = newScrollLeft;
+          container.scrollTop = newScrollTop;
+        });
+      }
+    };
+
+    container.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      container.removeEventListener('wheel', handleWheel);
+    };
+  }, [scale]);
+
   const handleZoom = (delta: number) => {
     setScale(prev => Math.max(0.1, Math.min(1.5, prev + delta)));
   };
