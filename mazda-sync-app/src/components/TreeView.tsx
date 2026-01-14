@@ -209,7 +209,8 @@ const IssueCard = ({
   onSelectTask,
   highlightCompleted,
   selectedIssueId,
-  selectedTaskId
+  selectedTaskId,
+  forceExpand
 }: {
   issue: Issue;
   onSelectIssue?: (issue: Issue) => void;
@@ -217,8 +218,16 @@ const IssueCard = ({
   highlightCompleted?: boolean;
   selectedIssueId?: string;
   selectedTaskId?: string;
+  forceExpand?: boolean | null;
 }) => {
   const [expanded, setExpanded] = useState(false);
+
+  // forceExpandが変更されたら同期
+  useEffect(() => {
+    if (forceExpand !== null && forceExpand !== undefined) {
+      setExpanded(forceExpand);
+    }
+  }, [forceExpand]);
   const isCompleted = issue.status === TASK_STATUS.COMPLETED;
   const isSelected = selectedIssueId === issue.id;
 
@@ -297,7 +306,8 @@ const Node = ({
   onSelectTask,
   highlightCompleted,
   selectedIssueId,
-  selectedTaskId
+  selectedTaskId,
+  forceExpand
 }: {
   node: StrategyNode;
   onSelectIssue?: (issue: Issue) => void;
@@ -305,6 +315,7 @@ const Node = ({
   highlightCompleted?: boolean;
   selectedIssueId?: string;
   selectedTaskId?: string;
+  forceExpand?: boolean | null;
 }) => {
   const hasChildren = node.children && node.children.length > 0;
   const hasIssues = node.issues && node.issues.length > 0;
@@ -341,6 +352,7 @@ const Node = ({
                     highlightCompleted={highlightCompleted}
                     selectedIssueId={selectedIssueId}
                     selectedTaskId={selectedTaskId}
+                    forceExpand={forceExpand}
                   />
                 ) : (
                   <IssueCard
@@ -350,6 +362,7 @@ const Node = ({
                     highlightCompleted={highlightCompleted}
                     selectedIssueId={selectedIssueId}
                     selectedTaskId={selectedTaskId}
+                    forceExpand={forceExpand}
                   />
                 )}
               </div>
@@ -812,6 +825,7 @@ export const TreeView = ({ strategyData, onNavigate: _onNavigate }: TreeViewProp
   const [panelWidth, setPanelWidth] = useState(400);
   const [isResizing, setIsResizing] = useState(false);
   const [highlightCompleted, setHighlightCompleted] = useState(false);
+  const [expandAll, setExpandAll] = useState<boolean | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);
   const userZoomedRef = useRef(false); // ユーザーが手動でズームしたかどうか
@@ -982,7 +996,7 @@ export const TreeView = ({ strategyData, onNavigate: _onNavigate }: TreeViewProp
           minWidth: '100%',
           minHeight: '100%',
           padding: PADDING,
-          paddingBottom: PADDING + 80,
+          paddingBottom: PADDING + 250,
           boxSizing: 'border-box',
           textAlign: 'center'
         }}
@@ -1005,7 +1019,7 @@ export const TreeView = ({ strategyData, onNavigate: _onNavigate }: TreeViewProp
               left: 0
             }}
           >
-            <Node node={strategyData} onSelectIssue={(issue) => { setSelectedIssue(issue); setSelectedTask(null); }} onSelectTask={(task) => { setSelectedTask(task); setSelectedIssue(null); }} highlightCompleted={highlightCompleted} selectedIssueId={selectedIssue?.id} selectedTaskId={selectedTask?.id} />
+            <Node node={strategyData} onSelectIssue={(issue) => { setSelectedIssue(issue); setSelectedTask(null); }} onSelectTask={(task) => { setSelectedTask(task); setSelectedIssue(null); }} highlightCompleted={highlightCompleted} selectedIssueId={selectedIssue?.id} selectedTaskId={selectedTask?.id} forceExpand={expandAll} />
           </div>
         </div>
       </div>
@@ -1051,7 +1065,7 @@ export const TreeView = ({ strategyData, onNavigate: _onNavigate }: TreeViewProp
         style={{
           position: 'fixed',
           bottom: '16px',
-          right: '16px',
+          left: '16px',
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
@@ -1125,6 +1139,43 @@ export const TreeView = ({ strategyData, onNavigate: _onNavigate }: TreeViewProp
           title="画面にフィット"
         >
           <i className="fas fa-expand"></i>
+        </button>
+        <div style={{ width: '1px', height: '24px', background: '#e2e8f0', margin: '0 4px' }}></div>
+        <button
+          onClick={() => setExpandAll(true)}
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '10px',
+            background: '#f1f5f9',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#475569'
+          }}
+          title="全て展開"
+        >
+          <i className="fas fa-angle-double-down"></i>
+        </button>
+        <button
+          onClick={() => setExpandAll(false)}
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '10px',
+            background: '#f1f5f9',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#475569'
+          }}
+          title="全て折りたたむ"
+        >
+          <i className="fas fa-angle-double-up"></i>
         </button>
         <div style={{ width: '1px', height: '24px', background: '#e2e8f0', margin: '0 4px' }}></div>
         <button
