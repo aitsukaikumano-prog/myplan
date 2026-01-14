@@ -82,6 +82,7 @@ export interface Issue {
   id: string;
   title: string;
   tasks: Task[];
+  status?: string;
 }
 
 // 戦略ノード

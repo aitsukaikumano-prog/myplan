@@ -207,6 +207,7 @@ const IssueCard = ({
   highlightCompleted?: boolean;
 }) => {
   const [expanded, setExpanded] = useState(false);
+  const isCompleted = issue.status === TASK_STATUS.COMPLETED;
   // _onNavigate は将来の詳細表示機能用に保持
 
   const handleClick = (e: React.MouseEvent) => {
@@ -214,11 +215,16 @@ const IssueCard = ({
     setExpanded(!expanded);
   };
 
+  // 完了ハイライト時のスタイル
+  const completedStyle = highlightCompleted && isCompleted
+    ? 'completed-highlight'
+    : '';
+
   return (
-    <div className="tree-node">
+    <div className={`tree-node ${highlightCompleted && isCompleted ? 'completed-connector' : ''}`}>
       <div
         onClick={handleClick}
-        className={`issue-card ${expanded ? 'issue-card-expanded' : ''}`}
+        className={`issue-card ${expanded ? 'issue-card-expanded' : ''} ${completedStyle}`}
       >
         <div className="flex items-center justify-between mb-1">
           <span className="text-[10px] font-bold text-blue-500">#{issue.id}</span>
