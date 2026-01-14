@@ -339,6 +339,7 @@ const buildStrategyFromYaml = (
         issues: (category.issues || []).map((issue: any) => ({
           id: issue.id,
           title: issue.title,
+          status: issue.status,
           context: issue.context,
           assignee: issue.assignee,
           labels: issue.labels || [],
