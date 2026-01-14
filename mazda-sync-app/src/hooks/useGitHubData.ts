@@ -336,11 +336,21 @@ const buildStrategyFromYaml = (
         id: category.id,
         title: category.title,
         icon: getIcon(category.id, 2),
-        issues: (category.issues || []).map((issue: any) => ({
+        issues: (category.issues || []).map((issue: any) => {
+          // Issue詳細ファイルからデータをマージ
+          const issueDetail = issue.id ? taskDetails.get(issue.id) : undefined;
+          return {
           id: issue.id,
           title: issue.title,
           status: issue.status,
           context: issue.context,
+          // 詳細ファイルのデータを優先、なければissues.yamlのデータ
+          description: issueDetail?.description || issue.description,
+          successCriteria: issueDetail?.successCriteria || issue.successCriteria || [],
+          outputs: issueDetail?.outputs || issue.outputs || [],
+          outputsSummary: issueDetail?.outputsSummary || issue.outputsSummary,
+          notes: issueDetail?.notes || issue.notes,
+          completedDate: issueDetail?.completedDate || issue.completedDate,
           assignee: issue.assignee,
           labels: issue.labels || [],
           success_criteria: issue.success_criteria,
@@ -363,7 +373,8 @@ const buildStrategyFromYaml = (
               completedDate: detail?.completedDate || task.completedDate
             };
           })
-        }))
+        };
+        })
       }))
     }))
   };

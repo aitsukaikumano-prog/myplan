@@ -734,6 +734,12 @@ const IssueDetailPanel = ({
         </div>
         <div className="text-[10px] font-bold text-blue-500 mb-1">#{issue.id}</div>
         <h3 className="text-xl font-bold text-slate-800 leading-tight">{issue.title}</h3>
+        {issue.completedDate && (
+          <div className="mt-2 text-sm text-slate-500">
+            <i className="fas fa-calendar-check mr-2 text-green-500"></i>
+            {issue.completedDate} 完了
+          </div>
+        )}
       </div>
 
       {/* コンテンツ */}
@@ -743,10 +749,72 @@ const IssueDetailPanel = ({
           <div>
             <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
               <i className="fas fa-info-circle mr-2 text-blue-500"></i>
-              説明
+              概要
             </div>
             <div className="text-sm text-slate-700 bg-slate-50 p-4 rounded-xl leading-relaxed">
               {issue.context}
+            </div>
+          </div>
+        )}
+
+        {/* 詳細説明 */}
+        {issue.description && (
+          <div>
+            <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
+              <i className="fas fa-align-left mr-2 text-blue-500"></i>
+              詳細説明
+            </div>
+            <div className="text-sm text-slate-700 bg-slate-50 p-4 rounded-xl leading-relaxed whitespace-pre-line">
+              {issue.description}
+            </div>
+          </div>
+        )}
+
+        {/* 成果物サマリー */}
+        {issue.outputsSummary && (
+          <div>
+            <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
+              <i className="fas fa-clipboard-check mr-2 text-emerald-500"></i>
+              成果物サマリー
+            </div>
+            <div className="text-sm text-slate-700 bg-emerald-50 p-4 rounded-xl leading-relaxed border border-emerald-100 whitespace-pre-line">
+              {issue.outputsSummary}
+            </div>
+          </div>
+        )}
+
+        {/* 完了条件 */}
+        {issue.successCriteria && issue.successCriteria.length > 0 && (
+          <div>
+            <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
+              <i className="fas fa-check-circle mr-2 text-amber-500"></i>
+              完了条件
+            </div>
+            <div className="space-y-2">
+              {issue.successCriteria.map((criteria, i) => (
+                <div
+                  key={i}
+                  className="flex items-start space-x-3 text-sm bg-amber-50 p-3 rounded-xl border border-amber-100"
+                >
+                  <i className={`fas ${status === TASK_STATUS.COMPLETED ? 'fa-check-square text-green-500' : 'fa-square text-slate-300'} mt-0.5`}></i>
+                  <span className={status === TASK_STATUS.COMPLETED ? 'text-slate-500' : 'text-slate-700'}>
+                    {criteria}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* メモ */}
+        {issue.notes && (
+          <div>
+            <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
+              <i className="fas fa-sticky-note mr-2 text-slate-400"></i>
+              メモ
+            </div>
+            <div className="text-sm text-slate-600 bg-slate-50 p-4 rounded-xl whitespace-pre-line">
+              {issue.notes}
             </div>
           </div>
         )}

@@ -84,6 +84,12 @@ export interface Issue {
   tasks: Task[];
   status?: string;
   context?: string;
+  description?: string;
+  successCriteria?: string[];
+  outputs?: (string | TaskOutput)[];
+  outputsSummary?: string;
+  notes?: string;
+  completedDate?: string;
 }
 
 // 戦略ノード
