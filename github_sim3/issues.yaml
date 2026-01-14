@@ -26,8 +26,9 @@ strategies:
                 subtasks:
                   - "製造業全般の課題リサーチ"
                   - "自動車製造業の課題リサーチ"
-              - title: "仮説としてのサービス案3つ作成"
-                status: "pending"
+              - id: "1-A-01-3"
+                title: "仮説としてのサービス案3つ作成"
+                status: "completed"
           - id: "1-A-02"
             title: "営業ツール整備"
             context: "信頼を得るための最低限のツール"

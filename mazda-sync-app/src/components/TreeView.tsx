@@ -472,7 +472,7 @@ const TaskDetailPanel = ({
               <i className="fas fa-clipboard-check mr-2 text-emerald-500"></i>
               成果物サマリー
             </div>
-            <div className="text-sm text-slate-700 bg-emerald-50 p-4 rounded-xl leading-relaxed border border-emerald-100">
+            <div className="text-sm text-slate-700 bg-emerald-50 p-4 rounded-xl leading-relaxed border border-emerald-100 whitespace-pre-line">
               {task.outputsSummary}
             </div>
           </div>
