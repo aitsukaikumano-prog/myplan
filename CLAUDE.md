@@ -58,6 +58,26 @@
 | ステータス変更 | issues.yaml のみ |
 | 詳細・成果物追加 | tasks/{id}.md のみ |
 
+### タスク完了チェックリスト
+
+タスクを完了にする際は、以下を**すべて**実行すること：
+
+1. **完了条件の確認**
+   - `tasks/{id}.md` の `successCriteria` をすべて満たしているか確認
+
+2. **ファイル更新**（3箇所）
+   - [ ] `issues.yaml` の `status` を `"completed"` に変更
+   - [ ] `tasks/{id}.md` に `completedDate: "YYYY-MM-DD"` を追加
+   - [ ] `tasks/{id}.md` のメモに完了記録を追記
+
+3. **コミット・プッシュ**
+   - [ ] `git add` → `git commit` → `git push origin main`
+
+4. **UI確認**
+   - [ ] ブラウザをリロード（Cmd+Shift+R）
+   - [ ] タスク検索画面で「完了」バッジが表示されることを確認
+   - [ ] ツリー表示で完了ボタンON時にキラキラ表示されることを確認
+
 ### タスク詳細ファイルの形式
 ```markdown
 ---
