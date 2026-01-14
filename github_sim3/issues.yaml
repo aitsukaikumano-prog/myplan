@@ -22,10 +22,10 @@ strategies:
                 # 詳細は tasks/1-A-01-1.md を参照
               - id: "1-A-01-2"
                 title: "製造業の一般的な課題リサーチ"
-                status: "pending"
+                status: "completed"
                 subtasks:
-                  - "製造業DXの動向調査"
-                  - "よくある課題パターンの整理"
+                  - "製造業全般の課題リサーチ"
+                  - "自動車製造業の課題リサーチ"
               - title: "仮説としてのサービス案3つ作成"
                 status: "pending"
           - id: "1-A-02"

@@ -17,7 +17,7 @@ function App() {
   const [currentProject, setCurrentProject] = useState('rescue');
 
   const { strategyData: rawStrategyData, documents, emails, loading, error } = useGitHubData(currentProject);
-  const { taskStates, updateTaskStatus, approveTask } = useTaskStates();
+  const { taskStates } = useTaskStates();
 
   // タスク状態を適用
   const strategyData = rawStrategyData ? applyTaskStates(rawStrategyData, taskStates) : null;
@@ -76,8 +76,6 @@ function App() {
         <DetailView
           issue={currentIssue}
           onBack={() => setView({ type: 'main', tab: view.tab, issue: null })}
-          onUpdateTaskStatus={updateTaskStatus}
-          onApproveTask={approveTask}
         />
       );
     }

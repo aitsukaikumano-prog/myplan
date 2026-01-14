@@ -147,13 +147,13 @@ const SubIssueCard = ({
     }
   };
 
-  // 完了ハイライト時のスタイル
+  // 完了ハイライト時のスタイル（キラキラ効果）
   const completedStyle = highlightCompleted && isCompleted
-    ? 'bg-green-100 border-green-400 ring-2 ring-green-300'
+    ? 'completed-highlight'
     : '';
 
   return (
-    <div className="tree-node">
+    <div className={`tree-node ${highlightCompleted && isCompleted ? 'completed-connector' : ''}`}>
       <div
         onClick={handleClick}
         className={`issue-card sub-issue-card ${expanded ? 'issue-card-expanded' : ''} ${(hasSubtasks || hasDetails) ? 'cursor-pointer' : ''} ${completedStyle}`}
@@ -232,19 +232,22 @@ const IssueCard = ({
       {expanded && issue.tasks.length > 0 && (
         <div className="tree-children">
           <div className="connector-vertical"></div>
-          <div className={`children-container ${issue.tasks.length > 1 ? 'has-multiple' : ''}`}>
-            {issue.tasks.map((task, idx) => (
-              <div key={idx} className="child-wrapper">
-                <div className="connector-vertical"></div>
-                <SubIssueCard
-                  task={task}
-                  issueId={issue.id}
-                  index={idx}
-                  onSelectTask={onSelectTask}
-                  highlightCompleted={highlightCompleted}
-                />
-              </div>
-            ))}
+          <div className={`children-container ${issue.tasks.length > 1 ? 'has-multiple' : ''} ${highlightCompleted && issue.tasks.some(t => t.status === 'completed') ? 'has-completed' : ''}`}>
+            {issue.tasks.map((task, idx) => {
+              const isTaskCompleted = highlightCompleted && task.status === 'completed';
+              return (
+                <div key={idx} className={`child-wrapper ${isTaskCompleted ? 'completed-connector' : ''}`}>
+                  <div className="connector-vertical"></div>
+                  <SubIssueCard
+                    task={task}
+                    issueId={issue.id}
+                    index={idx}
+                    onSelectTask={onSelectTask}
+                    highlightCompleted={highlightCompleted}
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

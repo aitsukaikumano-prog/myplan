@@ -1,46 +1,30 @@
 import { useState, useEffect, useCallback } from 'react';
 import { TaskStates, TaskStatusType, StrategyNode, Deliverable, TASK_STATUS } from '../types';
 
+// LocalStorageベースの進捗管理は廃止
+// issues.yamlのステータスをそのまま使用する
+
 const STORAGE_KEY = 'mazda-sync-task-states';
 
-// LocalStorageからタスク状態を読み込む
+// 古いLocalStorageデータをクリア
+if (typeof window !== 'undefined') {
+  localStorage.removeItem(STORAGE_KEY);
+}
+
+// LocalStorageからタスク状態を読み込む（廃止：常に空を返す）
 const loadTaskStates = (): TaskStates => {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : {};
-  } catch {
-    return {};
-  }
+  return {};
 };
 
-// タスク状態をLocalStorageに保存
-const saveTaskStates = (states: TaskStates): void => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(states));
+// タスク状態をLocalStorageに保存（廃止：何もしない）
+const saveTaskStates = (_states: TaskStates): void => {
+  // 廃止
 };
 
-// タスク状態を戦略データに適用
-export const applyTaskStates = (data: StrategyNode, taskStates: TaskStates): StrategyNode => {
-  const apply = (node: StrategyNode): StrategyNode => {
-    const newNode = { ...node };
-    
-    if (node.issues) {
-      newNode.issues = node.issues.map(issue => ({
-        ...issue,
-        tasks: issue.tasks.map((task, idx) => ({
-          ...task,
-          ...(taskStates[issue.id]?.[idx] || {})
-        }))
-      }));
-    }
-    
-    if (node.children) {
-      newNode.children = node.children.map(child => apply(child));
-    }
-    
-    return newNode;
-  };
-  
-  return apply(data);
+// タスク状態を戦略データに適用（廃止：元データをそのまま返す）
+export const applyTaskStates = (data: StrategyNode, _taskStates: TaskStates): StrategyNode => {
+  // issues.yamlのステータスをそのまま使用
+  return data;
 };
 
 // 変更されたファイルを取得
