@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { StrategyNode, Issue, Subtask, SubtaskItem, TaskOutput, Task, TASK_STATUS, STATUS_CONFIG } from '../types';
+import { StrategyNode, Issue, Subtask, SubtaskItem, TaskOutput, Task, TASK_STATUS, STATUS_CONFIG, TaskStatusType } from '../types';
 import './TreeView.css';
 
 interface TreeViewProps {
   strategyData: StrategyNode;
-  onNavigate: (issue: Issue) => void;
+  onNavigate?: (issue: Issue) => void;
 }
 
 // SubTaskCard: タスクカード（5階層目以降）- outputsは展開しない
@@ -123,19 +123,22 @@ const SubIssueCard = ({
   issueId,
   index,
   onSelectTask,
-  highlightCompleted
+  highlightCompleted,
+  selectedTaskId
 }: {
   task: Task;
   issueId: string;
   index: number;
   onSelectTask?: (task: Task) => void;
   highlightCompleted?: boolean;
+  selectedTaskId?: string;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const hasSubtasks = task.subtasks && task.subtasks.length > 0;
   const hasDetails = task.outputs || task.description || task.successCriteria;
   const cardId = `${issueId}-${index + 1}`;
   const isCompleted = task.status === TASK_STATUS.COMPLETED;
+  const isSelected = selectedTaskId === task.id;
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -152,11 +155,16 @@ const SubIssueCard = ({
     ? 'completed-highlight'
     : '';
 
+  // 選択中のスタイル
+  const selectedStyle = isSelected
+    ? 'outline outline-4 outline-yellow-400 outline-offset-2 shadow-[0_0_12px_rgba(250,204,21,0.7)]'
+    : '';
+
   return (
     <div className={`tree-node ${highlightCompleted && isCompleted ? 'completed-connector' : ''}`}>
       <div
         onClick={handleClick}
-        className={`issue-card sub-issue-card ${expanded ? 'issue-card-expanded' : ''} ${(hasSubtasks || hasDetails) ? 'cursor-pointer' : ''} ${completedStyle}`}
+        className={`issue-card sub-issue-card ${expanded ? 'issue-card-expanded' : ''} ${(hasSubtasks || hasDetails) ? 'cursor-pointer' : ''} ${completedStyle} ${selectedStyle}`}
       >
         <div className="flex items-center justify-between mb-1">
           <span className="text-[10px] font-bold text-blue-500">#{cardId}</span>
@@ -197,22 +205,35 @@ const SubIssueCard = ({
 
 const IssueCard = ({
   issue,
-  onNavigate: _onNavigate,
+  onSelectIssue,
   onSelectTask,
-  highlightCompleted
+  highlightCompleted,
+  selectedIssueId,
+  selectedTaskId
 }: {
   issue: Issue;
-  onNavigate: (issue: Issue) => void;
+  onSelectIssue?: (issue: Issue) => void;
   onSelectTask?: (task: Task) => void;
   highlightCompleted?: boolean;
+  selectedIssueId?: string;
+  selectedTaskId?: string;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const isCompleted = issue.status === TASK_STATUS.COMPLETED;
-  // _onNavigate は将来の詳細表示機能用に保持
+  const isSelected = selectedIssueId === issue.id;
 
-  const handleClick = (e: React.MouseEvent) => {
+  // ▶アイコンクリック → 展開/折りたたみ
+  const handleExpandClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setExpanded(!expanded);
+  };
+
+  // カード本体クリック → 詳細パネル表示
+  const handleCardClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onSelectIssue) {
+      onSelectIssue(issue);
+    }
   };
 
   // 完了ハイライト時のスタイル
@@ -220,16 +241,24 @@ const IssueCard = ({
     ? 'completed-highlight'
     : '';
 
+  // 選択中のスタイル
+  const selectedStyle = isSelected
+    ? 'outline outline-4 outline-yellow-400 outline-offset-2 shadow-[0_0_12px_rgba(250,204,21,0.7)]'
+    : '';
+
   return (
     <div className={`tree-node ${highlightCompleted && isCompleted ? 'completed-connector' : ''}`}>
       <div
-        onClick={handleClick}
-        className={`issue-card ${expanded ? 'issue-card-expanded' : ''} ${completedStyle}`}
+        onClick={handleCardClick}
+        className={`issue-card ${expanded ? 'issue-card-expanded' : ''} ${completedStyle} ${selectedStyle} cursor-pointer`}
       >
         <div className="flex items-center justify-between mb-1">
           <span className="text-[10px] font-bold text-blue-500">#{issue.id}</span>
-          <span className="text-[10px] text-slate-400">
-            {expanded ? '▼' : '▶'} {issue.tasks.length}
+          <span
+            onClick={handleExpandClick}
+            className="text-sm text-slate-400 hover:text-blue-500 px-2 -mr-2 cursor-pointer"
+          >
+            {expanded ? '▼' : '▶'} <span className="text-[10px]">{issue.tasks.length}</span>
           </span>
         </div>
         <div className="text-xs font-semibold text-slate-700 leading-tight">{issue.title}</div>
@@ -250,6 +279,7 @@ const IssueCard = ({
                     index={idx}
                     onSelectTask={onSelectTask}
                     highlightCompleted={highlightCompleted}
+                    selectedTaskId={selectedTaskId}
                   />
                 </div>
               );
@@ -263,14 +293,18 @@ const IssueCard = ({
 
 const Node = ({
   node,
-  onNavigate,
+  onSelectIssue,
   onSelectTask,
-  highlightCompleted
+  highlightCompleted,
+  selectedIssueId,
+  selectedTaskId
 }: {
   node: StrategyNode;
-  onNavigate: (issue: Issue) => void;
+  onSelectIssue?: (issue: Issue) => void;
   onSelectTask?: (task: Task) => void;
   highlightCompleted?: boolean;
+  selectedIssueId?: string;
+  selectedTaskId?: string;
 }) => {
   const hasChildren = node.children && node.children.length > 0;
   const hasIssues = node.issues && node.issues.length > 0;
@@ -302,16 +336,20 @@ const Node = ({
                 {child.type === 'node' ? (
                   <Node
                     node={child.data}
-                    onNavigate={onNavigate}
+                    onSelectIssue={onSelectIssue}
                     onSelectTask={onSelectTask}
                     highlightCompleted={highlightCompleted}
+                    selectedIssueId={selectedIssueId}
+                    selectedTaskId={selectedTaskId}
                   />
                 ) : (
                   <IssueCard
                     issue={child.data}
-                    onNavigate={onNavigate}
+                    onSelectIssue={onSelectIssue}
                     onSelectTask={onSelectTask}
                     highlightCompleted={highlightCompleted}
+                    selectedIssueId={selectedIssueId}
+                    selectedTaskId={selectedTaskId}
                   />
                 )}
               </div>
@@ -615,10 +653,162 @@ const TaskDetailPanel = ({
   );
 };
 
-export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
+// Issue詳細パネル
+const IssueDetailPanel = ({
+  issue,
+  onClose,
+  onSelectTask,
+  width,
+  onResizeStart
+}: {
+  issue: Issue;
+  onClose: () => void;
+  onSelectTask?: (task: Task) => void;
+  width: number;
+  onResizeStart: (e: React.MouseEvent) => void;
+}) => {
+  const status = issue.status || TASK_STATUS.PENDING;
+  const config = STATUS_CONFIG[status as TaskStatusType];
+
+  // タスクの進捗計算
+  const completedTasks = issue.tasks.filter(t => t.status === TASK_STATUS.COMPLETED).length;
+  const totalTasks = issue.tasks.length;
+  const progressPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+  return (
+    <div
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        position: 'fixed',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        width: `${width}px`,
+        background: 'white',
+        boxShadow: '-4px 0 20px rgba(0,0,0,0.1)',
+        zIndex: 100,
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+    >
+      {/* リサイズハンドル */}
+      <div
+        onMouseDown={onResizeStart}
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: '6px',
+          cursor: 'col-resize',
+          background: 'transparent',
+          zIndex: 10
+        }}
+        className="hover:bg-blue-400 transition-colors"
+      />
+      {/* ヘッダー */}
+      <div className="p-6 border-b border-slate-100">
+        <div className="flex items-start justify-between mb-3">
+          <span className={`text-xs font-bold px-2 py-1 rounded-full border ${config.color}`}>
+            {config.label}
+          </span>
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-600 p-1"
+          >
+            <i className="fas fa-times"></i>
+          </button>
+        </div>
+        <div className="text-[10px] font-bold text-blue-500 mb-1">#{issue.id}</div>
+        <h3 className="text-xl font-bold text-slate-800 leading-tight">{issue.title}</h3>
+      </div>
+
+      {/* コンテンツ */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        {/* 説明（context） */}
+        {issue.context && (
+          <div>
+            <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
+              <i className="fas fa-info-circle mr-2 text-blue-500"></i>
+              説明
+            </div>
+            <div className="text-sm text-slate-700 bg-slate-50 p-4 rounded-xl leading-relaxed">
+              {issue.context}
+            </div>
+          </div>
+        )}
+
+        {/* 進捗 */}
+        <div>
+          <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
+            <i className="fas fa-tasks mr-2 text-emerald-500"></i>
+            進捗 ({completedTasks}/{totalTasks})
+          </div>
+          <div className="bg-slate-100 rounded-full h-3 overflow-hidden">
+            <div
+              className="bg-gradient-to-r from-emerald-400 to-emerald-500 h-full transition-all duration-300"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+          <div className="text-right text-xs text-slate-400 mt-1">{progressPercent}% 完了</div>
+        </div>
+
+        {/* タスク一覧 */}
+        {issue.tasks.length > 0 && (
+          <div>
+            <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
+              <i className="fas fa-list mr-2 text-purple-500"></i>
+              タスク一覧
+            </div>
+            <div className="space-y-2">
+              {issue.tasks.map((task, i) => {
+                const taskStatus = task.status || TASK_STATUS.PENDING;
+                const taskConfig = STATUS_CONFIG[taskStatus];
+                const hasDetails = task.outputs || task.description || task.successCriteria;
+                return (
+                  <div
+                    key={i}
+                    onClick={() => hasDetails && onSelectTask?.(task)}
+                    className={`flex items-center p-3 rounded-xl border ${hasDetails ? 'cursor-pointer hover:bg-slate-50' : ''} ${
+                      taskStatus === TASK_STATUS.COMPLETED
+                        ? 'bg-green-50 border-green-200'
+                        : 'bg-white border-slate-200'
+                    }`}
+                  >
+                    <i className={`${taskConfig.icon} ${taskConfig.color.split(' ')[2]} w-4 mr-3`}></i>
+                    <div className="flex-1">
+                      <div className="text-sm font-medium text-slate-700">{task.title}</div>
+                      {task.id && (
+                        <div className="text-[10px] text-slate-400">#{task.id}</div>
+                      )}
+                    </div>
+                    {hasDetails && (
+                      <i className="fas fa-chevron-right text-slate-300"></i>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* 何も情報がない場合 */}
+        {!issue.context && issue.tasks.length === 0 && (
+          <div className="text-center py-10">
+            <i className="fas fa-info-circle text-4xl text-slate-200 mb-3"></i>
+            <p className="text-slate-400">詳細情報がありません</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export const TreeView = ({ strategyData, onNavigate: _onNavigate }: TreeViewProps) => {
   const [scale, setScale] = useState(1);
   const [treeDimensions, setTreeDimensions] = useState({ width: 0, height: 0 });
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
   const [panelWidth, setPanelWidth] = useState(400);
   const [isResizing, setIsResizing] = useState(false);
   const [highlightCompleted, setHighlightCompleted] = useState(false);
@@ -762,7 +952,7 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
   return (
     <div
       ref={containerRef}
-      onClick={() => setSelectedTask(null)}
+      onClick={() => { setSelectedTask(null); setSelectedIssue(null); }}
       style={{
         width: '100%',
         height: '100%',
@@ -782,7 +972,7 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
           top: 0
         }}
       >
-        <Node node={strategyData} onNavigate={() => {}} onSelectTask={() => {}} />
+        <Node node={strategyData} onSelectIssue={() => {}} onSelectTask={() => {}} />
       </div>
 
       {/* 表示用：スクロール可能なコンテンツ */}
@@ -815,16 +1005,27 @@ export const TreeView = ({ strategyData, onNavigate }: TreeViewProps) => {
               left: 0
             }}
           >
-            <Node node={strategyData} onNavigate={onNavigate} onSelectTask={setSelectedTask} highlightCompleted={highlightCompleted} />
+            <Node node={strategyData} onSelectIssue={(issue) => { setSelectedIssue(issue); setSelectedTask(null); }} onSelectTask={(task) => { setSelectedTask(task); setSelectedIssue(null); }} highlightCompleted={highlightCompleted} selectedIssueId={selectedIssue?.id} selectedTaskId={selectedTask?.id} />
           </div>
         </div>
       </div>
 
-      {/* 詳細パネル */}
+      {/* タスク詳細パネル */}
       {selectedTask && (
         <TaskDetailPanel
           task={selectedTask}
           onClose={() => setSelectedTask(null)}
+          width={panelWidth}
+          onResizeStart={handleResizeStart}
+        />
+      )}
+
+      {/* Issue詳細パネル */}
+      {selectedIssue && (
+        <IssueDetailPanel
+          issue={selectedIssue}
+          onClose={() => setSelectedIssue(null)}
+          onSelectTask={(task) => { setSelectedTask(task); setSelectedIssue(null); }}
           width={panelWidth}
           onResizeStart={handleResizeStart}
         />
