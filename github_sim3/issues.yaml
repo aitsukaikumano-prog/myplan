@@ -15,6 +15,7 @@ strategies:
           - id: "1-A-01"
             title: "提供価値の明確化"
             context: "何を売るのかの仮説を立てる（詳細は顧客接点後に検証）"
+            status: "completed"
             tasks:
               - id: "1-A-01-1"
                 title: "自分のスキル棚卸し（Web/AI/業務改善）"
