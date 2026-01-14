@@ -67,6 +67,7 @@ export interface Task {
   title: string;
   status?: TaskStatusType;
   deliverable?: Deliverable;
+  tasks?: Task[];                       // 子タスク（再帰構造）
   subtasks?: (string | Subtask)[];      // 文字列とオブジェクト両方サポート
   outputs?: (string | TaskOutput)[];    // 成果物（文字列とオブジェクト両対応）
   outputsSummary?: string;              // 成果物全体のサマリー

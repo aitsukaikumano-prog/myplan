@@ -310,6 +310,28 @@ export const useGitHubData = (projectId: string) => {
 };
 
 // YAMLからStrategyNodeを完全に動的に構築
+// タスクを再帰的にマッピング（子タスク対応）
+const mapTask = (task: any, taskDetails: Map<string, TaskDetailData>): any => {
+  const detail = task.id ? taskDetails.get(task.id) : undefined;
+  return {
+    id: task.id,
+    title: task.title,
+    status: task.status || TASK_STATUS.PENDING,
+    deliverable: task.deliverable,
+    // 子タスクがある場合は再帰的にマッピング
+    tasks: task.tasks ? task.tasks.map((t: any) => mapTask(t, taskDetails)) : undefined,
+    subtasks: task.subtasks || [],
+    // 詳細ファイルのデータを優先、なければissues.yamlのデータ
+    outputs: detail?.outputs || task.outputs || [],
+    outputsSummary: detail?.outputsSummary || task.outputsSummary,
+    links: task.links || [],
+    notes: detail?.notes || task.notes,
+    description: detail?.description || task.description,
+    successCriteria: detail?.successCriteria || task.successCriteria || [],
+    completedDate: detail?.completedDate || task.completedDate
+  };
+};
+
 const buildStrategyFromYaml = (
   yamlData: any,
   project: ProjectConfig,
@@ -354,25 +376,7 @@ const buildStrategyFromYaml = (
           assignee: issue.assignee,
           labels: issue.labels || [],
           success_criteria: issue.success_criteria,
-          tasks: (issue.tasks || []).map((task: any) => {
-            // タスク詳細ファイルからデータをマージ
-            const detail = task.id ? taskDetails.get(task.id) : undefined;
-            return {
-              id: task.id,
-              title: task.title,
-              status: task.status || TASK_STATUS.PENDING,
-              deliverable: task.deliverable,
-              subtasks: task.subtasks || [],
-              // 詳細ファイルのデータを優先、なければissues.yamlのデータ
-              outputs: detail?.outputs || task.outputs || [],
-              outputsSummary: detail?.outputsSummary || task.outputsSummary,
-              links: task.links || [],
-              notes: detail?.notes || task.notes,
-              description: detail?.description || task.description,
-              successCriteria: detail?.successCriteria || task.successCriteria || [],
-              completedDate: detail?.completedDate || task.completedDate
-            };
-          })
+          tasks: (issue.tasks || []).map((task: any) => mapTask(task, taskDetails))
         };
         })
       }))

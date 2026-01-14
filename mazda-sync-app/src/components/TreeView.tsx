@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { StrategyNode, Issue, Subtask, SubtaskItem, TaskOutput, Task, TASK_STATUS, STATUS_CONFIG, TaskStatusType } from '../types';
 import './TreeView.css';
 
@@ -6,6 +6,58 @@ interface TreeViewProps {
   strategyData: StrategyNode;
   onNavigate?: (issue: Issue) => void;
 }
+
+// ツリーの最大深度を計算（パディング計算用）
+const calculateTreeDepth = (node: StrategyNode): number => {
+  let maxDepth = 1; // root
+
+  // 子ノードの深さ
+  if (node.children) {
+    for (const child of node.children) {
+      maxDepth = Math.max(maxDepth, 1 + calculateTreeDepth(child));
+    }
+  }
+
+  // Issueの深さ（Issue -> Task -> ChildTask -> Subtask -> SubtaskItem）
+  if (node.issues) {
+    for (const issue of node.issues) {
+      let issueDepth = 1; // Issue自体
+      if (issue.tasks) {
+        for (const task of issue.tasks) {
+          issueDepth = Math.max(issueDepth, 1 + calculateTaskDepth(task));
+        }
+      }
+      maxDepth = Math.max(maxDepth, 1 + issueDepth);
+    }
+  }
+
+  return maxDepth;
+};
+
+// タスクの深さを再帰的に計算
+const calculateTaskDepth = (task: Task): number => {
+  let depth = 1; // Task自体
+
+  // 子タスク
+  if (task.tasks && task.tasks.length > 0) {
+    for (const childTask of task.tasks) {
+      depth = Math.max(depth, 1 + calculateTaskDepth(childTask));
+    }
+  }
+
+  // サブタスク
+  if (task.subtasks && task.subtasks.length > 0) {
+    let subtaskDepth = 1;
+    for (const subtask of task.subtasks) {
+      if (typeof subtask === 'object' && subtask.items && subtask.items.length > 0) {
+        subtaskDepth = 2; // Subtask + SubtaskItem
+      }
+    }
+    depth = Math.max(depth, subtaskDepth);
+  }
+
+  return depth;
+};
 
 // SubTaskCard: タスクカード（5階層目以降）- outputsは展開しない
 const SubTaskCard = ({
@@ -135,18 +187,28 @@ const SubIssueCard = ({
 }) => {
   const [expanded, setExpanded] = useState(false);
   const hasSubtasks = task.subtasks && task.subtasks.length > 0;
+  const hasChildTasks = task.tasks && task.tasks.length > 0;  // 子タスク対応
   const hasDetails = task.outputs || task.description || task.successCriteria;
-  const cardId = `${issueId}-${index + 1}`;
+  const cardId = task.id || `${issueId}-${index + 1}`;
   const isCompleted = task.status === TASK_STATUS.COMPLETED;
   const isSelected = selectedTaskId === task.id;
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // 詳細情報がある場合は詳細パネルを開く
+    // 子タスクがある場合は展開/折りたたみ
+    if (hasChildTasks || hasSubtasks) {
+      setExpanded(!expanded);
+    } else if (hasDetails && onSelectTask) {
+      // 子タスクがなく詳細情報がある場合は詳細パネルを開く
+      onSelectTask(task);
+    }
+  };
+
+  // 詳細アイコンクリック → 詳細パネル表示
+  const handleDetailClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (hasDetails && onSelectTask) {
       onSelectTask(task);
-    } else if (hasSubtasks) {
-      setExpanded(!expanded);
     }
   };
 
@@ -164,24 +226,58 @@ const SubIssueCard = ({
     <div className={`tree-node ${highlightCompleted && isCompleted ? 'completed-connector' : ''}`}>
       <div
         onClick={handleClick}
-        className={`issue-card sub-issue-card ${expanded ? 'issue-card-expanded' : ''} ${(hasSubtasks || hasDetails) ? 'cursor-pointer' : ''} ${completedStyle} ${selectedStyle}`}
+        className={`issue-card sub-issue-card ${expanded ? 'issue-card-expanded' : ''} ${(hasChildTasks || hasSubtasks || hasDetails) ? 'cursor-pointer' : ''} ${completedStyle} ${selectedStyle}`}
       >
         <div className="flex items-center justify-between mb-1">
           <span className="text-[10px] font-bold text-blue-500">#{cardId}</span>
-          {hasDetails ? (
-            <span className="text-[10px] text-blue-500 font-bold">
-              <i className="fas fa-info-circle"></i>
-            </span>
-          ) : hasSubtasks ? (
-            <span className="text-[10px] text-slate-400">
-              {expanded ? '▼' : '▶'} {task.subtasks!.length}
-            </span>
-          ) : null}
+          <div className="flex items-center gap-2">
+            {hasDetails && (
+              <span
+                onClick={handleDetailClick}
+                className="text-[10px] text-blue-500 font-bold hover:text-blue-700 cursor-pointer"
+              >
+                <i className="fas fa-info-circle"></i>
+              </span>
+            )}
+            {hasChildTasks && (
+              <span className="text-[10px] text-slate-400">
+                {expanded ? '▼' : '▶'} {task.tasks!.length}
+              </span>
+            )}
+            {hasSubtasks && !hasChildTasks && (
+              <span className="text-[10px] text-slate-400">
+                {expanded ? '▼' : '▶'} {task.subtasks!.length}
+              </span>
+            )}
+          </div>
         </div>
         <div className="text-xs font-semibold text-slate-700 leading-tight">{task.title}</div>
       </div>
 
-      {expanded && hasSubtasks && !hasDetails && (
+      {/* 子タスク（task.tasks）の描画 */}
+      {expanded && hasChildTasks && (
+        <div className="tree-children">
+          <div className="connector-vertical"></div>
+          <div className={`children-container ${task.tasks!.length > 1 ? 'has-multiple' : ''}`}>
+            {task.tasks!.map((childTask, idx) => (
+              <div key={idx} className="child-wrapper">
+                <div className="connector-vertical"></div>
+                <SubIssueCard
+                  task={childTask}
+                  issueId={cardId}
+                  index={idx}
+                  onSelectTask={onSelectTask}
+                  highlightCompleted={highlightCompleted}
+                  selectedTaskId={selectedTaskId}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* サブタスク（task.subtasks）の描画 */}
+      {expanded && hasSubtasks && !hasChildTasks && (
         <div className="tree-children">
           <div className="connector-vertical"></div>
           <div className={`children-container ${task.subtasks!.length > 1 ? 'has-multiple' : ''}`}>
@@ -927,6 +1023,11 @@ export const TreeView = ({ strategyData, onNavigate: _onNavigate }: TreeViewProp
 
   // パディング設定（定数）
   const PADDING = 40;
+  const DEPTH_PADDING = 80; // 1階層あたりの追加パディング
+
+  // ツリーの最大深度を計算
+  const treeDepth = useMemo(() => calculateTreeDepth(strategyData), [strategyData]);
+  const dynamicBottomPadding = PADDING + (treeDepth * DEPTH_PADDING);
 
   // 自動フィット計算
   const calculateFit = (force = false) => {
@@ -1064,7 +1165,7 @@ export const TreeView = ({ strategyData, onNavigate: _onNavigate }: TreeViewProp
           minWidth: '100%',
           minHeight: '100%',
           padding: PADDING,
-          paddingBottom: PADDING + 250,
+          paddingBottom: dynamicBottomPadding,
           boxSizing: 'border-box',
           textAlign: 'center'
         }}
