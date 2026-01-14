@@ -503,7 +503,7 @@ const TaskDetailPanel = ({
               <i className="fas fa-align-left mr-2 text-blue-500"></i>
               詳細説明
             </div>
-            <div className="text-sm text-slate-700 bg-slate-50 p-4 rounded-xl leading-relaxed">
+            <div className="text-sm text-slate-700 bg-slate-50 p-4 rounded-xl leading-relaxed whitespace-pre-line">
               {task.description}
             </div>
           </div>
