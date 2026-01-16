@@ -24,12 +24,12 @@ interface ProjectConfig {
 const PROJECTS: ProjectConfig[] = [
   {
     id: 'rescue',
-    name: 'マツダ救済',
-    icon: 'fas fa-rocket',
+    name: '熊野AIコミュニティ',
+    icon: 'fas fa-users',
     folder: 'github_sim3',
     issuesFile: 'github_sim3/issues.yaml',
-    rootTitle: 'マツダからAIコンサル案件を獲得する',
-    rootIcon: 'fas fa-rocket',
+    rootTitle: '熊野町にAIコミュニティを作る',
+    rootIcon: 'fas fa-users',
     emailsFolder: 'github_sim3/docs/emails',
     meetingsFolder: 'github_sim3/docs/meetings',
     proposalsFolder: 'github_sim3/docs/proposals',

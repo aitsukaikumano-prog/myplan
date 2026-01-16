@@ -107,12 +107,16 @@ const TaskCard = ({
   subtask,
   parentId,
   index,
-  onSelectTask
+  onSelectTask,
+  highlightCompleted,
+  parentCompleted
 }: {
   subtask: string | Subtask;
   parentId: string;
   index: number;
   onSelectTask?: (task: Task) => void;
+  highlightCompleted?: boolean;
+  parentCompleted?: boolean;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const cardId = `${parentId}-${index + 1}`;
@@ -123,6 +127,14 @@ const TaskCard = ({
   const items = isObject ? subtask.items : undefined;
   const hasItems = items && items.length > 0;
 
+  // 親タスクが完了していればsubtaskも完了扱い
+  const isCompleted = parentCompleted;
+
+  // 完了ハイライト時のスタイル
+  const completedStyle = highlightCompleted && isCompleted
+    ? 'completed-highlight'
+    : '';
+
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (hasItems) {
@@ -131,10 +143,10 @@ const TaskCard = ({
   };
 
   return (
-    <div className="tree-node">
+    <div className={`tree-node ${highlightCompleted && isCompleted ? 'completed-connector' : ''}`}>
       <div
         onClick={handleClick}
-        className={`issue-card task-card ${expanded ? 'issue-card-expanded' : ''} ${hasItems ? 'cursor-pointer' : ''}`}
+        className={`issue-card task-card ${expanded ? 'issue-card-expanded' : ''} ${hasItems ? 'cursor-pointer' : ''} ${completedStyle}`}
       >
         <div className="flex items-center justify-between mb-1">
           <span className="text-[10px] font-bold text-emerald-500">#{cardId}</span>
@@ -193,19 +205,16 @@ const SubIssueCard = ({
   const isCompleted = task.status === TASK_STATUS.COMPLETED;
   const isSelected = selectedTaskId === task.id;
 
-  const handleClick = (e: React.MouseEvent) => {
+  // ▶︎アイコンクリック → 展開/折りたたみ
+  const handleExpandClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // 子タスクがある場合は展開/折りたたみ
     if (hasChildTasks || hasSubtasks) {
       setExpanded(!expanded);
-    } else if (hasDetails && onSelectTask) {
-      // 子タスクがなく詳細情報がある場合は詳細パネルを開く
-      onSelectTask(task);
     }
   };
 
-  // 詳細アイコンクリック → 詳細パネル表示
-  const handleDetailClick = (e: React.MouseEvent) => {
+  // カード本体クリック → 詳細パネル表示
+  const handleCardClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (hasDetails && onSelectTask) {
       onSelectTask(task);
@@ -225,27 +234,30 @@ const SubIssueCard = ({
   return (
     <div className={`tree-node ${highlightCompleted && isCompleted ? 'completed-connector' : ''}`}>
       <div
-        onClick={handleClick}
-        className={`issue-card sub-issue-card ${expanded ? 'issue-card-expanded' : ''} ${(hasChildTasks || hasSubtasks || hasDetails) ? 'cursor-pointer' : ''} ${completedStyle} ${selectedStyle}`}
+        onClick={handleCardClick}
+        className={`issue-card sub-issue-card ${expanded ? 'issue-card-expanded' : ''} ${hasDetails ? 'cursor-pointer' : ''} ${completedStyle} ${selectedStyle}`}
       >
         <div className="flex items-center justify-between mb-1">
           <span className="text-[10px] font-bold text-blue-500">#{cardId}</span>
           <div className="flex items-center gap-2">
             {hasDetails && (
-              <span
-                onClick={handleDetailClick}
-                className="text-[10px] text-blue-500 font-bold hover:text-blue-700 cursor-pointer"
-              >
+              <span className="text-[10px] text-blue-500 font-bold">
                 <i className="fas fa-info-circle"></i>
               </span>
             )}
             {hasChildTasks && (
-              <span className="text-[10px] text-slate-400">
+              <span
+                onClick={handleExpandClick}
+                className="text-[10px] text-slate-400 hover:text-blue-500 cursor-pointer px-1"
+              >
                 {expanded ? '▼' : '▶'} {task.tasks!.length}
               </span>
             )}
             {hasSubtasks && !hasChildTasks && (
-              <span className="text-[10px] text-slate-400">
+              <span
+                onClick={handleExpandClick}
+                className="text-[10px] text-slate-400 hover:text-blue-500 cursor-pointer px-1"
+              >
                 {expanded ? '▼' : '▶'} {task.subtasks!.length}
               </span>
             )}
@@ -280,15 +292,17 @@ const SubIssueCard = ({
       {expanded && hasSubtasks && !hasChildTasks && (
         <div className="tree-children">
           <div className="connector-vertical"></div>
-          <div className={`children-container ${task.subtasks!.length > 1 ? 'has-multiple' : ''}`}>
+          <div className={`children-container ${task.subtasks!.length > 1 ? 'has-multiple' : ''} ${highlightCompleted && isCompleted ? 'has-completed' : ''}`}>
             {task.subtasks!.map((subtask, idx) => (
-              <div key={idx} className="child-wrapper">
+              <div key={idx} className={`child-wrapper ${highlightCompleted && isCompleted ? 'completed-connector' : ''}`}>
                 <div className="connector-vertical"></div>
                 <TaskCard
                   subtask={subtask}
                   parentId={cardId}
                   index={idx}
                   onSelectTask={onSelectTask}
+                  highlightCompleted={highlightCompleted}
+                  parentCompleted={isCompleted}
                 />
               </div>
             ))}
