@@ -487,6 +487,22 @@ const getOutputTitle = (output: string | TaskOutput): string => {
   return output;
 };
 
+// 成果物のURLを取得
+const getOutputUrl = (output: string | TaskOutput): string | null => {
+  if (typeof output === 'object') {
+    return output.url || null;
+  }
+  return null;
+};
+
+// 成果物のサマリーを取得
+const getOutputSummary = (output: string | TaskOutput): string | null => {
+  if (typeof output === 'object') {
+    return output.summary || null;
+  }
+  return null;
+};
+
 // ベースパス
 const BASE_PATH = import.meta.env.BASE_URL;
 
@@ -664,9 +680,38 @@ const TaskDetailPanel = ({
             <div className="space-y-2">
               {task.outputs.map((output, i) => {
                 const filePath = extractFilePath(output);
+                const outputUrl = getOutputUrl(output);
+                const outputSummary = getOutputSummary(output);
                 const isExpanded = expandedOutputs.has(i);
                 const isLoading = loadingOutputs.has(i);
                 const content = outputContents[i];
+                const hasFile = !!filePath;
+                const hasUrl = !!outputUrl;
+
+                // URLのみの場合はシンプル表示（展開なし）
+                if (hasUrl && !hasFile) {
+                  return (
+                    <a
+                      key={i}
+                      href={outputUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-100 hover:bg-emerald-100 transition-colors"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <i className="fas fa-external-link-alt text-emerald-500"></i>
+                        <div>
+                          <div className="text-sm font-medium text-slate-700">{getOutputTitle(output)}</div>
+                          {outputSummary && (
+                            <div className="text-xs text-slate-500">{outputSummary}</div>
+                          )}
+                        </div>
+                      </div>
+                      <i className="fas fa-chevron-right text-emerald-300"></i>
+                    </a>
+                  );
+                }
 
                 return (
                   <div key={i}>
