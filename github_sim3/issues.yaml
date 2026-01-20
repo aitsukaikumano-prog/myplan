@@ -72,7 +72,7 @@ strategies:
             tasks:
               - id: "1-B-01-1"
                 title: "熊野町の産業構造・主要事業者調査"
-                status: "pending"
+                status: "completed"
               - id: "1-B-01-2"
                 title: "地域課題のヒアリング（商工会・役場）"
                 status: "pending"
