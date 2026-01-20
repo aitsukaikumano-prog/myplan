@@ -358,6 +358,7 @@ const buildStrategyFromYaml = (
         id: category.id,
         title: category.title,
         icon: getIcon(category.id, 2),
+        status: category.status,
         issues: (category.issues || []).map((issue: any) => {
           // Issue詳細ファイルからデータをマージ
           const issueDetail = issue.id ? taskDetails.get(issue.id) : undefined;

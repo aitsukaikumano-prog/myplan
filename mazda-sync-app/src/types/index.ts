@@ -98,6 +98,7 @@ export interface StrategyNode {
   id: string;
   title: string;
   icon?: string;
+  status?: TaskStatusType;
   children?: StrategyNode[];
   issues?: Issue[];
 }
