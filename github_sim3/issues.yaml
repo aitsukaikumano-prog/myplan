@@ -93,6 +93,33 @@ strategies:
                 title: "キーパーソン特定・接点づくり"
                 status: "pending"
 
+      - id: "1-C"
+        title: "C. 初期実績構築"
+        issues:
+          - id: "1-C-01"
+            title: "和田酒店AI活用支援"
+            context: "地元事業者へのAI活用支援で実績とポートフォリオを構築"
+            tasks:
+              - id: "1-C-01-1"
+                title: "PR画像・動画制作"
+                status: "completed"
+              - id: "1-C-01-2"
+                title: "オリジナルブランド期間限定ラベルデザイン"
+                status: "in_progress"
+              - id: "1-C-01-3"
+                title: "成果の記録・ポートフォリオ化"
+                status: "pending"
+          - id: "1-C-02"
+            title: "地域イベントIT支援"
+            context: "地域イベントのIT化で認知度と信頼を獲得"
+            tasks:
+              - id: "1-C-02-1"
+                title: "ソフトバレー大会 得点表デジタル化"
+                status: "in_progress"
+              - id: "1-C-02-2"
+                title: "成果の記録・ポートフォリオ化"
+                status: "pending"
+
   - id: "2"
     title: "コミュニティ立ち上げ（月2-4）"
     categories:
