@@ -136,7 +136,7 @@ strategies:
             tasks:
               - id: "1-C-03-1"
                 title: "Cowork最新情報の収集・まとめ"
-                status: "pending"
+                status: "completed"
               - id: "1-C-03-2"
                 title: "検証会の実施（2/12 町民会館）"
                 status: "pending"
