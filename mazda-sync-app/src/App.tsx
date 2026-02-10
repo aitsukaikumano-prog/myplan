@@ -9,7 +9,8 @@ import {
   DocsView,
   EmailsView,
   DetailView,
-  Header
+  Header,
+  MemoView
 } from './components';
 
 function App() {
@@ -87,6 +88,7 @@ function App() {
         {view.tab === 'progress' && <ProgressView strategyData={strategyData} />}
         {view.tab === 'docs' && <DocsView currentProject={currentProject} documents={documents} />}
         {view.tab === 'emails' && <EmailsView currentProject={currentProject} emails={emails} />}
+        {view.tab === 'memo' && <MemoView />}
       </>
     );
   };

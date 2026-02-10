@@ -96,6 +96,12 @@ export const Header = ({
           >
             <i className="fas fa-envelope mr-2"></i>メール
           </button>
+          <button
+            onClick={() => setView({ type: 'main', tab: 'memo', issue: null })}
+            className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${view.tab === 'memo' ? 'bg-amber-500 text-white' : 'text-slate-500 hover:bg-slate-100'}`}
+          >
+            <i className="fas fa-sticky-note mr-2"></i>メモ
+          </button>
         </div>
       </div>
     </header>
