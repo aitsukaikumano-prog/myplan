@@ -87,6 +87,12 @@ function buildGraph(taskStatuses: Map<string, string>): string {
       C03_1 --> C03_2 --> C03_3
     end
 
+    subgraph C04["🖼️ 熊野町AIアート（アート系）"]
+      C04_1["作品制作・発信<br>1-C-04-1"]:::${c('1-C-04-1')}
+      C04_2["コンセプト言語化<br>展示準備<br>1-C-04-2"]:::${c('1-C-04-2')}
+      C04_1 --> C04_2
+    end
+
     %% ===== 1-B: ニーズ調査・関係構築 =====
 
     subgraph B01_2g["🤝 関係構築"]
@@ -129,6 +135,8 @@ function buildGraph(taskStatuses: Map<string, string>): string {
 
     %% ===== カテゴリ間の依存 =====
     C03_3 -.->|デモ材料| B01_2_1
+    C04_2 -.->|AI実例| B01_2_1
+    C04_2 -.->|アート活動実績| B03_1
     B01_2_3 --> B01_3
     B02_2 -.-> B03_1
 

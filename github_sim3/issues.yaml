@@ -160,6 +160,17 @@ strategies:
                 title: "検証結果のまとめ・デモ資料化"
                 status: "pending"
 
+          - id: "1-C-04"
+            title: "熊野町AIアート制作・発信"
+            context: "熊野町の景色をAI加工し「見る人によって違う景色」をコンセプトに作品を制作・発信"
+            tasks:
+              - id: "1-C-04-1"
+                title: "作品制作・SNS/Web発信"
+                status: "in_progress"
+              - id: "1-C-04-2"
+                title: "コンセプト言語化・展示準備"
+                status: "pending"
+
   - id: "2"
     title: "コミュニティ確立"
     categories:
