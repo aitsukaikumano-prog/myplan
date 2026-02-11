@@ -1,6 +1,7 @@
 export { TreeView } from './TreeView';
 export { TaskSearchView } from './TaskSearchView';
 export { ProgressView } from './ProgressView';
+export { DependencyGraphView } from './DependencyGraphView';
 export { DocsView } from './DocsView';
 export { EmailsView } from './EmailsView';
 export { DetailView } from './DetailView';

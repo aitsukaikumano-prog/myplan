@@ -73,6 +73,12 @@ export const Header = ({
             <i className="fas fa-sitemap mr-2"></i>ツリー表示
           </button>
           <button
+            onClick={() => setView({ type: 'main', tab: 'graph', issue: null })}
+            className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${view.tab === 'graph' ? 'bg-blue-600 text-white' : 'text-slate-500 hover:bg-slate-100'}`}
+          >
+            <i className="fas fa-project-diagram mr-2"></i>依存関係
+          </button>
+          <button
             onClick={() => setView({ type: 'main', tab: 'search', issue: null })}
             className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${view.tab === 'search' ? 'bg-blue-600 text-white' : 'text-slate-500 hover:bg-slate-100'}`}
           >

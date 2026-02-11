@@ -163,7 +163,7 @@ export interface Project {
 // ビュー状態
 export interface ViewState {
   type: 'main' | 'detail';
-  tab: 'tree' | 'search' | 'progress' | 'docs' | 'emails' | 'memo';
+  tab: 'tree' | 'search' | 'progress' | 'graph' | 'docs' | 'emails' | 'memo';
   issue: Issue | null;
 }
 

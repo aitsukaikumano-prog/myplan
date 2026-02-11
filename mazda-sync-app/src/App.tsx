@@ -6,6 +6,7 @@ import {
   TreeView,
   TaskSearchView,
   ProgressView,
+  DependencyGraphView,
   DocsView,
   EmailsView,
   DetailView,
@@ -86,6 +87,7 @@ function App() {
         {view.tab === 'tree' && <TreeView strategyData={strategyData} onNavigate={handleNavigate} />}
         {view.tab === 'search' && <TaskSearchView strategyData={strategyData} onNavigate={handleNavigate} />}
         {view.tab === 'progress' && <ProgressView strategyData={strategyData} />}
+        {view.tab === 'graph' && <DependencyGraphView strategyData={strategyData} />}
         {view.tab === 'docs' && <DocsView currentProject={currentProject} documents={documents} />}
         {view.tab === 'emails' && <EmailsView currentProject={currentProject} emails={emails} />}
         {view.tab === 'memo' && <MemoView />}
