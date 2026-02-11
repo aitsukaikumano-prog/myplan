@@ -7,7 +7,7 @@ project: hiroshima_ai_activation
 
 strategies:
   - id: "1"
-    title: "基盤構築（月1-2）"
+    title: "基盤構築"
     categories:
       - id: "1-A"
         title: "A. 自己ブランディング確立"
@@ -145,7 +145,7 @@ strategies:
                 status: "pending"
 
   - id: "2"
-    title: "コミュニティ立ち上げ（月2-4）"
+    title: "コミュニティ確立"
     categories:
       - id: "2-A"
         title: "A. 初期メンバー獲得"
@@ -208,7 +208,7 @@ strategies:
                 status: "pending"
 
   - id: "3"
-    title: "コミュニティ拡大・定着（月4-6）"
+    title: "拡大（アート系・業務系）"
     categories:
       - id: "3-A"
         title: "A. 実績づくり"
@@ -269,3 +269,21 @@ strategies:
               - id: "3-B-02-3"
                 title: "持続可能な収益基盤の確立"
                 status: "pending"
+
+  - id: "4"
+    title: "マツダアプローチ"
+    categories:
+      - id: "4-A"
+        title: "A. キーパーソン特定・接点づくり"
+        issues:
+          - id: "4-A-01"
+            title: "マツダへの接点構築"
+            context: "サプライヤー経由の紹介・実績ベースの提案書でマツダにアプローチ"
+            tasks: []
+      - id: "4-B"
+        title: "B. 提案・契約獲得"
+        issues:
+          - id: "4-B-01"
+            title: "パイロット案件の提案・実施"
+            context: "スモールスタートでマツダ内にAI活用の実績を作る"
+            tasks: []
