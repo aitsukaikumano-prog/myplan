@@ -1,9 +1,9 @@
-# 熊野町AIコミュニティ構築プロジェクト Issues
-# 最終更新: 2026-01-16
-# 目標: 熊野町にAIコミュニティを築き上げること
+# 広島AI活性化プロジェクト Issues
+# 最終更新: 2026-02-12
+# ビジョン: 広島を元気にする（AIアート×熊野町 + AI業務効率化×マツダ）
 
-version: 1
-project: kumano_ai_community
+version: 2
+project: hiroshima_ai_activation
 
 strategies:
   - id: "1"
