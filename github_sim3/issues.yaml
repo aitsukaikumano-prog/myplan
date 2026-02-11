@@ -184,6 +184,9 @@ strategies:
               - id: "1-C-05-2"
                 title: "美容院導入・QRコード広告設置"
                 status: "completed"
+              - id: "1-C-05-3"
+                title: "成果の記録・ポートフォリオ化"
+                status: "pending"
 
   - id: "2"
     title: "コミュニティ確立"
