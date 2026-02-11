@@ -419,7 +419,8 @@ const Node = ({
   selectedIssueId,
   selectedTaskId,
   selectedCategoryId,
-  forceExpand
+  forceExpand,
+  depth = 0
 }: {
   node: StrategyNode;
   onSelectIssue?: (issue: Issue) => void;
@@ -430,12 +431,22 @@ const Node = ({
   selectedTaskId?: string;
   selectedCategoryId?: string;
   forceExpand?: boolean | null;
+  depth?: number;
 }) => {
   const hasChildren = node.children && node.children.length > 0;
   const hasIssues = node.issues && node.issues.length > 0;
   const hasChildElements = hasChildren || hasIssues;
   const isCompleted = node.status === TASK_STATUS.COMPLETED;
   const isSelected = selectedCategoryId === node.id;
+
+  // 戦略レベル（depth=1）は初期折りたたみ
+  const isStrategyLevel = depth === 1;
+  const [localExpanded, setLocalExpanded] = useState(!isStrategyLevel);
+
+  // forceExpand が指定されている場合はそちらを優先
+  const isExpanded = forceExpand !== null && forceExpand !== undefined
+    ? forceExpand
+    : localExpanded;
 
   const allChildren = [
     ...(node.children || []).map(c => ({ type: 'node' as const, id: c.id, data: c })),
@@ -448,6 +459,12 @@ const Node = ({
     if (hasIssues && onSelectCategory) {
       onSelectCategory(node);
     }
+  };
+
+  // 戦略レベルのクリック → 展開/折りたたみ
+  const handleStrategyClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setLocalExpanded(prev => !prev);
   };
 
   // 完了ハイライト時のスタイル（キラキラ効果）
@@ -463,18 +480,21 @@ const Node = ({
   return (
     <div className={`tree-node ${highlightCompleted && isCompleted ? 'completed-connector' : ''}`}>
       <div
-        onClick={hasIssues ? handleCategoryClick : undefined}
+        onClick={isStrategyLevel ? handleStrategyClick : (hasIssues ? handleCategoryClick : undefined)}
         className={`node-box ${
           node.id === 'root' ? 'node-root' : hasIssues ? 'node-with-issues' : 'node-default'
-        } ${hasIssues ? 'cursor-pointer' : ''} ${completedStyle} ${selectedStyle}`}
+        } ${(hasIssues || isStrategyLevel) ? 'cursor-pointer' : ''} ${completedStyle} ${selectedStyle}`}
       >
+        {isStrategyLevel && hasChildElements && (
+          <i className={`fas fa-chevron-${isExpanded ? 'down' : 'right'} text-slate-400 text-xs mr-1.5`}></i>
+        )}
         {node.icon && <i className={`${node.icon} node-icon ${node.id === 'root' ? 'text-white/80' : 'text-blue-500'}`}></i>}
         <h3 className={`node-title ${node.id === 'root' ? 'text-white' : 'text-slate-700'}`}>
           {node.title}
         </h3>
       </div>
 
-      {hasChildElements && (
+      {hasChildElements && isExpanded && (
         <div className="tree-children">
           <div className="connector-vertical"></div>
           <div className={`children-container ${allChildren.length > 1 ? 'has-multiple' : ''}`}>
@@ -492,6 +512,7 @@ const Node = ({
                     selectedTaskId={selectedTaskId}
                     selectedCategoryId={selectedCategoryId}
                     forceExpand={forceExpand}
+                    depth={depth + 1}
                   />
                 ) : (
                   <IssueCard
@@ -1236,6 +1257,7 @@ export const TreeView = ({ strategyData, onNavigate: _onNavigate }: TreeViewProp
   const [expandAll, setExpandAll] = useState<boolean | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);
+  const treeContentRef = useRef<HTMLDivElement>(null);
   const userZoomedRef = useRef(false); // ユーザーが手動でズームしたかどうか
 
   // パネルリサイズ処理
@@ -1325,6 +1347,23 @@ export const TreeView = ({ strategyData, onNavigate: _onNavigate }: TreeViewProp
       observer.disconnect();
     };
   }, [strategyData]);
+
+  // ツリーコンテンツのサイズ変化を監視（展開/折りたたみ対応）
+  useEffect(() => {
+    const el = treeContentRef.current;
+    if (!el) return;
+
+    const observer = new ResizeObserver(() => {
+      const width = el.offsetWidth;
+      const height = el.offsetHeight;
+      if (width > 0 && height > 0) {
+        setTreeDimensions({ width, height });
+      }
+    });
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   // ピンチズーム
   useEffect(() => {
@@ -1432,7 +1471,9 @@ export const TreeView = ({ strategyData, onNavigate: _onNavigate }: TreeViewProp
               left: 0
             }}
           >
-            <Node node={strategyData} onSelectIssue={(issue) => { setSelectedIssue(issue); setSelectedTask(null); setSelectedCategory(null); }} onSelectTask={(task) => { setSelectedTask(task); setSelectedIssue(null); setSelectedCategory(null); }} onSelectCategory={(category) => { setSelectedCategory(category); setSelectedTask(null); setSelectedIssue(null); }} highlightCompleted={highlightCompleted} selectedIssueId={selectedIssue?.id} selectedTaskId={selectedTask?.id} selectedCategoryId={selectedCategory?.id} forceExpand={expandAll} />
+            <div ref={treeContentRef}>
+              <Node node={strategyData} onSelectIssue={(issue) => { setSelectedIssue(issue); setSelectedTask(null); setSelectedCategory(null); }} onSelectTask={(task) => { setSelectedTask(task); setSelectedIssue(null); setSelectedCategory(null); }} onSelectCategory={(category) => { setSelectedCategory(category); setSelectedTask(null); setSelectedIssue(null); }} highlightCompleted={highlightCompleted} selectedIssueId={selectedIssue?.id} selectedTaskId={selectedTask?.id} selectedCategoryId={selectedCategory?.id} forceExpand={expandAll} />
+            </div>
           </div>
         </div>
       </div>
