@@ -89,6 +89,9 @@ strategies:
                   - id: "1-B-01-2-3"
                     title: "ヒアリング結果のドキュメント化"
                     status: "pending"
+                  - id: "1-B-01-2-5"
+                    title: "生成AI-LT広島vol.2 登壇・ネットワーキング"
+                    status: "in_progress"
               - id: "1-B-01-3"
                 title: "AI活用で解決可能な課題リスト作成"
                 status: "pending"
@@ -170,6 +173,17 @@ strategies:
               - id: "1-C-04-2"
                 title: "コンセプト言語化・展示準備"
                 status: "pending"
+
+          - id: "1-C-05"
+            title: "AI Hairstyle Salon 開発・美容院導入"
+            context: "AIヘアスタイルシミュレーションアプリを開発・公開し、海田町の美容院に導入"
+            tasks:
+              - id: "1-C-05-1"
+                title: "アプリ開発・公開"
+                status: "completed"
+              - id: "1-C-05-2"
+                title: "美容院導入・QRコード広告設置"
+                status: "completed"
 
   - id: "2"
     title: "コミュニティ確立"
