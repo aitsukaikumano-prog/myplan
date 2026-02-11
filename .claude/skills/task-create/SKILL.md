@@ -88,9 +88,15 @@ argument-hint: "[タスクID タイトル]"
 - `github_sim3/tasks/index.yaml` の `files:` リストに `"{タスクID}"` を追加する
 - コメントで区切られたセクション（Strategy区分）の正しい場所に挿入する
 
-### 7. 結果報告
+### 7. 依存関係グラフの更新
+- `mazda-sync-app/src/components/DependencyGraphView.tsx` の `buildGraph()` を開く
+- 該当するsubgraph内にノードを追加: `ID["タイトル<br>タスクID"]:::${c('タスクID')}`
+- 依存関係がある場合は矢印を追加: `A --> B` or `A -.->|ラベル| B`
+- 移行条件に貢献する場合は `ID --> TC{N}` を追加
+
+### 8. 結果報告
 - 整合性チェック結果を再掲する
-- 更新した3ファイルの変更箇所を報告する
+- 更新した4ファイルの変更箇所を報告する（issues.yaml, tasks/{id}.md, index.yaml, DependencyGraphView.tsx）
 - 「`successCriteria` を具体的に記入してください」と促す
 - ⚠️ があった場合は追加タスクの作成を提案する
 - Git操作は行わない（ユーザーが `/commit-push` で別途実施）

@@ -23,9 +23,15 @@ paths:
 ## 更新ルール
 | 操作 | 更新対象 |
 |------|----------|
-| タスク追加 | issues.yaml + tasks/{id}.md + tasks/index.yaml |
-| ステータス変更 | issues.yaml のみ |
+| タスク追加 | issues.yaml + tasks/{id}.md + tasks/index.yaml + DependencyGraphView.tsx |
+| ステータス変更 | issues.yaml のみ（グラフ色は自動更新） |
 | 詳細・成果物追加 | tasks/{id}.md のみ |
+
+### 依存関係グラフの更新
+タスク追加・依存関係変更時は `mazda-sync-app/src/components/DependencyGraphView.tsx` の `buildGraph()` も更新する。
+- ノード追加: `ID["タイトル<br>タスクID"]:::${c('タスクID')}`
+- 矢印追加: `A --> B`（直接）, `A -.->|ラベル| B`（カテゴリ間）
+- ノード色はissues.yamlのステータスから自動生成されるので手動変更不要
 
 ## タスク完了チェックリスト
 
