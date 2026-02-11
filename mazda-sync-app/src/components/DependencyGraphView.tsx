@@ -96,8 +96,9 @@ function buildGraph(taskStatuses: Map<string, string>): string {
     subgraph C05["💇 AI Hairstyle Salon（業務系）"]
       C05_1["アプリ開発・公開<br>1-C-05-1"]:::${c('1-C-05-1')}
       C05_2["美容院導入・QR設置<br>1-C-05-2"]:::${c('1-C-05-2')}
-      C05_3["ポートフォリオ化<br>1-C-05-3"]:::${c('1-C-05-3')}
-      C05_1 --> C05_2 --> C05_3
+      C05_3["LT発表資料作成<br>1-C-05-3"]:::${c('1-C-05-3')}
+      C05_4["ポートフォリオ化<br>1-C-05-4"]:::${c('1-C-05-4')}
+      C05_1 --> C05_2 --> C05_3 --> C05_4
     end
 
     %% ===== 1-B: ニーズ調査・関係構築 =====
@@ -139,7 +140,7 @@ function buildGraph(taskStatuses: Map<string, string>): string {
     %% ===== 1-A → 他カテゴリへの基盤提供 =====
     A02_1 -.->|ポートフォリオ| C01_3
     A02_1 -.->|ポートフォリオ| C02_2
-    A02_1 -.->|ポートフォリオ| C05_3
+    A02_1 -.->|ポートフォリオ| C05_4
     A02_2 -.->|名刺| B01_2_4
     A02_3 -.->|ピッチ| B02_4
 
@@ -147,7 +148,7 @@ function buildGraph(taskStatuses: Map<string, string>): string {
     C03_3 -.->|デモ材料| B01_2_1
     C04_2 -.->|AI実例| B01_2_1
     C04_2 -.->|アート活動実績| B03_1
-    C05_2 -.->|発表題材| B01_2_5
+    C05_3 -.->|発表資料| B01_2_5
     B01_2_3 --> B01_3
     B02_2 -.-> B03_1
 
@@ -161,7 +162,7 @@ function buildGraph(taskStatuses: Map<string, string>): string {
     B01_2_5 --> TC1
     C01_3 --> TC2
     C02_2 --> TC2
-    C05_3 --> TC2
+    C05_4 --> TC2
     B03_2 --> TC3
 
     P2(("フェーズ2<br>コミュニティ確立")):::next

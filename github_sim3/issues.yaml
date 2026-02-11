@@ -185,6 +185,9 @@ strategies:
                 title: "美容院導入・QRコード広告設置"
                 status: "completed"
               - id: "1-C-05-3"
+                title: "生成AI-LT広島vol.2 発表資料作成"
+                status: "pending"
+              - id: "1-C-05-4"
                 title: "成果の記録・ポートフォリオ化"
                 status: "pending"
 
