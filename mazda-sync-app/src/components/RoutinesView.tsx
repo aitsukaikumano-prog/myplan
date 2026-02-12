@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import { Routine, RoutineLogEntry, WeeklyFocus, FocusHorizon, CalendarEvent, StrategyNode, TASK_STATUS } from '../types';
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { Routine, RoutineLogEntry, WeeklyFocus, FocusHorizon, CalendarEvent, StrategyNode, Task, Issue, TaskOutput, TASK_STATUS, STATUS_CONFIG } from '../types';
 
 interface RoutinesViewProps {
   routines: Routine[];
@@ -111,10 +111,75 @@ const findTaskInTasks = (tasks: any[], taskId: string): { title: string; status:
   return null;
 };
 
+// strategyDataからTask+Issueを検索（詳細パネル用）
+function findTaskWithIssue(
+  node: StrategyNode,
+  taskId: string
+): { task: Task; issue: Issue } | null {
+  const searchTasks = (tasks: Task[], issue: Issue): { task: Task; issue: Issue } | null => {
+    for (const task of tasks) {
+      if (task.id === taskId) return { task, issue };
+      if (task.tasks) {
+        const found = searchTasks(task.tasks, issue);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  const walkNode = (n: StrategyNode): { task: Task; issue: Issue } | null => {
+    if (n.issues) {
+      for (const issue of n.issues) {
+        if (issue.tasks) {
+          const found = searchTasks(issue.tasks, issue);
+          if (found) return found;
+        }
+      }
+    }
+    if (n.children) {
+      for (const child of n.children) {
+        const found = walkNode(child);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  return walkNode(node);
+}
+
 export const RoutinesView = ({ routines, weeklyFocus, strategyData }: RoutinesViewProps) => {
   const [log, setLog] = useState<RoutineLog>(loadLog);
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [noteText, setNoteText] = useState('');
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [panelWidth, setPanelWidth] = useState(380);
+  const [isResizing, setIsResizing] = useState(false);
+
+  const handleResizeStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  };
+
+  useEffect(() => {
+    if (!isResizing) return;
+    const handleMouseMove = (e: MouseEvent) => {
+      const newWidth = window.innerWidth - e.clientX;
+      setPanelWidth(Math.min(window.innerWidth * 0.6, Math.max(280, newWidth)));
+    };
+    const handleMouseUp = () => setIsResizing(false);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing]);
+
+  const selectedInfo = useMemo(() => {
+    if (!selectedTaskId || !strategyData) return null;
+    return findTaskWithIssue(strategyData, selectedTaskId);
+  }, [selectedTaskId, strategyData]);
 
   const updateLog = useCallback((next: RoutineLog) => {
     setLog(next);
@@ -169,12 +234,12 @@ export const RoutinesView = ({ routines, weeklyFocus, strategyData }: RoutinesVi
   }, { streak: 0, title: '' });
 
   return (
-    <div className="h-full overflow-y-auto p-6">
+    <div className="h-full overflow-y-auto p-6" onClick={() => setSelectedTaskId(null)}>
       {/* 上段: ルーティン（左） + フォーカスタスク（右） */}
       <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* 左カラム: フォーカスタスク */}
         <div>
-          <FocusSection weeklyFocus={weeklyFocus} strategyData={strategyData} />
+          <FocusSection weeklyFocus={weeklyFocus} strategyData={strategyData} onTaskSelect={(id) => { setSelectedTaskId(id); }} />
         </div>
 
         {/* 右カラム: ルーティン */}
@@ -373,6 +438,32 @@ export const RoutinesView = ({ routines, weeklyFocus, strategyData }: RoutinesVi
           events={weeklyFocus?.events || []}
         />
       )}
+
+      {/* タスク詳細パネル（fixed position） */}
+      {selectedInfo && (
+        <RoutineTaskDetailPanel
+          task={selectedInfo.task}
+          issue={selectedInfo.issue}
+          width={panelWidth}
+          onResizeStart={handleResizeStart}
+          onClose={() => setSelectedTaskId(null)}
+        />
+      )}
+
+      {/* リサイズ中のオーバーレイ */}
+      {isResizing && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            cursor: 'col-resize',
+            zIndex: 150,
+          }}
+        />
+      )}
     </div>
   );
 };
@@ -433,10 +524,12 @@ const HORIZONS: FocusHorizon[] = ['this_week', 'next_week', 'this_month', 'next_
 
 const FocusSection = ({
   weeklyFocus,
-  strategyData
+  strategyData,
+  onTaskSelect,
 }: {
   weeklyFocus: WeeklyFocus | null;
   strategyData: StrategyNode | null;
+  onTaskSelect?: (taskId: string) => void;
 }) => {
   const getStatusIcon = (status: string) => {
     if (status === TASK_STATUS.COMPLETED) return { icon: 'fas fa-check-circle', color: 'text-green-500' };
@@ -522,7 +615,11 @@ const FocusSection = ({
                     return (
                       <div
                         key={task.id}
-                        className={`px-3 py-2.5 border rounded-lg transition-colors ${getStatusBorder(task.status)}`}
+                        className={`px-3 py-2.5 border rounded-lg transition-colors cursor-pointer hover:shadow-md ${getStatusBorder(task.status)}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onTaskSelect?.(task.id);
+                        }}
                       >
                         <div className="flex items-center gap-2.5">
                           <i className={`${si.icon} ${si.color} text-sm`}></i>
@@ -705,6 +802,338 @@ const MonthlyCalendar = ({
             );
           })}
         </div>
+      </div>
+    </div>
+  );
+};
+
+// --- タスク詳細パネル（TreeViewと同一レイアウト） ---
+
+const BASE_PATH = import.meta.env.BASE_URL || '/';
+
+const extractFilePath = (output: string | TaskOutput): string | null => {
+  if (typeof output === 'object') return output.file || null;
+  const match = output.match(/^(docs\/[^\s]+\.md)/);
+  return match ? match[1] : null;
+};
+
+const getOutputTitle = (output: string | TaskOutput): string => {
+  if (typeof output === 'object') return output.title;
+  return output;
+};
+
+const getOutputUrl = (output: string | TaskOutput): string | null => {
+  if (typeof output === 'object') return output.url || null;
+  return null;
+};
+
+const getOutputSummary = (output: string | TaskOutput): string | null => {
+  if (typeof output === 'object') return output.summary || null;
+  return null;
+};
+
+const RoutineTaskDetailPanel = ({
+  task,
+  issue,
+  width,
+  onResizeStart,
+  onClose,
+}: {
+  task: Task;
+  issue: Issue;
+  width: number;
+  onResizeStart: (e: React.MouseEvent) => void;
+  onClose: () => void;
+}) => {
+  const status = task.status || TASK_STATUS.PENDING;
+  const config = STATUS_CONFIG[status];
+
+  const [expandedOutputs, setExpandedOutputs] = useState<Set<number>>(new Set());
+  const [outputContents, setOutputContents] = useState<Record<number, string>>({});
+  const [loadingOutputs, setLoadingOutputs] = useState<Set<number>>(new Set());
+
+  const fetchOutputContent = async (index: number, filePath: string) => {
+    if (outputContents[index] || loadingOutputs.has(index)) return;
+    setLoadingOutputs(prev => new Set(prev).add(index));
+    try {
+      const url = `${BASE_PATH}data/github_sim3/${filePath}`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const text = await res.text();
+        setOutputContents(prev => ({ ...prev, [index]: text }));
+      }
+    } catch (err) {
+      console.error('成果物の取得に失敗:', err);
+    } finally {
+      setLoadingOutputs(prev => {
+        const next = new Set(prev);
+        next.delete(index);
+        return next;
+      });
+    }
+  };
+
+  const toggleOutputExpand = (index: number, filePath: string | null) => {
+    const isExpanded = expandedOutputs.has(index);
+    if (isExpanded) {
+      setExpandedOutputs(prev => {
+        const next = new Set(prev);
+        next.delete(index);
+        return next;
+      });
+    } else {
+      setExpandedOutputs(prev => new Set(prev).add(index));
+      if (filePath) fetchOutputContent(index, filePath);
+    }
+  };
+
+  return (
+    <div
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        position: 'fixed',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        width: `${width}px`,
+        background: 'white',
+        boxShadow: '-4px 0 20px rgba(0,0,0,0.1)',
+        zIndex: 100,
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+    >
+      {/* リサイズハンドル */}
+      <div
+        onMouseDown={onResizeStart}
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: '6px',
+          cursor: 'col-resize',
+          background: 'transparent',
+          zIndex: 10
+        }}
+        className="hover:bg-blue-400 transition-colors"
+      />
+
+      {/* ヘッダー */}
+      <div className="p-6 border-b border-slate-100">
+        <div className="flex items-start justify-between mb-3">
+          <span className={`text-xs font-bold px-2 py-1 rounded-full border ${config.color}`}>
+            {config.label}
+          </span>
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-600 p-1"
+          >
+            <i className="fas fa-times"></i>
+          </button>
+        </div>
+        <h3 className="text-xl font-bold text-slate-800 leading-tight">{task.title}</h3>
+        {task.id && (
+          <div className="mt-1 text-xs font-mono text-slate-400">{task.id}</div>
+        )}
+        {task.completedDate && (
+          <div className="mt-2 text-sm text-slate-500">
+            <i className="fas fa-calendar-check mr-2 text-green-500"></i>
+            {task.completedDate} 完了
+          </div>
+        )}
+      </div>
+
+      {/* コンテンツ */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        {/* 親Issue */}
+        <div>
+          <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
+            <i className="fas fa-sitemap mr-2 text-indigo-500"></i>
+            所属Issue
+          </div>
+          <div className="text-sm text-slate-700 bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+            <span className="font-bold">#{issue.id}</span> {issue.title}
+          </div>
+        </div>
+
+        {/* 詳細説明 */}
+        {task.description && (
+          <div>
+            <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
+              <i className="fas fa-align-left mr-2 text-blue-500"></i>
+              詳細説明
+            </div>
+            <div className="text-sm text-slate-700 bg-slate-50 p-4 rounded-xl leading-relaxed whitespace-pre-line">
+              {task.description}
+            </div>
+          </div>
+        )}
+
+        {/* 成果物サマリー */}
+        {task.outputsSummary && (
+          <div>
+            <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
+              <i className="fas fa-clipboard-check mr-2 text-emerald-500"></i>
+              成果物サマリー
+            </div>
+            <div className="text-sm text-slate-700 bg-emerald-50 p-4 rounded-xl leading-relaxed border border-emerald-100 whitespace-pre-line">
+              {task.outputsSummary}
+            </div>
+          </div>
+        )}
+
+        {/* 完了条件 */}
+        {task.successCriteria && task.successCriteria.length > 0 && (
+          <div>
+            <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
+              <i className="fas fa-check-circle mr-2 text-amber-500"></i>
+              完了条件
+            </div>
+            <div className="space-y-2">
+              {task.successCriteria.map((criteria, i) => (
+                <div
+                  key={i}
+                  className="flex items-start space-x-3 text-sm bg-amber-50 p-3 rounded-xl border border-amber-100"
+                >
+                  <i className={`fas ${status === TASK_STATUS.COMPLETED ? 'fa-check-square text-green-500' : 'fa-square text-slate-300'} mt-0.5`}></i>
+                  <span className={status === TASK_STATUS.COMPLETED ? 'text-slate-500' : 'text-slate-700'}>
+                    {criteria}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 成果物 */}
+        {task.outputs && task.outputs.length > 0 && (
+          <div>
+            <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
+              <i className="fas fa-file-alt mr-2 text-emerald-500"></i>
+              成果物
+            </div>
+            <div className="space-y-2">
+              {task.outputs.map((output, i) => {
+                const filePath = extractFilePath(output);
+                const outputUrl = getOutputUrl(output);
+                const outputSummary = getOutputSummary(output);
+                const isExpanded = expandedOutputs.has(i);
+                const isLoading = loadingOutputs.has(i);
+                const content = outputContents[i];
+                const hasFile = !!filePath;
+                const hasUrl = !!outputUrl;
+
+                if (hasUrl && !hasFile) {
+                  return (
+                    <a
+                      key={i}
+                      href={outputUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-100 hover:bg-emerald-100 transition-colors"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <i className="fas fa-external-link-alt text-emerald-500"></i>
+                        <div>
+                          <div className="text-sm font-medium text-slate-700">{getOutputTitle(output)}</div>
+                          {outputSummary && (
+                            <div className="text-xs text-slate-500">{outputSummary}</div>
+                          )}
+                        </div>
+                      </div>
+                      <i className="fas fa-chevron-right text-emerald-300"></i>
+                    </a>
+                  );
+                }
+
+                return (
+                  <div key={i}>
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleOutputExpand(i, filePath);
+                      }}
+                      className={`flex items-center p-3 bg-emerald-50 rounded-xl border border-emerald-100 cursor-pointer hover:bg-emerald-100 transition-colors ${isExpanded ? 'rounded-b-none border-b-0' : ''}`}
+                    >
+                      <i className={`fas ${isExpanded ? 'fa-chevron-down' : 'fa-chevron-right'} text-emerald-500 w-4 mr-3`}></i>
+                      <div>
+                        <div className="text-sm font-medium text-slate-700">{getOutputTitle(output)}</div>
+                        {filePath && (
+                          <div className="text-xs text-slate-400">{filePath}</div>
+                        )}
+                      </div>
+                    </div>
+                    {isExpanded && (
+                      <div className="p-4 bg-white border border-emerald-100 rounded-b-xl border-t-0 max-h-80 overflow-y-auto">
+                        {isLoading ? (
+                          <div className="flex items-center justify-center py-4 text-slate-400">
+                            <i className="fas fa-spinner fa-spin mr-2"></i>
+                            読み込み中...
+                          </div>
+                        ) : content ? (
+                          <pre className="whitespace-pre-wrap text-sm text-slate-700 font-mono leading-relaxed">{content}</pre>
+                        ) : (
+                          <div className="text-sm text-slate-400">内容を取得できませんでした</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* リンク */}
+        {task.links && task.links.length > 0 && (
+          <div>
+            <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
+              <i className="fas fa-link mr-2 text-purple-500"></i>
+              参考リンク
+            </div>
+            <div className="space-y-2">
+              {task.links.map((link, i) => (
+                <a
+                  key={i}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3 bg-purple-50 rounded-xl border border-purple-100 hover:bg-purple-100 transition-colors"
+                >
+                  <div className="flex items-center space-x-3">
+                    <i className="fas fa-external-link-alt text-purple-500"></i>
+                    <span className="text-sm font-medium text-slate-700">{link.title}</span>
+                  </div>
+                  <i className="fas fa-chevron-right text-purple-300"></i>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* メモ */}
+        {task.notes && (
+          <div>
+            <div className="flex items-center text-sm font-bold text-slate-500 mb-2">
+              <i className="fas fa-sticky-note mr-2 text-slate-400"></i>
+              メモ
+            </div>
+            <div className="text-sm text-slate-600 bg-slate-50 p-4 rounded-xl">
+              {task.notes}
+            </div>
+          </div>
+        )}
+
+        {/* 何も情報がない場合 */}
+        {!task.description && (!task.successCriteria || task.successCriteria.length === 0) &&
+         (!task.outputs || task.outputs.length === 0) && (!task.links || task.links.length === 0) && !task.notes && (
+          <div className="text-center py-10">
+            <i className="fas fa-info-circle text-4xl text-slate-200 mb-3"></i>
+            <p className="text-slate-400">詳細情報がありません</p>
+          </div>
+        )}
       </div>
     </div>
   );

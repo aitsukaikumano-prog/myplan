@@ -82,7 +82,7 @@ export const Header = ({
             onClick={() => setView({ type: 'main', tab: 'routines', issue: null })}
             className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${view.tab === 'routines' ? 'bg-indigo-500 text-white' : 'text-slate-500 hover:bg-slate-100'}`}
           >
-            <i className="fas fa-redo-alt mr-2"></i>ルーティン
+            <i className="fas fa-calendar-check mr-2"></i>今日のタスク
           </button>
           <button
             onClick={() => setView({ type: 'main', tab: 'search', issue: null })}
