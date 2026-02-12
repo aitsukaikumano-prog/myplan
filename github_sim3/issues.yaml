@@ -82,7 +82,7 @@ strategies:
                     status: "pending"
                   - id: "1-B-01-2-2"
                     title: "商工会の公開イベント・セミナー日程の調査"
-                    status: "pending"
+                    status: "completed"
                   - id: "1-B-01-2-4"
                     title: "商工会イベントへの参加・初回接触"
                     status: "pending"
