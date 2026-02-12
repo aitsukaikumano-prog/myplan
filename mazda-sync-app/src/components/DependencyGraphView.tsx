@@ -226,6 +226,32 @@ export const DependencyGraphView = ({ strategyData }: Props) => {
   const [scale, setScale] = useState(0.8);
   const [renderError, setRenderError] = useState<string | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [panelWidth, setPanelWidth] = useState(380);
+  const [isResizing, setIsResizing] = useState(false);
+
+  const handleResizeStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  };
+
+  // パネルリサイズ
+  useEffect(() => {
+    if (!isResizing) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const newWidth = window.innerWidth - e.clientX;
+      setPanelWidth(Math.min(window.innerWidth * 0.6, Math.max(280, newWidth)));
+    };
+
+    const handleMouseUp = () => setIsResizing(false);
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing]);
 
   // 選択中タスクの情報
   const selectedInfo = useMemo(() => {
@@ -421,10 +447,24 @@ export const DependencyGraphView = ({ strategyData }: Props) => {
           <TaskDetailPanel
             task={selectedInfo.task}
             issue={selectedInfo.issue}
+            width={panelWidth}
+            onResizeStart={handleResizeStart}
             onClose={() => setSelectedTaskId(null)}
           />
         )}
       </div>
+
+      {/* リサイズ中のオーバーレイ */}
+      {isResizing && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0, left: 0, right: 0, bottom: 0,
+            cursor: 'col-resize',
+            zIndex: 150,
+          }}
+        />
+      )}
     </div>
   );
 };
@@ -434,17 +474,33 @@ export const DependencyGraphView = ({ strategyData }: Props) => {
 const TaskDetailPanel = ({
   task,
   issue,
+  width,
+  onResizeStart,
   onClose,
 }: {
   task: Task;
   issue: Issue;
+  width: number;
+  onResizeStart: (e: React.MouseEvent) => void;
   onClose: () => void;
 }) => {
   const status = task.status || TASK_STATUS.PENDING;
   const config = STATUS_CONFIG[status];
 
   return (
-    <div className="w-80 border-l border-slate-200 bg-white overflow-y-auto shrink-0">
+    <div className="border-l border-slate-200 bg-white overflow-y-auto shrink-0 relative" style={{ width: `${width}px` }}>
+      {/* リサイズハンドル */}
+      <div
+        onMouseDown={onResizeStart}
+        style={{
+          position: 'absolute',
+          left: 0, top: 0, bottom: 0,
+          width: '6px',
+          cursor: 'col-resize',
+          zIndex: 10,
+        }}
+        className="hover:bg-blue-400 transition-colors"
+      />
       {/* ヘッダー */}
       <div className="sticky top-0 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between z-10">
         <span className="text-sm font-bold text-slate-700">タスク詳細</span>
