@@ -121,7 +121,9 @@ function buildGraph(taskStatuses: Map<string, string>): string {
       C03_1["情報収集<br>1-C-03-1"]:::${c('1-C-03-1')}
       C03_2["検証会<br>1-C-03-2"]:::${c('1-C-03-2')}
       C03_3["デモ資料化<br>1-C-03-3"]:::${c('1-C-03-3')}
+      C03_4["レポート公開<br>note・SNS・HP<br>1-C-03-4"]:::${c('1-C-03-4')}
       C03_1 --> C03_2 --> C03_3
+      C03_2 --> C03_4
     end
 
     subgraph C04["🖼️ 熊野町AIアート（アート系）"]

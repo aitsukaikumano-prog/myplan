@@ -175,6 +175,11 @@ export interface Routine {
 export type FocusHorizon = 'this_week' | 'next_week' | 'this_month' | 'next_month' | 'later';
 
 // 今週のフォーカス
+export interface CalendarEvent {
+  date: string;
+  title: string;
+}
+
 export interface WeeklyFocus {
   week: string;
   this_week: string[];
@@ -182,6 +187,7 @@ export interface WeeklyFocus {
   this_month: string[];
   next_month: string[];
   later: string[];
+  events?: CalendarEvent[];
 }
 
 // ルーティン消化ログ（LocalStorage用）

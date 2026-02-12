@@ -4,6 +4,7 @@ this_week:
   - "1-C-05-4"
   - "1-C-03-2"
   - "1-C-01-2"
+  - "1-C-03-4"
 next_week:
   - "1-C-04-2"
   - "1-C-02-2"
@@ -11,3 +12,6 @@ next_week:
 this_month: []
 next_month: []
 later: []
+events:
+  - date: "2026-02-18"
+    title: "LT広島vol.2"
