@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import mermaid from 'mermaid';
-import { StrategyNode, Task } from '../types';
+import { StrategyNode, Task, Issue, TASK_STATUS, STATUS_CONFIG, TaskOutput } from '../types';
 
 interface Props {
   strategyData: StrategyNode;
@@ -34,6 +34,43 @@ function extractTaskStatuses(node: StrategyNode): Map<string, string> {
 
   walkNode(node);
   return map;
+}
+
+// タスクIDで、タスク本体と親Issueを検索
+function findTaskWithIssue(
+  node: StrategyNode,
+  taskId: string
+): { task: Task; issue: Issue } | null {
+  const searchTasks = (tasks: Task[], issue: Issue): { task: Task; issue: Issue } | null => {
+    for (const task of tasks) {
+      if (task.id === taskId) return { task, issue };
+      if (task.tasks) {
+        const found = searchTasks(task.tasks, issue);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  const walkNode = (n: StrategyNode): { task: Task; issue: Issue } | null => {
+    if (n.issues) {
+      for (const issue of n.issues) {
+        if (issue.tasks) {
+          const found = searchTasks(issue.tasks, issue);
+          if (found) return found;
+        }
+      }
+    }
+    if (n.children) {
+      for (const child of n.children) {
+        const found = walkNode(child);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  return walkNode(node);
 }
 
 function statusClass(taskStatuses: Map<string, string>, id: string): string {
@@ -179,6 +216,8 @@ function buildGraph(taskStatuses: Map<string, string>): string {
 `;
 }
 
+const TASK_ID_REGEX = /1-[A-C]-\d{2}-\d+(?:-\d+)*/;
+
 let renderCounter = 0;
 
 export const DependencyGraphView = ({ strategyData }: Props) => {
@@ -186,6 +225,13 @@ export const DependencyGraphView = ({ strategyData }: Props) => {
   const graphRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.8);
   const [renderError, setRenderError] = useState<string | null>(null);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+
+  // 選択中タスクの情報
+  const selectedInfo = useMemo(() => {
+    if (!selectedTaskId) return null;
+    return findTaskWithIssue(strategyData, selectedTaskId);
+  }, [selectedTaskId, strategyData]);
 
   // Mermaid 描画
   useEffect(() => {
@@ -214,6 +260,20 @@ export const DependencyGraphView = ({ strategyData }: Props) => {
           const svgEl = graphRef.current.querySelector('svg');
           if (svgEl) {
             svgEl.style.maxWidth = 'none';
+
+            // タスクノードにクリックハンドラを追加
+            const nodes = svgEl.querySelectorAll('.node');
+            nodes.forEach(node => {
+              const text = node.textContent || '';
+              const match = text.match(TASK_ID_REGEX);
+              if (match) {
+                (node as SVGElement).style.cursor = 'pointer';
+                node.addEventListener('click', (e) => {
+                  e.stopPropagation();
+                  setSelectedTaskId(prev => prev === match[0] ? null : match[0]);
+                });
+              }
+            });
           }
         }
         setRenderError(null);
@@ -319,36 +379,169 @@ export const DependencyGraphView = ({ strategyData }: Props) => {
         </div>
       </div>
 
-      {/* グラフ本体 */}
-      <div
-        ref={scrollRef}
-        className="flex-1 overflow-auto bg-white"
-        style={{ position: 'relative' }}
-      >
-        {renderError ? (
-          <div className="p-6 text-red-600">
-            <p className="font-bold">グラフの描画に失敗しました</p>
-            <pre className="text-xs mt-2 bg-red-50 p-3 rounded-lg overflow-auto">{renderError}</pre>
-          </div>
-        ) : (
-          <div
-            style={{
-              display: 'inline-block',
-              minWidth: '100%',
-              minHeight: '100%',
-              padding: '24px',
-              boxSizing: 'border-box',
-            }}
-          >
+      {/* グラフ + 詳細パネル */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* グラフ本体 */}
+        <div
+          ref={scrollRef}
+          className="flex-1 overflow-auto bg-white"
+          style={{ position: 'relative' }}
+          onClick={() => setSelectedTaskId(null)}
+        >
+          {renderError ? (
+            <div className="p-6 text-red-600">
+              <p className="font-bold">グラフの描画に失敗しました</p>
+              <pre className="text-xs mt-2 bg-red-50 p-3 rounded-lg overflow-auto">{renderError}</pre>
+            </div>
+          ) : (
             <div
               style={{
                 display: 'inline-block',
-                transform: `scale(${scale})`,
-                transformOrigin: 'top left',
+                minWidth: '100%',
+                minHeight: '100%',
+                padding: '24px',
+                boxSizing: 'border-box',
               }}
             >
-              <div ref={graphRef} />
+              <div
+                style={{
+                  display: 'inline-block',
+                  transform: `scale(${scale})`,
+                  transformOrigin: 'top left',
+                }}
+              >
+                <div ref={graphRef} />
+              </div>
             </div>
+          )}
+        </div>
+
+        {/* タスク詳細パネル */}
+        {selectedInfo && (
+          <TaskDetailPanel
+            task={selectedInfo.task}
+            issue={selectedInfo.issue}
+            onClose={() => setSelectedTaskId(null)}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
+
+// --- タスク詳細サイドパネル ---
+
+const TaskDetailPanel = ({
+  task,
+  issue,
+  onClose,
+}: {
+  task: Task;
+  issue: Issue;
+  onClose: () => void;
+}) => {
+  const status = task.status || TASK_STATUS.PENDING;
+  const config = STATUS_CONFIG[status];
+
+  return (
+    <div className="w-80 border-l border-slate-200 bg-white overflow-y-auto shrink-0">
+      {/* ヘッダー */}
+      <div className="sticky top-0 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between z-10">
+        <span className="text-sm font-bold text-slate-700">タスク詳細</span>
+        <button
+          onClick={onClose}
+          className="w-6 h-6 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-colors"
+        >
+          <i className="fas fa-times text-xs"></i>
+        </button>
+      </div>
+
+      <div className="p-4 space-y-4">
+        {/* ステータス + ID */}
+        <div className="flex items-center justify-between">
+          <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${config.color}`}>
+            <i className={`${config.icon} mr-1`}></i>
+            {config.label}
+          </span>
+          <span className="text-xs font-mono text-slate-400">{task.id}</span>
+        </div>
+
+        {/* タイトル */}
+        <h3 className="text-base font-black text-slate-800 leading-tight">
+          {task.title}
+        </h3>
+
+        {/* 親Issue */}
+        <div className="px-3 py-2 bg-slate-50 rounded-lg">
+          <span className="text-xs text-slate-400 block mb-0.5">Issue</span>
+          <span className="text-sm font-bold text-slate-600">
+            #{issue.id} {issue.title}
+          </span>
+        </div>
+
+        {/* 完了日 */}
+        {task.completedDate && (
+          <div className="flex items-center gap-2 text-sm text-green-600">
+            <i className="fas fa-calendar-check"></i>
+            <span className="font-medium">{task.completedDate} 完了</span>
+          </div>
+        )}
+
+        {/* 説明 */}
+        {task.description && (
+          <div>
+            <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">説明</h4>
+            <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">{task.description}</p>
+          </div>
+        )}
+
+        {/* 完了条件 */}
+        {task.successCriteria && task.successCriteria.length > 0 && (
+          <div>
+            <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">完了条件</h4>
+            <ul className="space-y-1">
+              {task.successCriteria.map((sc, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
+                  <i className={`fas fa-${status === TASK_STATUS.COMPLETED ? 'check-circle text-green-500' : 'circle text-slate-300'} mt-0.5 text-xs`}></i>
+                  <span>{sc}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* 成果物 */}
+        {task.outputs && task.outputs.length > 0 && (
+          <div>
+            <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">成果物</h4>
+            <div className="space-y-1.5">
+              {task.outputs.map((output, i) => {
+                if (typeof output === 'string') {
+                  return (
+                    <div key={i} className="flex items-start gap-2 text-sm text-slate-600">
+                      <i className="fas fa-paperclip text-slate-400 mt-0.5 text-xs"></i>
+                      <span>{output}</span>
+                    </div>
+                  );
+                }
+                const o = output as TaskOutput;
+                return (
+                  <div key={i} className="px-3 py-2 bg-blue-50 rounded-lg">
+                    <span className="text-sm font-medium text-blue-700 block">{o.title}</span>
+                    {o.summary && <p className="text-xs text-blue-600 mt-0.5">{o.summary}</p>}
+                    {o.file && <span className="text-xs text-blue-400 font-mono">{o.file}</span>}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* メモ */}
+        {task.notes && (
+          <div>
+            <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">メモ</h4>
+            <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">{task.notes}</p>
           </div>
         )}
       </div>

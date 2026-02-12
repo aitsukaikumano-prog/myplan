@@ -171,6 +171,19 @@ export interface Routine {
   link?: string;
 }
 
+// フォーカスのホライズン
+export type FocusHorizon = 'this_week' | 'next_week' | 'this_month' | 'next_month' | 'later';
+
+// 今週のフォーカス
+export interface WeeklyFocus {
+  week: string;
+  this_week: string[];
+  next_week: string[];
+  this_month: string[];
+  next_month: string[];
+  later: string[];
+}
+
 // ルーティン消化ログ（LocalStorage用）
 export interface RoutineLogEntry {
   completed: boolean;

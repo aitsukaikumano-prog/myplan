@@ -1,8 +1,10 @@
 import { useState, useCallback } from 'react';
-import { Routine, RoutineLogEntry } from '../types';
+import { Routine, RoutineLogEntry, WeeklyFocus, FocusHorizon, StrategyNode, TASK_STATUS } from '../types';
 
 interface RoutinesViewProps {
   routines: Routine[];
+  weeklyFocus: WeeklyFocus | null;
+  strategyData: StrategyNode | null;
 }
 
 const STORAGE_KEY = 'mazda-routines-log';
@@ -83,7 +85,44 @@ const calcStreak = (routineId: string, log: RoutineLog): number => {
   return streak;
 };
 
-export const RoutinesView = ({ routines }: RoutinesViewProps) => {
+// strategyDataからタスクIDでタスク情報を検索
+const findTaskById = (node: StrategyNode, taskId: string): { title: string; status: string } | null => {
+  if (node.issues) {
+    for (const issue of node.issues) {
+      // Issue自体のIDチェック
+      if (issue.id === taskId) {
+        return { title: issue.title, status: issue.status || TASK_STATUS.PENDING };
+      }
+      // Issue配下のタスクを検索
+      if (issue.tasks) {
+        const found = findTaskInTasks(issue.tasks, taskId);
+        if (found) return found;
+      }
+    }
+  }
+  if (node.children) {
+    for (const child of node.children) {
+      const found = findTaskById(child, taskId);
+      if (found) return found;
+    }
+  }
+  return null;
+};
+
+const findTaskInTasks = (tasks: any[], taskId: string): { title: string; status: string } | null => {
+  for (const task of tasks) {
+    if (task.id === taskId) {
+      return { title: task.title, status: task.status || TASK_STATUS.PENDING };
+    }
+    if (task.tasks) {
+      const found = findTaskInTasks(task.tasks, taskId);
+      if (found) return found;
+    }
+  }
+  return null;
+};
+
+export const RoutinesView = ({ routines, weeklyFocus, strategyData }: RoutinesViewProps) => {
   const [log, setLog] = useState<RoutineLog>(loadLog);
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [noteText, setNoteText] = useState('');
@@ -366,7 +405,178 @@ export const RoutinesView = ({ routines }: RoutinesViewProps) => {
             <p className="text-sm mt-1">routines.yaml にルーティンを追加してください</p>
           </div>
         )}
+
+        {/* フォーカスタスク */}
+        <FocusSection weeklyFocus={weeklyFocus} strategyData={strategyData} />
       </div>
+    </div>
+  );
+};
+
+// --- ホライズン期限日を計算 ---
+
+const getHorizonDeadline = (horizon: FocusHorizon, weekStr: string): string => {
+  // weekStr = "2026-W07" → その週の日曜日を基準に計算
+  const match = weekStr.match(/^(\d{4})-W(\d{2})$/);
+  if (!match) return '';
+
+  const year = parseInt(match[1]);
+  const week = parseInt(match[2]);
+
+  // ISO週の月曜日を計算
+  const jan4 = new Date(year, 0, 4);
+  const dayOfWeek = jan4.getDay() || 7; // 月=1, 日=7
+  const monday = new Date(jan4);
+  monday.setDate(jan4.getDate() - dayOfWeek + 1 + (week - 1) * 7);
+
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+
+  const fmt = (d: Date) => `${d.getMonth() + 1}/${d.getDate()}`;
+
+  switch (horizon) {
+    case 'this_week':
+      return `~${fmt(sunday)}`;
+    case 'next_week': {
+      const nextSun = new Date(sunday);
+      nextSun.setDate(sunday.getDate() + 7);
+      return `~${fmt(nextSun)}`;
+    }
+    case 'this_month': {
+      const lastDay = new Date(monday.getFullYear(), monday.getMonth() + 1, 0);
+      return `~${fmt(lastDay)}`;
+    }
+    case 'next_month': {
+      const lastDay = new Date(monday.getFullYear(), monday.getMonth() + 2, 0);
+      return `~${fmt(lastDay)}`;
+    }
+    case 'later':
+      return '';
+  }
+};
+
+const HORIZON_CONFIG: Record<FocusHorizon, { label: string; icon: string; color: string }> = {
+  this_week:  { label: '今週',     icon: 'fas fa-bolt',          color: 'text-amber-600' },
+  next_week:  { label: '来週',     icon: 'fas fa-arrow-right',   color: 'text-blue-600' },
+  this_month: { label: '今月',     icon: 'fas fa-calendar',      color: 'text-purple-600' },
+  next_month: { label: '来月',     icon: 'fas fa-calendar-alt',  color: 'text-slate-600' },
+  later:      { label: 'もっと先', icon: 'fas fa-clock',         color: 'text-slate-400' },
+};
+
+const HORIZONS: FocusHorizon[] = ['this_week', 'next_week', 'this_month', 'next_month', 'later'];
+
+// --- フォーカスタスク セクション ---
+
+const FocusSection = ({
+  weeklyFocus,
+  strategyData
+}: {
+  weeklyFocus: WeeklyFocus | null;
+  strategyData: StrategyNode | null;
+}) => {
+  const getStatusIcon = (status: string) => {
+    if (status === TASK_STATUS.COMPLETED) return { icon: 'fas fa-check-circle', color: 'text-green-500' };
+    if (status === TASK_STATUS.IN_PROGRESS) return { icon: 'fas fa-circle-notch', color: 'text-blue-500' };
+    return { icon: 'far fa-circle', color: 'text-slate-300' };
+  };
+
+  const getStatusBorder = (status: string) => {
+    if (status === TASK_STATUS.COMPLETED) return 'border-green-200 bg-green-50';
+    if (status === TASK_STATUS.IN_PROGRESS) return 'border-blue-200 bg-blue-50';
+    return 'border-slate-200 bg-white';
+  };
+
+  // 全ホライズンのタスクを集約して情報を付与
+  const allTasks = HORIZONS.flatMap(h =>
+    (weeklyFocus?.[h] || []).map(taskId => {
+      const info = strategyData ? findTaskById(strategyData, taskId) : null;
+      return {
+        id: taskId,
+        title: info?.title || taskId,
+        status: info?.status || TASK_STATUS.PENDING,
+        horizon: h,
+      };
+    })
+  );
+
+  const totalCount = allTasks.length;
+  const completedCount = allTasks.filter(t => t.status === TASK_STATUS.COMPLETED).length;
+
+  // ホライズンごとにグループ化（タスクがあるホライズンのみ）
+  const groups = HORIZONS
+    .map(h => ({
+      horizon: h,
+      tasks: allTasks.filter(t => t.horizon === h),
+    }))
+    .filter(g => g.tasks.length > 0);
+
+  const hasAnyTasks = totalCount > 0;
+
+  return (
+    <div className="mb-8">
+      {/* ヘッダー */}
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+          <i className="fas fa-crosshairs mr-1"></i>
+          フォーカスタスク {weeklyFocus?.week ? `(${weeklyFocus.week})` : ''}
+        </h3>
+        {hasAnyTasks && (
+          <span className={`text-xs font-bold px-2 py-1 rounded-full ${completedCount === totalCount ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600'}`}>
+            {completedCount}/{totalCount} 完了
+          </span>
+        )}
+      </div>
+
+      {!weeklyFocus || !hasAnyTasks ? (
+        <div className="p-6 border-2 border-dashed border-slate-200 rounded-xl text-center">
+          <i className="fas fa-crosshairs text-2xl text-slate-300 mb-2 block"></i>
+          <p className="text-sm font-bold text-slate-400">
+            フォーカスタスクが未設定です
+          </p>
+          <p className="text-xs text-slate-400 mt-1">
+            Claude Code でタスクを選びましょう
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {groups.map(({ horizon, tasks }) => {
+            const config = HORIZON_CONFIG[horizon];
+            const deadline = getHorizonDeadline(horizon, weeklyFocus.week);
+            return (
+              <div key={horizon}>
+                {/* ホライズンヘッダー */}
+                <div className="flex items-center gap-2 mb-2">
+                  <i className={`${config.icon} ${config.color}`}></i>
+                  <span className={`text-sm font-bold ${config.color}`}>{config.label}</span>
+                  {deadline && (
+                    <span className="text-xs text-slate-400">（{deadline}）</span>
+                  )}
+                </div>
+                {/* タスクリスト */}
+                <div className="space-y-1.5 ml-1">
+                  {tasks.map(task => {
+                    const si = getStatusIcon(task.status);
+                    return (
+                      <div
+                        key={task.id}
+                        className={`px-3 py-2.5 border rounded-lg transition-colors ${getStatusBorder(task.status)}`}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <i className={`${si.icon} ${si.color} text-sm`}></i>
+                          <span className="flex-1 min-w-0 text-sm font-medium text-slate-700 truncate">
+                            {task.title}
+                          </span>
+                          <span className="text-xs text-slate-400 font-mono flex-shrink-0">{task.id}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

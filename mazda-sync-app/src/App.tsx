@@ -17,7 +17,7 @@ function App() {
   const [view, setView] = useState<ViewState>({ type: 'main', tab: 'tree', issue: null });
   const [currentProject, setCurrentProject] = useState('rescue');
 
-  const { strategyData: rawStrategyData, documents, routines, loading, error } = useGitHubData(currentProject);
+  const { strategyData: rawStrategyData, documents, routines, weeklyFocus, loading, error } = useGitHubData(currentProject);
   const { taskStates } = useTaskStates();
 
   // タスク状態を適用
@@ -87,7 +87,7 @@ function App() {
         {view.tab === 'search' && <TaskSearchView strategyData={strategyData} onNavigate={handleNavigate} />}
         {view.tab === 'graph' && <DependencyGraphView strategyData={strategyData} />}
         {view.tab === 'docs' && <DocsView currentProject={currentProject} documents={documents} />}
-        {view.tab === 'routines' && <RoutinesView routines={routines} />}
+        {view.tab === 'routines' && <RoutinesView routines={routines} weeklyFocus={weeklyFocus} strategyData={strategyData} />}
         {view.tab === 'memo' && <MemoView />}
       </>
     );

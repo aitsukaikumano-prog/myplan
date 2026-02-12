@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import yaml from 'js-yaml';
-import { StrategyNode, Meeting, Email, Document, Routine, TASK_STATUS, TaskDetailData, TaskOutput } from '../types';
+import { StrategyNode, Meeting, Email, Document, Routine, WeeklyFocus, TASK_STATUS, TaskDetailData, TaskOutput } from '../types';
 
 // ベースパス（Viteの設定と一致させる）
 const BASE_PATH = import.meta.env.BASE_URL;
@@ -59,6 +59,7 @@ export const useGitHubData = (projectId: string) => {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [emails, setEmails] = useState<Email[]>([]);
   const [routines, setRoutines] = useState<Routine[]>([]);
+  const [weeklyFocus, setWeeklyFocus] = useState<WeeklyFocus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -87,12 +88,13 @@ export const useGitHubData = (projectId: string) => {
       const data = buildStrategyFromYaml(issuesYaml, project, taskDetails);
       setStrategyData(data);
 
-      // 議事録、ドキュメント、メール、ルーティンを取得
+      // 議事録、ドキュメント、メール、ルーティン、週間フォーカスを取得
       await Promise.all([
         fetchMeetings(project.meetingsFolder),
         fetchAllDocuments(project),
         fetchEmails(project.emailsFolder),
-        fetchRoutines(project.folder)
+        fetchRoutines(project.folder),
+        fetchWeeklyFocus(project.folder)
       ]);
 
     } catch (err) {
@@ -274,6 +276,22 @@ export const useGitHubData = (projectId: string) => {
     }
   };
 
+  const fetchWeeklyFocus = async (folder: string) => {
+    try {
+      const url = `${BASE_PATH}data/${folder}/weekly-focus.yaml`;
+      const res = await fetch(url);
+      if (!res.ok) {
+        setWeeklyFocus(null);
+        return;
+      }
+      const text = await res.text();
+      const data = yaml.load(text) as WeeklyFocus | null;
+      setWeeklyFocus(data || null);
+    } catch {
+      setWeeklyFocus(null);
+    }
+  };
+
   const fetchEmails = async (emailsFolder: string) => {
     try {
       // index.yamlからメールファイル一覧を取得
@@ -322,6 +340,7 @@ export const useGitHubData = (projectId: string) => {
     documents,
     emails,
     routines,
+    weeklyFocus,
     loading,
     error,
     projects: PROJECTS,
