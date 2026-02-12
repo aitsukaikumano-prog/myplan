@@ -67,6 +67,12 @@ export const Header = ({
       <div className="h-12 flex items-center px-6">
         <div className="flex items-center space-x-1">
           <button
+            onClick={() => setView({ type: 'main', tab: 'routines', issue: null })}
+            className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${view.tab === 'routines' ? 'bg-indigo-500 text-white' : 'text-slate-500 hover:bg-slate-100'}`}
+          >
+            <i className="fas fa-calendar-check mr-2"></i>今日のタスク
+          </button>
+          <button
             onClick={() => setView({ type: 'main', tab: 'tree', issue: null })}
             className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${view.tab === 'tree' ? 'bg-blue-600 text-white' : 'text-slate-500 hover:bg-slate-100'}`}
           >
@@ -77,12 +83,6 @@ export const Header = ({
             className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${view.tab === 'graph' ? 'bg-blue-600 text-white' : 'text-slate-500 hover:bg-slate-100'}`}
           >
             <i className="fas fa-project-diagram mr-2"></i>依存関係
-          </button>
-          <button
-            onClick={() => setView({ type: 'main', tab: 'routines', issue: null })}
-            className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${view.tab === 'routines' ? 'bg-indigo-500 text-white' : 'text-slate-500 hover:bg-slate-100'}`}
-          >
-            <i className="fas fa-calendar-check mr-2"></i>今日のタスク
           </button>
           <button
             onClick={() => setView({ type: 'main', tab: 'search', issue: null })}
