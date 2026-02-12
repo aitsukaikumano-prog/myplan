@@ -79,28 +79,22 @@ export const Header = ({
             <i className="fas fa-project-diagram mr-2"></i>依存関係
           </button>
           <button
+            onClick={() => setView({ type: 'main', tab: 'routines', issue: null })}
+            className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${view.tab === 'routines' ? 'bg-indigo-500 text-white' : 'text-slate-500 hover:bg-slate-100'}`}
+          >
+            <i className="fas fa-redo-alt mr-2"></i>ルーティン
+          </button>
+          <button
             onClick={() => setView({ type: 'main', tab: 'search', issue: null })}
             className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${view.tab === 'search' ? 'bg-blue-600 text-white' : 'text-slate-500 hover:bg-slate-100'}`}
           >
             <i className="fas fa-search mr-2"></i>タスク検索
           </button>
           <button
-            onClick={() => setView({ type: 'main', tab: 'progress', issue: null })}
-            className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${view.tab === 'progress' ? 'bg-blue-600 text-white' : 'text-slate-500 hover:bg-slate-100'}`}
-          >
-            <i className="fas fa-chart-line mr-2"></i>進捗率確認
-          </button>
-          <button
             onClick={() => setView({ type: 'main', tab: 'docs', issue: null })}
             className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${view.tab === 'docs' ? 'bg-blue-600 text-white' : 'text-slate-500 hover:bg-slate-100'}`}
           >
             <i className="fas fa-folder-open mr-2"></i>ドキュメント
-          </button>
-          <button
-            onClick={() => setView({ type: 'main', tab: 'emails', issue: null })}
-            className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${view.tab === 'emails' ? 'bg-blue-600 text-white' : 'text-slate-500 hover:bg-slate-100'}`}
-          >
-            <i className="fas fa-envelope mr-2"></i>メール
           </button>
           <button
             onClick={() => setView({ type: 'main', tab: 'memo', issue: null })}

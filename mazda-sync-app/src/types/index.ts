@@ -160,10 +160,28 @@ export interface Project {
   data: StrategyNode;
 }
 
+// ルーティン定義
+export interface Routine {
+  id: string;
+  title: string;
+  frequency: 'daily' | 'weekly';
+  description: string;
+  duration?: string;
+  relatedTask?: string;
+  link?: string;
+}
+
+// ルーティン消化ログ（LocalStorage用）
+export interface RoutineLogEntry {
+  completed: boolean;
+  date: string;
+  note?: string;
+}
+
 // ビュー状態
 export interface ViewState {
   type: 'main' | 'detail';
-  tab: 'tree' | 'search' | 'progress' | 'graph' | 'docs' | 'emails' | 'memo';
+  tab: 'tree' | 'search' | 'graph' | 'docs' | 'memo' | 'routines';
   issue: Issue | null;
 }
 

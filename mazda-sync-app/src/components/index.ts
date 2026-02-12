@@ -7,3 +7,4 @@ export { EmailsView } from './EmailsView';
 export { DetailView } from './DetailView';
 export { Header } from './Header';
 export { MemoView } from './MemoView';
+export { RoutinesView } from './RoutinesView';

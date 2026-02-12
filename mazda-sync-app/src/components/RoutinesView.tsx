@@ -1,0 +1,372 @@
+import { useState, useCallback } from 'react';
+import { Routine, RoutineLogEntry } from '../types';
+
+interface RoutinesViewProps {
+  routines: Routine[];
+}
+
+const STORAGE_KEY = 'mazda-routines-log';
+
+// --- LocalStorage helpers ---
+
+type RoutineLog = Record<string, Record<string, RoutineLogEntry>>;
+// { "R-01": { "2026-W07": { completed: true, date: "2026-02-13", note: "" }, ... } }
+
+const loadLog = (): RoutineLog => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : {};
+  } catch {
+    return {};
+  }
+};
+
+const saveLog = (log: RoutineLog) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
+};
+
+// --- Date helpers ---
+
+const today = () => {
+  const d = new Date();
+  return d.toISOString().slice(0, 10); // "2026-02-13"
+};
+
+const getISOWeek = (d: Date): string => {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+};
+
+const currentWeek = () => getISOWeek(new Date());
+
+// 今週の月曜〜日曜の日付を返す
+const getWeekDates = (): Date[] => {
+  const now = new Date();
+  const day = now.getDay(); // 0=Sun
+  const diff = day === 0 ? -6 : 1 - day; // 月曜基準
+  const monday = new Date(now);
+  monday.setDate(now.getDate() + diff);
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return d;
+  });
+};
+
+const DAY_LABELS = ['月', '火', '水', '木', '金', '土', '日'];
+
+// ストリーク計算（daily用）
+const calcStreak = (routineId: string, log: RoutineLog): number => {
+  const entries = log[routineId];
+  if (!entries) return 0;
+
+  let streak = 0;
+  const d = new Date();
+  // 今日が完了していればそこからカウント、なければ昨日から遡る
+  const todayStr = d.toISOString().slice(0, 10);
+  if (!entries[todayStr]?.completed) {
+    d.setDate(d.getDate() - 1);
+  }
+
+  for (let i = 0; i < 365; i++) {
+    const key = d.toISOString().slice(0, 10);
+    if (entries[key]?.completed) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  return streak;
+};
+
+export const RoutinesView = ({ routines }: RoutinesViewProps) => {
+  const [log, setLog] = useState<RoutineLog>(loadLog);
+  const [editingNote, setEditingNote] = useState<string | null>(null);
+  const [noteText, setNoteText] = useState('');
+
+  const updateLog = useCallback((next: RoutineLog) => {
+    setLog(next);
+    saveLog(next);
+  }, []);
+
+  const toggleComplete = (routineId: string, key: string) => {
+    const next = { ...log };
+    if (!next[routineId]) next[routineId] = {};
+    const current = next[routineId][key];
+    next[routineId] = {
+      ...next[routineId],
+      [key]: {
+        completed: !current?.completed,
+        date: today(),
+        note: current?.note || ''
+      }
+    };
+    updateLog(next);
+  };
+
+  const saveNote = (routineId: string, key: string) => {
+    const next = { ...log };
+    if (!next[routineId]) next[routineId] = {};
+    const current = next[routineId][key] || { completed: false, date: today() };
+    next[routineId] = {
+      ...next[routineId],
+      [key]: { ...current, note: noteText }
+    };
+    updateLog(next);
+    setEditingNote(null);
+    setNoteText('');
+  };
+
+  const isCompleted = (routineId: string, key: string): boolean => {
+    return log[routineId]?.[key]?.completed || false;
+  };
+
+  const getNote = (routineId: string, key: string): string => {
+    return log[routineId]?.[key]?.note || '';
+  };
+
+  const dailyRoutines = routines.filter(r => r.frequency === 'daily');
+  const weeklyRoutines = routines.filter(r => r.frequency === 'weekly');
+  const weekDates = getWeekDates();
+  const todayStr = today();
+  const weekKey = currentWeek();
+
+  // 最大ストリーク
+  const maxStreak = dailyRoutines.reduce((max, r) => {
+    const s = calcStreak(r.id, log);
+    return s > max.streak ? { streak: s, title: r.title } : max;
+  }, { streak: 0, title: '' });
+
+  return (
+    <div className="h-full overflow-y-auto p-6">
+      <div className="max-w-2xl mx-auto">
+        <h2 className="text-2xl font-black text-slate-800 mb-6">
+          <i className="fas fa-redo-alt text-indigo-500 mr-3"></i>
+          ルーティン
+        </h2>
+
+        {/* ストリーク表示 */}
+        {maxStreak.streak > 0 && (
+          <div className="mb-6 p-4 bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-orange-200 rounded-xl">
+            <span className="text-lg font-black text-orange-600">
+              <i className="fas fa-fire text-orange-500 mr-2"></i>
+              {maxStreak.title} {maxStreak.streak}日連続
+            </span>
+          </div>
+        )}
+
+        {/* 今日のルーティン（daily） */}
+        {dailyRoutines.length > 0 && (
+          <div className="mb-8">
+            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
+              今日のルーティン
+            </h3>
+            <div className="space-y-2">
+              {dailyRoutines.map(r => {
+                const key = todayStr;
+                const done = isCompleted(r.id, key);
+                const note = getNote(r.id, key);
+                const streak = calcStreak(r.id, log);
+                return (
+                  <div key={r.id} className={`p-4 border-2 rounded-xl transition-colors ${done ? 'bg-green-50 border-green-200' : 'bg-white border-slate-200 hover:border-blue-300'}`}>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => toggleComplete(r.id, key)}
+                        className={`w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-colors ${done ? 'bg-green-500 border-green-500' : 'border-slate-300 hover:border-blue-500'}`}
+                      >
+                        {done && <i className="fas fa-check text-white text-xs"></i>}
+                      </button>
+                      <div className="flex-1">
+                        <span className={`text-sm font-bold ${done ? 'text-green-700' : 'text-slate-700'}`}>
+                          {r.title}
+                        </span>
+                        {r.duration && (
+                          <span className="ml-2 text-xs font-medium text-slate-400">({r.duration})</span>
+                        )}
+                        {streak > 1 && (
+                          <span className="ml-2 text-xs font-bold text-orange-500">
+                            <i className="fas fa-fire mr-1"></i>{streak}日
+                          </span>
+                        )}
+                      </div>
+                      {r.link && (
+                        <a
+                          href={r.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-400 hover:text-blue-600 transition-colors"
+                          title="開く"
+                        >
+                          <i className="fas fa-external-link-alt"></i>
+                        </a>
+                      )}
+                      <button
+                        onClick={() => {
+                          if (editingNote === `${r.id}-${key}`) {
+                            setEditingNote(null);
+                          } else {
+                            setEditingNote(`${r.id}-${key}`);
+                            setNoteText(note);
+                          }
+                        }}
+                        className={`text-sm transition-colors ${note ? 'text-blue-400' : 'text-slate-300 hover:text-slate-400'}`}
+                        title="メモ"
+                      >
+                        <i className="fas fa-comment-dots"></i>
+                      </button>
+                    </div>
+                    {note && editingNote !== `${r.id}-${key}` && (
+                      <p className="mt-2 ml-9 text-xs text-slate-500 italic">{note}</p>
+                    )}
+                    {editingNote === `${r.id}-${key}` && (
+                      <div className="mt-3 ml-9 flex gap-2">
+                        <input
+                          type="text"
+                          value={noteText}
+                          onChange={e => setNoteText(e.target.value)}
+                          onKeyDown={e => e.key === 'Enter' && saveNote(r.id, key)}
+                          placeholder="メモを入力..."
+                          className="flex-1 px-3 py-1.5 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-blue-400"
+                          autoFocus
+                        />
+                        <button
+                          onClick={() => saveNote(r.id, key)}
+                          className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700"
+                        >
+                          保存
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* 今週のルーティン（weekly） */}
+        {weeklyRoutines.length > 0 && (
+          <div className="mb-8">
+            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
+              今週のルーティン ({weekKey})
+            </h3>
+            <div className="space-y-2">
+              {weeklyRoutines.map(r => {
+                const key = weekKey;
+                const done = isCompleted(r.id, key);
+                const note = getNote(r.id, key);
+                return (
+                  <div key={r.id} className={`p-4 border-2 rounded-xl transition-colors ${done ? 'bg-green-50 border-green-200' : 'bg-white border-slate-200 hover:border-blue-300'}`}>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => toggleComplete(r.id, key)}
+                        className={`w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-colors ${done ? 'bg-green-500 border-green-500' : 'border-slate-300 hover:border-blue-500'}`}
+                      >
+                        {done && <i className="fas fa-check text-white text-xs"></i>}
+                      </button>
+                      <div className="flex-1">
+                        <span className={`text-sm font-bold ${done ? 'text-green-700' : 'text-slate-700'}`}>
+                          {r.title}
+                        </span>
+                        <p className="text-xs text-slate-400 mt-0.5">{r.description}</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          if (editingNote === `${r.id}-${key}`) {
+                            setEditingNote(null);
+                          } else {
+                            setEditingNote(`${r.id}-${key}`);
+                            setNoteText(note);
+                          }
+                        }}
+                        className={`text-sm transition-colors ${note ? 'text-blue-400' : 'text-slate-300 hover:text-slate-400'}`}
+                        title="メモ"
+                      >
+                        <i className="fas fa-comment-dots"></i>
+                      </button>
+                    </div>
+                    {note && editingNote !== `${r.id}-${key}` && (
+                      <p className="mt-2 ml-9 text-xs text-slate-500 italic">{note}</p>
+                    )}
+                    {editingNote === `${r.id}-${key}` && (
+                      <div className="mt-3 ml-9 flex gap-2">
+                        <input
+                          type="text"
+                          value={noteText}
+                          onChange={e => setNoteText(e.target.value)}
+                          onKeyDown={e => e.key === 'Enter' && saveNote(r.id, key)}
+                          placeholder="メモを入力..."
+                          className="flex-1 px-3 py-1.5 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-blue-400"
+                          autoFocus
+                        />
+                        <button
+                          onClick={() => saveNote(r.id, key)}
+                          className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700"
+                        >
+                          保存
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* 週間カレンダー（daily用） */}
+        {dailyRoutines.length > 0 && (
+          <div className="mb-8">
+            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
+              週間カレンダー
+            </h3>
+            {dailyRoutines.map(r => (
+              <div key={r.id} className="mb-4 p-4 bg-white border-2 border-slate-200 rounded-xl">
+                <p className="text-sm font-bold text-slate-700 mb-3">{r.title}</p>
+                <div className="grid grid-cols-7 gap-2 text-center">
+                  {DAY_LABELS.map((label, i) => {
+                    const d = weekDates[i];
+                    const dateStr = d.toISOString().slice(0, 10);
+                    const done = isCompleted(r.id, dateStr);
+                    const isToday = dateStr === todayStr;
+                    return (
+                      <div key={i} className="flex flex-col items-center gap-1">
+                        <span className={`text-xs font-bold ${isToday ? 'text-blue-600' : 'text-slate-400'}`}>
+                          {label}
+                        </span>
+                        <button
+                          onClick={() => toggleComplete(r.id, dateStr)}
+                          className={`w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold transition-colors ${
+                            done
+                              ? 'bg-green-500 text-white'
+                              : isToday
+                                ? 'bg-blue-100 text-blue-600 border-2 border-blue-300'
+                                : 'bg-slate-100 text-slate-400'
+                          }`}
+                        >
+                          {done ? <i className="fas fa-check"></i> : d.getDate()}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {routines.length === 0 && (
+          <div className="text-center py-16 text-slate-400">
+            <i className="fas fa-redo-alt text-4xl mb-4 block"></i>
+            <p className="font-bold">ルーティンが定義されていません</p>
+            <p className="text-sm mt-1">routines.yaml にルーティンを追加してください</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import yaml from 'js-yaml';
-import { StrategyNode, Meeting, Email, Document, TASK_STATUS, TaskDetailData, TaskOutput } from '../types';
+import { StrategyNode, Meeting, Email, Document, Routine, TASK_STATUS, TaskDetailData, TaskOutput } from '../types';
 
 // ベースパス（Viteの設定と一致させる）
 const BASE_PATH = import.meta.env.BASE_URL;
@@ -58,6 +58,7 @@ export const useGitHubData = (projectId: string) => {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [emails, setEmails] = useState<Email[]>([]);
+  const [routines, setRoutines] = useState<Routine[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -86,11 +87,12 @@ export const useGitHubData = (projectId: string) => {
       const data = buildStrategyFromYaml(issuesYaml, project, taskDetails);
       setStrategyData(data);
 
-      // 議事録、ドキュメント、メールを取得
+      // 議事録、ドキュメント、メール、ルーティンを取得
       await Promise.all([
         fetchMeetings(project.meetingsFolder),
         fetchAllDocuments(project),
-        fetchEmails(project.emailsFolder)
+        fetchEmails(project.emailsFolder),
+        fetchRoutines(project.folder)
       ]);
 
     } catch (err) {
@@ -254,6 +256,24 @@ export const useGitHubData = (projectId: string) => {
     }
   };
 
+  const fetchRoutines = async (folder: string) => {
+    try {
+      const url = `${BASE_PATH}data/${folder}/routines.yaml`;
+      const res = await fetch(url);
+      if (!res.ok) {
+        console.warn('ルーティン定義が見つかりません');
+        setRoutines([]);
+        return;
+      }
+      const text = await res.text();
+      const data = yaml.load(text) as { routines?: Routine[] };
+      setRoutines(data?.routines || []);
+    } catch (err) {
+      console.error('ルーティン取得エラー:', err);
+      setRoutines([]);
+    }
+  };
+
   const fetchEmails = async (emailsFolder: string) => {
     try {
       // index.yamlからメールファイル一覧を取得
@@ -301,6 +321,7 @@ export const useGitHubData = (projectId: string) => {
     meetings,
     documents,
     emails,
+    routines,
     loading,
     error,
     projects: PROJECTS,
