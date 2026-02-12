@@ -14,7 +14,7 @@ import {
 } from './components';
 
 function App() {
-  const [view, setView] = useState<ViewState>({ type: 'main', tab: 'tree', issue: null });
+  const [view, setView] = useState<ViewState>({ type: 'main', tab: 'routines', issue: null });
   const [currentProject, setCurrentProject] = useState('rescue');
 
   const { strategyData: rawStrategyData, documents, routines, weeklyFocus, loading, error } = useGitHubData(currentProject);
