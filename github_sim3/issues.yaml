@@ -158,9 +158,12 @@ strategies:
                 status: "completed"
               - id: "1-C-03-2"
                 title: "検証会の実施（2/12 町民会館）"
-                status: "pending"
+                status: "completed"
               - id: "1-C-03-3"
                 title: "検証結果のまとめ・デモ資料化"
+                status: "pending"
+              - id: "1-C-03-4"
+                title: "検証会レポート公開（note・SNS・HP反映）"
                 status: "pending"
 
           - id: "1-C-04"
