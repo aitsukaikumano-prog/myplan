@@ -1,0 +1,5 @@
+名刺情報
+田中太郎
+株式会社サンプル 営業部
+TEL: 090-1234-5678
+Email: tanaka@sample.co.jp

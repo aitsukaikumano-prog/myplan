@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>出退勤管理</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+<style>
+  @keyframes pulse2{0%,100%{opacity:1}50%{opacity:.4}}
+  .dot-pulse{animation:pulse2 1.5s ease-in-out infinite}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+  .toast-anim{animation:fadeIn .3s ease-out}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;margin:0}
+  .drop-zone{border:2px dashed #cbd5e1;border-radius:12px;padding:32px;text-align:center;transition:all .2s;cursor:pointer}
+  .drop-zone:hover,.drop-active{border-color:#6366f1;background:#eef2ff}
+  .save-indicator{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 8px;border-radius:9999px}
+  .save-ok{background:#f0fdf4;color:#16a34a}
+  .save-saving{background:#fefce8;color:#ca8a04}
+  .save-none{background:#f3f4f6;color:#9ca3af}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useCallback,useRef}=React;
+
+const EMPLOYEES=[
+  {id:1,name:"田中 太郎",department:"営業部"},
+  {id:2,name:"佐藤 花子",department:"人事部"},
+  {id:3,name:"鈴木 一郎",department:"開発部"},
+  {id:4,name:"山田 美咲",department:"経理部"},
+  {id:5,name:"高橋 健太",department:"開発部"},
+];
+
+function fmt(d){return d.toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit",second:"2-digit"});}
+function fmtDate(d){return d.toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric",weekday:"long"});}
+function fmtShort(d){return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")}`;}
+function dur(a,b){const df=b-a;return `${Math.floor(df/3600000)}時間${Math.floor((df%3600000)/60000)}分`;}
+function durH(a,b){return ((b-a)/3600000).toFixed(2);}
+
+/* ── Excel書き出し用ワークブック生成 ── */
+function buildWorkbook(emps,recs,hist,pastHist){
+  const wb=XLSX.utils.book_new();
+  const today=fmtShort(new Date());
+
+  const attData=emps.map(e=>{
+    const r=recs[e.id];
+    return [e.id,e.name,e.department,today,
+      r?.clockIn?fmt(r.clockIn):r?.clockInStr||"",
+      r?.clockOut?fmt(r.clockOut):r?.clockOutStr||"",
+      r?.clockIn&&r?.clockOut?dur(r.clockIn,r.clockOut):"",
+      r?.clockIn&&r?.clockOut?Number(durH(r.clockIn,r.clockOut)):"",
+      !r?"未出勤":r.loaded?"読込済":r.clockOut?"退勤済":"勤務中"];
+  });
+  const ws1=XLSX.utils.aoa_to_sheet([["出退勤記録"],[],["ID","従業員名","部署","日付","出勤時刻","退勤時刻","勤務時間","勤務時間(h)","ステータス"],...attData]);
+  ws1["!cols"]=[{wch:5},{wch:16},{wch:12},{wch:12},{wch:12},{wch:12},{wch:14},{wch:14},{wch:10}];
+  ws1["!merges"]=[{s:{r:0,c:0},e:{r:0,c:8}}];
+  XLSX.utils.book_append_sheet(wb,ws1,"出退勤記録");
+
+  const allHist=[...pastHist,...hist];
+  const logData=allHist.map(en=>{
+    const e=emps.find(x=>x.id===en.employeeId);
+    return [en.dateStr||fmtShort(en.time),en.timeStr||fmt(en.time),e?.id||"",e?.name||"",e?.department||"",en.type];
+  });
+  const ws2=XLSX.utils.aoa_to_sheet([["打刻ログ"],[],["日付","時刻","ID","従業員名","部署","種別"],...logData]);
+  ws2["!cols"]=[{wch:12},{wch:12},{wch:5},{wch:16},{wch:12},{wch:8}];
+  ws2["!merges"]=[{s:{r:0,c:0},e:{r:0,c:5}}];
+  XLSX.utils.book_append_sheet(wb,ws2,"打刻ログ");
+
+  const empData=emps.map(e=>[e.id,e.name,e.department]);
+  const ws3=XLSX.utils.aoa_to_sheet([["従業員マスター"],[],["ID","従業員名","部署"],...empData]);
+  ws3["!cols"]=[{wch:5},{wch:16},{wch:12}];
+  ws3["!merges"]=[{s:{r:0,c:0},e:{r:0,c:2}}];
+  XLSX.utils.book_append_sheet(wb,ws3,"従業員マスター");
+
+  return wb;
+}
+
+/* ── File System Access API で同じファイルに上書き保存 ── */
+let fileHandle = null;
+
+async function pickSaveFile(){
+  try{
+    fileHandle = await window.showSaveFilePicker({
+      suggestedName: `出退勤記録_${new Date().getFullYear()}${String(new Date().getMonth()+1).padStart(2,"0")}${String(new Date().getDate()).padStart(2,"0")}.xlsx`,
+      types:[{description:"Excel",accept:{"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":[".xlsx"]}}]
+    });
+    return true;
+  }catch(e){
+    if(e.name==="AbortError") return false;
+    throw e;
+  }
+}
+
+async function pickOpenFile(){
+  try{
+    const [handle] = await window.showOpenFilePicker({
+      types:[{description:"Excel",accept:{"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":[".xlsx"],"application/vnd.ms-excel":[".xls"]}}]
+    });
+    fileHandle = handle;
+    const file = await handle.getFile();
+    return file;
+  }catch(e){
+    if(e.name==="AbortError") return null;
+    throw e;
+  }
+}
+
+async function saveToHandle(wb){
+  if(!fileHandle) return false;
+  try{
+    const wbout = XLSX.write(wb,{bookType:"xlsx",type:"array"});
+    const writable = await fileHandle.createWritable();
+    await writable.write(new Uint8Array(wbout));
+    await writable.close();
+    return true;
+  }catch(e){
+    console.error("Save error:",e);
+    return false;
+  }
+}
+
+/* ── Excel読み込み ── */
+function parseExcel(data,emps){
+  const wb=XLSX.read(data,{type:"array"});
+  const logSheet=wb.Sheets["打刻ログ"];
+  const attSheet=wb.Sheets["出退勤記録"];
+  const pastHist=[];
+  const loadedRecs={};
+
+  if(logSheet){
+    const rows=XLSX.utils.sheet_to_json(logSheet,{header:1});
+    let startRow=-1;
+    for(let i=0;i<rows.length;i++){if(rows[i]&&rows[i][0]==="日付"&&rows[i][1]==="時刻"){startRow=i+1;break;}}
+    if(startRow>0){
+      for(let i=startRow;i<rows.length;i++){
+        const row=rows[i]; if(!row||!row[0]) continue;
+        const empId=Number(row[2]),type=String(row[5]);
+        if(empId&&type) pastHist.push({dateStr:String(row[0]),timeStr:String(row[1]),employeeId:empId,type,time:new Date()});
+      }
+    }
+  }
+  if(attSheet){
+    const rows=XLSX.utils.sheet_to_json(attSheet,{header:1});
+    let startRow=-1;
+    for(let i=0;i<rows.length;i++){if(rows[i]&&rows[i][0]==="ID"&&String(rows[i][1]).includes("従業員")){startRow=i+1;break;}}
+    if(startRow>0){
+      for(let i=startRow;i<rows.length;i++){
+        const row=rows[i]; if(!row||!row[0]) continue;
+        const empId=Number(row[0]),clockInStr=String(row[4]||""),clockOutStr=String(row[5]||""),status=String(row[8]||"");
+        if(empId&&(clockInStr||status!=="未出勤")) loadedRecs[empId]={clockInStr,clockOutStr,status,loaded:true};
+      }
+    }
+  }
+  return {pastHist,loadedRecs,sheetNames:wb.SheetNames};
+}
+
+/* ── UIコンポーネント ── */
+function Badge({status}){
+  const m={notStarted:{l:"未出勤",bg:"#f3f4f6",c:"#4b5563",dc:"#9ca3af"},working:{l:"勤務中",bg:"#f0fdf4",c:"#15803d",dc:"#22c55e"},finished:{l:"退勤済",bg:"#eff6ff",c:"#1d4ed8",dc:"#3b82f6"},loaded:{l:"読込済",bg:"#fdf4ff",c:"#7e22ce",dc:"#a855f7"}};
+  const v=m[status]||m.notStarted;
+  return <span style={{display:"inline-flex",alignItems:"center",gap:6,padding:"4px 12px",borderRadius:9999,fontSize:13,fontWeight:500,background:v.bg,color:v.c}}>
+    <span style={{width:8,height:8,borderRadius:9999,background:v.dc}} className={status==="working"?"dot-pulse":""}/>
+    {v.l}
+  </span>;
+}
+
+function SaveStatus({status,fileName}){
+  const cls=status==="saved"?"save-ok":status==="saving"?"save-saving":"save-none";
+  const label=status==="saved"?"保存済み":status==="saving"?"保存中...":fileName?"接続済み":"未接続";
+  return <span className={`save-indicator ${cls}`}>
+    <span style={{width:6,height:6,borderRadius:9999,background:"currentColor"}}/>
+    {label}
+    {fileName&&<span style={{opacity:.7}}> — {fileName}</span>}
+  </span>;
+}
+
+function Clock(){
+  const [now,setNow]=useState(new Date());
+  useEffect(()=>{const id=setInterval(()=>setNow(new Date()),1000);return()=>clearInterval(id);},[]);
+  return <div style={{textAlign:"center",padding:"24px 0"}}>
+    <p style={{color:"#6b7280",fontSize:14,marginBottom:4}}>{fmtDate(now)}</p>
+    <p style={{fontSize:48,fontWeight:300,letterSpacing:4,color:"#1f2937",fontVariantNumeric:"tabular-nums"}}>{fmt(now)}</p>
+  </div>;
+}
+
+function Card({emp,rec,onIn,onOut}){
+  const st=!rec?"notStarted":rec.loaded?"loaded":rec.clockOut?"finished":"working";
+  const canIn=st==="notStarted"||st==="finished"||st==="loaded";
+  const canOut=st==="working";
+  const ini=emp.name.split(" ").map(n=>n[0]).join("");
+  const btnBase={flex:1,padding:"10px 0",borderRadius:8,fontSize:13,fontWeight:500,border:"none",cursor:"pointer",transition:"background .2s"};
+  return <div style={{background:"#fff",borderRadius:12,boxShadow:"0 1px 3px rgba(0,0,0,.08)",border:"1px solid #e5e7eb",padding:20}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}>
+      <div style={{display:"flex",alignItems:"center",gap:12}}>
+        <div style={{width:44,height:44,borderRadius:9999,background:"#e0e7ff",color:"#4338ca",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontSize:14}}>{ini}</div>
+        <div><div style={{fontWeight:600,color:"#111827"}}>{emp.name}</div><div style={{fontSize:12,color:"#6b7280"}}>{emp.department}</div></div>
+      </div>
+      <Badge status={st}/>
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12,textAlign:"center",fontSize:13,marginBottom:16,background:"#f9fafb",borderRadius:8,padding:12}}>
+      <div><div style={{color:"#9ca3af",fontSize:11,marginBottom:4}}>出勤</div><div style={{fontWeight:500,color:"#1f2937"}}>{rec?.clockIn?fmt(rec.clockIn):rec?.clockInStr||"—"}</div></div>
+      <div><div style={{color:"#9ca3af",fontSize:11,marginBottom:4}}>退勤</div><div style={{fontWeight:500,color:"#1f2937"}}>{rec?.clockOut?fmt(rec.clockOut):rec?.clockOutStr||"—"}</div></div>
+      <div><div style={{color:"#9ca3af",fontSize:11,marginBottom:4}}>勤務時間</div><div style={{fontWeight:500,color:"#1f2937"}}>{rec?.clockIn&&rec?.clockOut?dur(rec.clockIn,rec.clockOut):rec?.loaded?rec.status:"—"}</div></div>
+    </div>
+    <div style={{display:"flex",gap:8}}>
+      <button onClick={()=>onIn(emp.id)} disabled={!canIn} style={{...btnBase,background:canIn?"#16a34a":"#f3f4f6",color:canIn?"#fff":"#9ca3af",cursor:canIn?"pointer":"not-allowed"}}>出勤</button>
+      <button onClick={()=>onOut(emp.id)} disabled={!canOut} style={{...btnBase,background:canOut?"#ef4444":"#f3f4f6",color:canOut?"#fff":"#9ca3af",cursor:canOut?"pointer":"not-allowed"}}>退勤</button>
+    </div>
+  </div>;
+}
+
+function Summary({recs,total}){
+  const w=Object.values(recs).filter(r=>r.clockIn&&!r.clockOut).length;
+  const f=Object.values(recs).filter(r=>r.clockOut||r.loaded).length;
+  const n=total-w-f;
+  const box={background:"#fff",borderRadius:12,padding:16,textAlign:"center"};
+  return <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:16,marginBottom:24}}>
+    <div style={{...box,border:"1px solid #e5e7eb"}}><div style={{fontSize:28,fontWeight:700,color:"#9ca3af"}}>{n}</div><div style={{fontSize:12,color:"#6b7280",marginTop:4}}>未出勤</div></div>
+    <div style={{...box,border:"1px solid #bbf7d0"}}><div style={{fontSize:28,fontWeight:700,color:"#16a34a"}}>{w}</div><div style={{fontSize:12,color:"#6b7280",marginTop:4}}>勤務中</div></div>
+    <div style={{...box,border:"1px solid #bfdbfe"}}><div style={{fontSize:28,fontWeight:700,color:"#2563eb"}}>{f}</div><div style={{fontSize:12,color:"#6b7280",marginTop:4}}>退勤済</div></div>
+  </div>;
+}
+
+function History({emps,hist,pastHist}){
+  const all=[...pastHist,...hist];
+  if(!all.length) return null;
+  const th={padding:"10px 16px",textAlign:"left",fontSize:11,color:"#6b7280",textTransform:"uppercase",letterSpacing:1};
+  const td={padding:"10px 16px",fontSize:13};
+  return <div style={{background:"#fff",borderRadius:12,boxShadow:"0 1px 3px rgba(0,0,0,.08)",border:"1px solid #e5e7eb",overflow:"hidden",marginTop:24}}>
+    <div style={{padding:"16px 20px",borderBottom:"1px solid #f3f4f6",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+      <span style={{fontWeight:600,color:"#1f2937"}}>打刻履歴</span>
+      <span style={{fontSize:12,color:"#9ca3af"}}>{all.length}件</span>
+    </div>
+    <div style={{maxHeight:400,overflowY:"auto"}}>
+    <table style={{width:"100%",borderCollapse:"collapse"}}>
+      <thead><tr style={{background:"#f9fafb"}}><th style={th}>日付</th><th style={th}>時刻</th><th style={th}>従業員</th><th style={th}>部署</th><th style={th}>種別</th></tr></thead>
+      <tbody>{all.slice().reverse().map((en,i)=>{
+        const e=emps.find(x=>x.id===en.employeeId);
+        const isPast=!!en.dateStr&&!en.clockIn;
+        return <tr key={i} style={{borderTop:"1px solid #f3f4f6",background:isPast?"#fafafa":"#fff"}}>
+          <td style={{...td,color:"#374151"}}>{en.dateStr||fmtShort(en.time)}</td>
+          <td style={{...td,color:"#374151",fontVariantNumeric:"tabular-nums"}}>{en.timeStr||fmt(en.time)}</td>
+          <td style={{...td,fontWeight:500,color:"#111827"}}>{e?.name||""}</td>
+          <td style={{...td,color:"#6b7280"}}>{e?.department||""}</td>
+          <td style={td}><span style={{display:"inline-block",padding:"2px 10px",borderRadius:9999,fontSize:12,fontWeight:500,background:en.type==="出勤"?"#dcfce7":"#fee2e2",color:en.type==="出勤"?"#15803d":"#b91c1c"}}>{en.type}</span></td>
+        </tr>})}</tbody>
+    </table>
+    </div>
+  </div>;
+}
+
+/* ── メインアプリ ── */
+function App(){
+  const [emps]=useState(EMPLOYEES);
+  const [recs,setRecs]=useState({});
+  const [hist,setHist]=useState([]);
+  const [pastHist,setPastHist]=useState([]);
+  const [toast,setToast]=useState(null);
+  const [saveState,setSaveState]=useState("none");
+  const [fileName,setFileName]=useState("");
+  const [connected,setConnected]=useState(false);
+  const [dragOver,setDragOver]=useState(false);
+  const latestRef=useRef({recs:{},hist:[],pastHist:[]});
+
+  useEffect(()=>{latestRef.current={recs,hist,pastHist};},[recs,hist,pastHist]);
+
+  const notify=useCallback(m=>{setToast(m);setTimeout(()=>setToast(null),3000);},[]);
+
+  const autoSave=useCallback(async()=>{
+    if(!fileHandle) return;
+    setSaveState("saving");
+    const {recs:r,hist:h,pastHist:ph}=latestRef.current;
+    const wb=buildWorkbook(emps,r,h,ph);
+    const ok=await saveToHandle(wb);
+    setSaveState(ok?"saved":"none");
+  },[emps]);
+
+  const clockIn=useCallback(async(id)=>{
+    const now=new Date();
+    setRecs(p=>{const n={...p,[id]:{clockIn:now,clockOut:null}};latestRef.current.recs=n;return n;});
+    setHist(p=>{const n=[...p,{employeeId:id,type:"出勤",time:now}];latestRef.current.hist=n;return n;});
+    notify(`${emps.find(e=>e.id===id).name} さんが出勤しました`);
+    setTimeout(()=>autoSave(),100);
+  },[emps,notify,autoSave]);
+
+  const clockOut=useCallback(async(id)=>{
+    const now=new Date();
+    setRecs(p=>{const n={...p,[id]:{...p[id],clockOut:now}};latestRef.current.recs=n;return n;});
+    setHist(p=>{const n=[...p,{employeeId:id,type:"退勤",time:now}];latestRef.current.hist=n;return n;});
+    notify(`${emps.find(e=>e.id===id).name} さんが退勤しました`);
+    setTimeout(()=>autoSave(),100);
+  },[emps,notify,autoSave]);
+
+  // Excelファイルを開いて接続
+  const connectOpen=useCallback(async()=>{
+    try{
+      const file=await pickOpenFile();
+      if(!file) return;
+      const data=new Uint8Array(await file.arrayBuffer());
+      const result=parseExcel(data,emps);
+      setPastHist(result.pastHist);
+      latestRef.current.pastHist=result.pastHist;
+      setRecs(prev=>{
+        const next={...prev};
+        Object.entries(result.loadedRecs).forEach(([id,rec])=>{if(!next[id]) next[id]=rec;});
+        latestRef.current.recs=next;
+        return next;
+      });
+      setFileName(file.name);
+      setConnected(true);
+      setSaveState("saved");
+      notify(`接続完了: ${file.name} (${result.pastHist.length}件の記録)`);
+    }catch(err){console.error(err);notify("読み込みに失敗しました");}
+  },[emps,notify]);
+
+  // 新規Excelファイルを作成して接続
+  const connectNew=useCallback(async()=>{
+    try{
+      const ok=await pickSaveFile();
+      if(!ok) return;
+      setFileName(fileHandle.name);
+      setConnected(true);
+      const wb=buildWorkbook(emps,latestRef.current.recs,latestRef.current.hist,latestRef.current.pastHist);
+      const saved=await saveToHandle(wb);
+      setSaveState(saved?"saved":"none");
+      notify(`新規作成: ${fileHandle.name}`);
+    }catch(err){console.error(err);notify("ファイル作成に失敗しました");}
+  },[emps,notify]);
+
+  // 手動保存
+  const manualSave=useCallback(async()=>{
+    if(!fileHandle){
+      const ok=await pickSaveFile();
+      if(!ok) return;
+      setFileName(fileHandle.name);
+      setConnected(true);
+    }
+    setSaveState("saving");
+    const wb=buildWorkbook(emps,latestRef.current.recs,latestRef.current.hist,latestRef.current.pastHist);
+    const ok=await saveToHandle(wb);
+    setSaveState(ok?"saved":"none");
+    if(ok) notify("保存しました");
+    else notify("保存に失敗しました");
+  },[emps,notify]);
+
+  // ドラッグ&ドロップ読み込み（接続はできないがデータは読める）
+  const handleDrop=useCallback(async(e)=>{
+    e.preventDefault();setDragOver(false);
+    const file=e.dataTransfer.files[0];
+    if(!file||!file.name.match(/\.xlsx?$/i)){notify("Excelファイルを選んでください");return;}
+    try{
+      const data=new Uint8Array(await file.arrayBuffer());
+      const result=parseExcel(data,emps);
+      setPastHist(result.pastHist);
+      latestRef.current.pastHist=result.pastHist;
+      setRecs(prev=>{
+        const next={...prev};
+        Object.entries(result.loadedRecs).forEach(([id,rec])=>{if(!next[id]) next[id]=rec;});
+        latestRef.current.recs=next;
+        return next;
+      });
+      notify(`読み込み完了: ${result.pastHist.length}件 — 保存先を設定してください`);
+    }catch(err){notify("読み込み失敗");}
+  },[emps,notify]);
+
+  const fsSupported=!!window.showSaveFilePicker;
+  const btnG={display:"inline-flex",alignItems:"center",gap:8,padding:"8px 16px",background:"#059669",color:"#fff",fontSize:13,fontWeight:500,borderRadius:8,border:"none",cursor:"pointer"};
+  const btnP={display:"inline-flex",alignItems:"center",gap:8,padding:"8px 16px",background:"#4f46e5",color:"#fff",fontSize:13,fontWeight:500,borderRadius:8,border:"none",cursor:"pointer"};
+  const btnO={display:"inline-flex",alignItems:"center",gap:8,padding:"8px 14px",background:"#fff",color:"#374151",fontSize:13,fontWeight:500,borderRadius:8,border:"1px solid #d1d5db",cursor:"pointer"};
+
+  return <div style={{minHeight:"100vh",background:"#f9fafb"}}>
+    {toast&&<div className="toast-anim" style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:50,background:"#111827",color:"#fff",padding:"10px 20px",borderRadius:8,boxShadow:"0 4px 12px rgba(0,0,0,.2)",fontSize:14}}>{toast}</div>}
+
+    <header style={{background:"#fff",borderBottom:"1px solid #e5e7eb",position:"sticky",top:0,zIndex:40}}>
+      <div style={{maxWidth:960,margin:"0 auto",padding:"12px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+          <div style={{width:36,height:36,background:"#4f46e5",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <svg width="20" height="20" fill="none" stroke="#fff" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div>
+            <h1 style={{fontSize:18,fontWeight:700,color:"#111827",margin:0}}>出退勤管理</h1>
+            <SaveStatus status={saveState} fileName={fileName}/>
+          </div>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+          {fsSupported&&<button onClick={connectOpen} style={btnO}>
+            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+            開く
+          </button>}
+          <button onClick={manualSave} style={btnG}>
+            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+            保存
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main style={{maxWidth:960,margin:"0 auto",padding:24}}>
+      <Clock/>
+
+      {!connected&&!hist.length&&<div
+        className={dragOver?"drop-zone drop-active":"drop-zone"}
+        style={{marginBottom:24}}
+        onDragOver={e=>{e.preventDefault();setDragOver(true);}}
+        onDragLeave={()=>setDragOver(false)}
+        onDrop={handleDrop}
+      >
+        <svg width="48" height="48" fill="none" stroke="#94a3b8" strokeWidth="1.5" viewBox="0 0 24 24" style={{margin:"0 auto 12px"}}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+        </svg>
+        <p style={{color:"#475569",fontWeight:500,marginBottom:12}}>Excelファイルをドラッグ＆ドロップして過去の記録を読み込み</p>
+        <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
+          {fsSupported&&<button onClick={connectOpen} style={btnP}>既存ファイルを開く</button>}
+          {fsSupported&&<button onClick={connectNew} style={btnG}>新規ファイルを作成</button>}
+        </div>
+        {fsSupported&&<p style={{color:"#94a3b8",fontSize:12,marginTop:12}}>ファイルを選ぶと、出退勤のたびに自動で上書き保存されます</p>}
+        {!fsSupported&&<p style={{color:"#f59e0b",fontSize:12,marginTop:12}}>このブラウザは自動保存に非対応です。Chromeをお使いください。</p>}
+      </div>}
+
+      {connected&&<div style={{background:"#f0fdf4",border:"1px solid #bbf7d0",borderRadius:8,padding:"8px 16px",marginBottom:16,fontSize:13,color:"#15803d",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
+        <div style={{display:"flex",alignItems:"center",gap:8}}>
+          <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span><strong>{fileName}</strong> に接続中 — 出退勤のたびに自動保存されます</span>
+        </div>
+      </div>}
+
+      <Summary recs={recs} total={emps.length}/>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:16,marginBottom:32}}>
+        {emps.map(e=><Card key={e.id} emp={e} rec={recs[e.id]} onIn={clockIn} onOut={clockOut}/>)}
+      </div>
+      <History emps={emps} hist={hist} pastHist={pastHist}/>
+    </main>
+  </div>;
+}
+
+ReactDOM.render(<App/>,document.getElementById("root"));
+</script>
+</body>
+</html>

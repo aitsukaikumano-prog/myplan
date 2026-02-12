@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>資料自動分類ツール</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0f1117; --surface: #1a1d27; --surface2: #232738; --surface3: #2a2f42;
+    --border: #2e3347; --text: #e4e6ef; --text-dim: #8b8fa7;
+    --accent: #6c7cff; --accent-glow: rgba(108,124,255,0.18);
+    --green: #34d399; --green-dim: rgba(52,211,153,0.15);
+    --orange: #fb923c; --red: #f87171; --cyan: #22d3ee;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    padding: 2rem 1rem;
+  }
+  h1 {
+    font-size: 1.7rem; font-weight: 700; margin-bottom: 0.25rem;
+    background: linear-gradient(135deg, var(--accent), var(--cyan));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .subtitle { color: var(--text-dim); font-size: 0.88rem; margin-bottom: 1.6rem; }
+  .container { width: 100%; max-width: 760px; }
+
+  /* Dir picker */
+  .dir-section { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
+  .dir-btn {
+    background: var(--accent); color: #fff; border: none;
+    padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.82rem;
+    font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; white-space: nowrap;
+  }
+  .dir-btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+  .dir-path {
+    flex: 1; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 0.5rem 0.8rem; color: var(--text-dim);
+    font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .dir-path.active { color: var(--green); border-color: var(--green); }
+
+  /* Rule bar */
+  .rule-bar {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 0.6rem 1rem; margin-bottom: 1rem; font-size: 0.8rem; line-height: 1.6;
+    color: var(--text-dim);
+  }
+  .rule-bar code {
+    background: var(--surface2); padding: 0.15rem 0.45rem; border-radius: 5px;
+    font-family: 'SF Mono','Fira Code',monospace; color: var(--cyan); font-size: 0.78rem;
+  }
+  .rule-tags { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-top: 0.4rem; }
+  .rule-tag {
+    background: var(--surface3); padding: 0.12rem 0.45rem; border-radius: 5px;
+    font-size: 0.7rem; color: var(--text-dim);
+  }
+
+  /* Dropzone */
+  .dropzone {
+    min-height: 200px; border: 2px dashed var(--border); border-radius: 16px;
+    background: var(--surface); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 0.7rem;
+    cursor: pointer; transition: all 0.3s; margin-bottom: 1.2rem;
+  }
+  .dropzone.hover { border-color: var(--accent); background: var(--accent-glow); }
+  .drop-icon {
+    width: 52px; height: 52px; border-radius: 50%; background: var(--surface2);
+    display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+    transition: transform 0.3s;
+  }
+  .dropzone.hover .drop-icon { transform: scale(1.15) rotate(-5deg); }
+  .drop-text { font-size: 0.92rem; color: var(--text-dim); }
+  .drop-hint { font-size: 0.76rem; color: var(--text-dim); opacity: 0.5; }
+  .drop-btn {
+    background: var(--accent); color: #fff; border: none;
+    padding: 0.45rem 1.1rem; border-radius: 7px; font-size: 0.82rem;
+    font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit;
+  }
+  .drop-btn:hover { filter: brightness(1.15); }
+
+  /* Drag overlay */
+  .drag-overlay {
+    position: fixed; inset: 0; background: rgba(108,124,255,0.08);
+    border: 3px dashed var(--accent); z-index: 900;
+    display: none; align-items: center; justify-content: center; pointer-events: none;
+  }
+  .drag-overlay.show { display: flex; }
+  .drag-overlay-text {
+    background: var(--surface); padding: 1.2rem 2rem; border-radius: 14px;
+    font-size: 1.1rem; font-weight: 600; color: var(--accent);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.65);
+    display: none; align-items: center; justify-content: center;
+    z-index: 1000; backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; width: 92%; max-width: 540px;
+    max-height: 88vh; overflow-y: auto; padding: 1.5rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .modal h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.1rem; }
+
+  /* Loading spinner */
+  .loading-bar {
+    display: none; align-items: center; gap: 0.6rem;
+    padding: 0.6rem 0.8rem; margin-bottom: 1rem;
+    background: var(--surface2); border-radius: 8px; font-size: 0.8rem; color: var(--text-dim);
+  }
+  .loading-bar.show { display: flex; }
+  .spinner {
+    width: 16px; height: 16px; border: 2px solid var(--border);
+    border-top-color: var(--accent); border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Form */
+  .form-group { margin-bottom: 0.9rem; }
+  .form-label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.3rem; }
+  .form-input, .form-select, .form-date {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 0.55rem 0.75rem; color: var(--text);
+    font-size: 0.88rem; outline: none; transition: border 0.2s; font-family: inherit;
+  }
+  .form-input:focus, .form-select:focus, .form-date:focus { border-color: var(--accent); }
+  .form-input::placeholder { color: var(--text-dim); opacity: 0.45; }
+  .form-select {
+    cursor: pointer; appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b8fa7' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 0.8rem center;
+  }
+  .form-date { color-scheme: dark; }
+
+  /* Autocomplete */
+  .autocomplete-wrap { position: relative; }
+  .autocomplete-list {
+    position: absolute; top: 100%; left: 0; right: 0;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; margin-top: 2px; max-height: 150px;
+    overflow-y: auto; z-index: 10; display: none;
+  }
+  .autocomplete-list.open { display: block; }
+  .ac-item {
+    padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.83rem;
+    transition: background 0.15s; display: flex; align-items: center; gap: 0.4rem;
+  }
+  .ac-item:hover, .ac-item.selected { background: var(--surface3); }
+  .ac-count {
+    margin-left: auto; font-size: 0.68rem; color: var(--text-dim);
+    background: var(--surface); padding: 0.08rem 0.35rem; border-radius: 4px;
+  }
+
+  /* Detect info */
+  .detect-info {
+    background: var(--green-dim); border: 1px solid rgba(52,211,153,0.3);
+    border-radius: 8px; padding: 0.45rem 0.75rem; margin-bottom: 0.9rem;
+    font-size: 0.78rem; color: var(--green); display: none;
+  }
+  .detect-info.show { display: block; }
+  .detect-source { font-size: 0.7rem; color: rgba(52,211,153,0.6); margin-top: 0.2rem; }
+
+  /* Modal file list */
+  .modal-files {
+    background: var(--surface2); border-radius: 8px;
+    padding: 0.5rem; margin-bottom: 1rem; max-height: 120px; overflow-y: auto;
+  }
+  .modal-file { display: flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.4rem; font-size: 0.78rem; }
+  .modal-file-name { flex: 1; word-break: break-all; }
+  .modal-file-size { color: var(--text-dim); font-size: 0.7rem; white-space: nowrap; }
+
+  /* Preview */
+  .preview-box {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 0.6rem 0.8rem; margin-bottom: 1rem;
+  }
+  .preview-label { font-size: 0.72rem; color: var(--text-dim); margin-bottom: 0.25rem; }
+  .preview-path { font-family: 'SF Mono','Fira Code',monospace; font-size: 0.82rem; color: var(--cyan); word-break: break-all; }
+
+  /* Buttons */
+  .modal-actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
+  .btn {
+    padding: 0.5rem 1.2rem; border-radius: 8px; font-size: 0.86rem;
+    font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; font-family: inherit;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { filter: brightness(1.15); transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn-secondary { background: transparent; color: var(--text-dim); border: 1px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--text-dim); color: var(--text); }
+
+  /* History */
+  .history-section { margin-top: 1.4rem; }
+  .history-title { font-size: 0.92rem; font-weight: 600; margin-bottom: 0.7rem; }
+  .history-empty { color: var(--text-dim); font-size: 0.82rem; }
+  .history-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 0.6rem 0.9rem; margin-bottom: 0.45rem;
+    display: flex; align-items: center; gap: 0.6rem; transition: background 0.2s;
+  }
+  .history-item:hover { background: var(--surface2); }
+  .history-folder { font-family: 'SF Mono','Fira Code',monospace; font-size: 0.78rem; color: var(--cyan); flex: 1; word-break: break-all; }
+  .history-count { font-size: 0.72rem; color: var(--text-dim); background: var(--surface2); padding: 0.12rem 0.45rem; border-radius: 6px; }
+  .history-time { font-size: 0.7rem; color: var(--text-dim); white-space: nowrap; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: var(--surface2); border: 1px solid var(--green);
+    padding: 0.65rem 1.3rem; border-radius: 10px; font-size: 0.83rem;
+    color: var(--green); opacity: 0; transition: all 0.4s; z-index: 2000;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { border-color: var(--red); color: var(--red); }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 600px) {
+    h1 { font-size: 1.3rem; }
+    .modal { padding: 1.1rem; }
+    .dir-section { flex-direction: column; align-items: stretch; }
+  }
+</style>
+</head>
+<body>
+
+<h1>資料自動分類ツール</h1>
+<p class="subtitle">書類をドロップ → 取引先名を自動読取 → フォルダ作成・保存</p>
+
+<div class="container">
+  <div class="dir-section">
+    <button class="dir-btn" id="pickDirBtn">📂 保存先フォルダを選択</button>
+    <div class="dir-path" id="dirPath">未選択（分類時に選択できます）</div>
+  </div>
+
+  <div class="rule-bar">
+    保存先の構造: <code>資料自動分類 / {取引先名} / {取引先名_YYYYMMDD_種別} / ファイル</code>
+    <div class="rule-tags">
+      <span class="rule-tag">領収書</span><span class="rule-tag">請求書</span>
+      <span class="rule-tag">見積書</span><span class="rule-tag">契約書</span><span class="rule-tag">納品書</span>
+    </div>
+  </div>
+
+  <div class="dropzone" id="dropzone">
+    <div class="drop-icon">📂</div>
+    <div class="drop-text">ここに書類をドロップ</div>
+    <button class="drop-btn" id="selectFilesBtn">またはファイルを選択</button>
+    <div class="drop-hint">PDF対応 — 中身から取引先名を自動検出</div>
+  </div>
+  <input type="file" id="fileInput" multiple style="display:none">
+
+  <div class="history-section">
+    <div class="history-title">分類履歴</div>
+    <div id="historyList"></div>
+  </div>
+</div>
+
+<div class="drag-overlay" id="dragOverlay">
+  <div class="drag-overlay-text">ここにドロップして分類</div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <h2>分類情報を確認</h2>
+
+    <div class="loading-bar" id="loadingBar">
+      <div class="spinner"></div>
+      <span id="loadingText">PDFの内容を読み取り中...</span>
+    </div>
+
+    <div class="detect-info" id="detectInfo"></div>
+
+    <div class="form-group">
+      <label class="form-label">取引先名 <span style="color:var(--red)">*</span></label>
+      <div class="autocomplete-wrap">
+        <input type="text" class="form-input" id="clientInput" placeholder="例: ABC商事" autocomplete="off">
+        <div class="autocomplete-list" id="acList"></div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">書類の種別</label>
+      <select class="form-select" id="docType">
+        <option value="領収書">領収書</option>
+        <option value="請求書">請求書</option>
+        <option value="見積書">見積書</option>
+        <option value="契約書">契約書</option>
+        <option value="納品書">納品書</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">日付</label>
+      <input type="date" class="form-date" id="dateInput">
+    </div>
+
+    <div class="preview-box">
+      <div class="preview-label">保存先パス</div>
+      <div class="preview-path" id="previewPath">—</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">対象ファイル（<span id="fileCount">0</span> 件）</label>
+      <div class="modal-files" id="modalFiles"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="cancelBtn">キャンセル</button>
+      <button class="btn btn-primary" id="confirmBtn" disabled>分類する</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ========== CONFIG ==========
+const DOC_TYPE_KEYWORDS = {
+  '領収書': ['領収書','領収証','receipt'],
+  '請求書': ['請求書','御請求','invoice'],
+  '見積書': ['見積書','御見積','estimate','quotation'],
+  '契約書': ['契約書','業務委託契約','contract','agreement'],
+  '納品書': ['納品書','納品明細','delivery'],
+};
+
+// Company suffixes / patterns for extraction
+const COMPANY_PATTERNS = [
+  // 株式会社〇〇 or 〇〇株式会社
+  /(?:株式会社|㈱)\s*([^\s\n,、。（）()「」]{2,20})/,
+  /([^\s\n,、。（）()「」]{2,20})\s*(?:株式会社|㈱)/,
+  // 有限会社
+  /(?:有限会社|㈲)\s*([^\s\n,、。（）()「」]{2,20})/,
+  /([^\s\n,、。（）()「」]{2,20})\s*(?:有限会社|㈲)/,
+  // 合同会社
+  /(?:合同会社)\s*([^\s\n,、。（）()「」]{2,20})/,
+  /([^\s\n,、。（）()「」]{2,20})\s*(?:合同会社)/,
+];
+
+// Full company name (including suffix)
+const FULL_COMPANY_RE = [
+  /(?:株式会社|㈱)\s*[^\s\n,、。（）()「」]{2,20}/,
+  /[^\s\n,、。（）()「」]{2,20}\s*(?:株式会社|㈱)/,
+  /(?:有限会社|㈲)\s*[^\s\n,、。（）()「」]{2,20}/,
+  /[^\s\n,、。（）()「」]{2,20}\s*(?:有限会社|㈲)/,
+  /(?:合同会社)\s*[^\s\n,、。（）()「」]{2,20}/,
+  /[^\s\n,、。（）()「」]{2,20}\s*(?:合同会社)/,
+];
+
+// ========== STATE ==========
+let dirHandle = null;
+let pendingFiles = [];
+let clientHistory = {};
+let actionHistory = [];
+try {
+  clientHistory = JSON.parse(localStorage.getItem('filesorter_clients') || '{}');
+  actionHistory = JSON.parse(localStorage.getItem('filesorter_history') || '[]');
+} catch(e) {}
+
+// ========== UTILITY ==========
+function formatSize(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+  if (b < 1073741824) return (b/1048576).toFixed(1) + ' MB';
+  return (b/1073741824).toFixed(2) + ' GB';
+}
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function dateToCompact(s) { return s.replace(/-/g,''); }
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function buildPath(client, date, type) {
+  if (!client) return '—';
+  const sub = client + '_' + dateToCompact(date) + '_' + type;
+  return client + ' / ' + sub + ' /';
+}
+
+function showToast(msg, dur=3000, isError=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(() => t.className = 'toast', dur);
+}
+function persist() {
+  try {
+    localStorage.setItem('filesorter_clients', JSON.stringify(clientHistory));
+    localStorage.setItem('filesorter_history', JSON.stringify(actionHistory));
+  } catch(e) {}
+}
+
+// ========== PDF TEXT EXTRACTION ==========
+async function extractPdfText(file) {
+  try {
+    const buf = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+    let text = '';
+    const maxPages = Math.min(pdf.numPages, 3); // First 3 pages only
+    for (let i = 1; i <= maxPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      text += content.items.map(item => item.str).join(' ') + '\n';
+    }
+    return text;
+  } catch(e) {
+    console.warn('PDF extraction failed:', e);
+    return '';
+  }
+}
+
+// ========== CONTENT-BASED DETECTION ==========
+function detectCompanyFromText(text) {
+  if (!text) return '';
+  // Try full company name patterns
+  for (const re of FULL_COMPANY_RE) {
+    const m = text.match(re);
+    if (m) return m[0].trim();
+  }
+  return '';
+}
+
+function detectDocTypeFromText(text) {
+  if (!text) return '';
+  for (const [type, keywords] of Object.entries(DOC_TYPE_KEYWORDS)) {
+    if (keywords.some(kw => text.includes(kw))) return type;
+  }
+  return '';
+}
+
+function detectDateFromText(text) {
+  if (!text) return '';
+  // Common date patterns in Japanese documents
+  const patterns = [
+    /(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/,
+    /(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/,
+    /(令和\s*\d{1,2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/,
+  ];
+  for (const re of patterns) {
+    const m = text.match(re);
+    if (m) {
+      let year = m[1];
+      // Handle 令和
+      if (year.includes('令和')) {
+        const rn = parseInt(year.replace(/[^0-9]/g,''));
+        year = String(2018 + rn);
+      }
+      const month = m[2].padStart(2,'0');
+      const day = m[3].padStart(2,'0');
+      return year + '-' + month + '-' + day;
+    }
+  }
+  return '';
+}
+
+// Fallback: detect from filename
+function detectFromFilename(name) {
+  let client = '', type = '', date = '';
+  const base = name.replace(/\.[^.]+$/, '');
+
+  for (const [t, keywords] of Object.entries(DOC_TYPE_KEYWORDS)) {
+    if (keywords.some(kw => base.includes(kw))) { type = t; break; }
+  }
+
+  // Known clients
+  const known = Object.keys(clientHistory)
+    .sort((a,b) => b.length - a.length)
+    .find(c => base.includes(c));
+  if (known) client = known;
+
+  if (!client) {
+    const parts = base.split(/[_\-\s　・]+/).filter(p => p.length > 0);
+    if (parts.length >= 2) {
+      const first = parts[0];
+      const isDate = /^\d{4,8}$/.test(first);
+      const isDocKw = Object.values(DOC_TYPE_KEYWORDS).flat().some(kw => first === kw);
+      if (!isDate && !isDocKw && first.length >= 2) client = first;
+    }
+  }
+
+  return { client, type, date };
+}
+
+// ========== DIRECTORY PICKER ==========
+const pickDirBtn = document.getElementById('pickDirBtn');
+const dirPathEl = document.getElementById('dirPath');
+
+async function pickDirectory() {
+  try {
+    dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+    dirPathEl.textContent = dirHandle.name;
+    dirPathEl.classList.add('active');
+    showToast('保存先: ' + dirHandle.name);
+    return true;
+  } catch(e) {
+    if (e.name !== 'AbortError') showToast('フォルダ選択に失敗', 3000, true);
+    return false;
+  }
+}
+pickDirBtn.addEventListener('click', pickDirectory);
+
+// ========== DRAG & DROP ==========
+let dragCounter = 0;
+const dragOverlay = document.getElementById('dragOverlay');
+
+document.addEventListener('dragenter', (e) => { e.preventDefault(); dragCounter++; if (dragCounter===1) dragOverlay.classList.add('show'); });
+document.addEventListener('dragleave', (e) => { e.preventDefault(); dragCounter--; if (dragCounter<=0) { dragCounter=0; dragOverlay.classList.remove('show'); } });
+document.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+document.addEventListener('drop', async (e) => {
+  e.preventDefault(); dragCounter=0; dragOverlay.classList.remove('show');
+  document.getElementById('dropzone').classList.remove('hover');
+  const files = await extractFiles(e.dataTransfer);
+  if (files.length > 0) openModal(files);
+});
+
+const dropzone = document.getElementById('dropzone');
+dropzone.addEventListener('dragenter', (e) => { e.preventDefault(); dropzone.classList.add('hover'); });
+dropzone.addEventListener('dragover',  (e) => { e.preventDefault(); });
+dropzone.addEventListener('dragleave', (e) => { e.preventDefault(); dropzone.classList.remove('hover'); });
+
+const fileInput = document.getElementById('fileInput');
+document.getElementById('selectFilesBtn').addEventListener('click', (e) => { e.stopPropagation(); fileInput.click(); });
+dropzone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', (e) => {
+  if (e.target.files.length > 0) openModal(Array.from(e.target.files));
+  fileInput.value = '';
+});
+
+async function extractFiles(dt) {
+  const files = [];
+  if (dt.items) {
+    const promises = [];
+    for (const item of dt.items) {
+      if (item.kind !== 'file') continue;
+      const entry = item.webkitGetAsEntry ? item.webkitGetAsEntry() : null;
+      if (entry) promises.push(readEntry(entry, files));
+      else { const f = item.getAsFile(); if (f) files.push(f); }
+    }
+    await Promise.all(promises);
+  } else if (dt.files) { for (const f of dt.files) files.push(f); }
+  return files;
+}
+
+async function readEntry(entry, files) {
+  if (entry.isFile) return new Promise(r => entry.file(f => { files.push(f); r(); }, () => r()));
+  if (entry.isDirectory) return new Promise(r => {
+    const reader = entry.createReader();
+    const batch = () => reader.readEntries(async (entries) => {
+      if (!entries.length) { r(); return; }
+      await Promise.all(entries.map(e => readEntry(e, files)));
+      batch();
+    }, () => r());
+    batch();
+  });
+}
+
+// ========== MODAL ==========
+const overlay  = document.getElementById('modalOverlay');
+const clientIn = document.getElementById('clientInput');
+const docType  = document.getElementById('docType');
+const dateIn   = document.getElementById('dateInput');
+const preview  = document.getElementById('previewPath');
+const confirmB = document.getElementById('confirmBtn');
+const detectEl = document.getElementById('detectInfo');
+const acList   = document.getElementById('acList');
+const loadBar  = document.getElementById('loadingBar');
+const loadText = document.getElementById('loadingText');
+
+async function openModal(files) {
+  pendingFiles = files;
+  dateIn.value = todayStr();
+  clientIn.value = '';
+  docType.selectedIndex = 0;
+  detectEl.classList.remove('show');
+  overlay.classList.add('open');
+  updatePreview();
+
+  // Show file list
+  document.getElementById('fileCount').textContent = files.length;
+  document.getElementById('modalFiles').innerHTML = files.map(f =>
+    `<div class="modal-file"><span class="modal-file-name">${escHtml(f.name)}</span><span class="modal-file-size">${formatSize(f.size)}</span></div>`
+  ).join('');
+
+  // Try content-based detection for PDFs
+  const pdfFiles = files.filter(f => f.name.toLowerCase().endsWith('.pdf'));
+  let contentClient = '', contentType = '', contentDate = '';
+  let detectedFrom = '';
+
+  if (pdfFiles.length > 0) {
+    loadBar.classList.add('show');
+    loadText.textContent = 'PDFの内容を読み取り中...';
+
+    for (const pdf of pdfFiles) {
+      const text = await extractPdfText(pdf);
+      if (text) {
+        if (!contentClient) { contentClient = detectCompanyFromText(text); if (contentClient) detectedFrom = 'PDF内容'; }
+        if (!contentType) contentType = detectDocTypeFromText(text);
+        if (!contentDate) contentDate = detectDateFromText(text);
+        if (contentClient && contentType) break;
+      }
+    }
+    loadBar.classList.remove('show');
+  }
+
+  // Fallback to filename detection
+  if (!contentClient || !contentType) {
+    for (const f of files) {
+      const fn = detectFromFilename(f.name);
+      if (!contentClient && fn.client) { contentClient = fn.client; detectedFrom = 'ファイル名'; }
+      if (!contentType && fn.type) contentType = fn.type;
+    }
+  }
+
+  // Apply detected values
+  if (contentClient) clientIn.value = contentClient;
+  if (contentType) docType.value = contentType;
+  if (contentDate) dateIn.value = contentDate;
+
+  // Show detection info
+  if (contentClient || contentType || contentDate) {
+    let msgs = [];
+    if (contentClient) msgs.push('取引先「' + contentClient + '」');
+    if (contentType) msgs.push('種別「' + contentType + '」');
+    if (contentDate) msgs.push('日付「' + contentDate + '」');
+    detectEl.innerHTML = '自動検出: ' + msgs.join('、') +
+      (detectedFrom ? '<div class="detect-source">検出元: ' + detectedFrom + '</div>' : '');
+    detectEl.classList.add('show');
+  }
+
+  updatePreview();
+  setTimeout(() => clientIn.focus(), 120);
+}
+
+function closeModal() {
+  overlay.classList.remove('open');
+  pendingFiles = [];
+  acList.classList.remove('open');
+  loadBar.classList.remove('show');
+}
+
+function updatePreview() {
+  const c = clientIn.value.trim();
+  preview.textContent = buildPath(c, dateIn.value, docType.value);
+  confirmB.disabled = !c;
+}
+
+clientIn.addEventListener('input', () => { updatePreview(); showAC(); });
+docType.addEventListener('change', updatePreview);
+dateIn.addEventListener('change', updatePreview);
+document.getElementById('cancelBtn').addEventListener('click', closeModal);
+overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+
+// ========== AUTOCOMPLETE ==========
+let acIdx = -1;
+function showAC() {
+  const val = clientIn.value.trim().toLowerCase();
+  const list = Object.entries(clientHistory)
+    .sort((a,b) => b[1] - a[1])
+    .filter(([n]) => !val || n.toLowerCase().includes(val))
+    .slice(0, 8);
+  if (!list.length || (list.length===1 && list[0][0]===clientIn.value.trim())) { acList.classList.remove('open'); return; }
+  acIdx = -1;
+  acList.innerHTML = list.map(([name, count], i) =>
+    `<div class="ac-item" data-i="${i}" data-n="${escHtml(name)}"><span>${hlMatch(name,val)}</span><span class="ac-count">${count}回</span></div>`
+  ).join('');
+  acList.classList.add('open');
+  acList.querySelectorAll('.ac-item').forEach(el => {
+    el.addEventListener('mousedown', (e) => { e.preventDefault(); clientIn.value = el.dataset.n; acList.classList.remove('open'); updatePreview(); });
+  });
+}
+function hlMatch(text, q) {
+  if (!q) return escHtml(text);
+  const idx = text.toLowerCase().indexOf(q);
+  if (idx === -1) return escHtml(text);
+  return escHtml(text.slice(0,idx))+'<strong style="color:var(--accent)">'+escHtml(text.slice(idx,idx+q.length))+'</strong>'+escHtml(text.slice(idx+q.length));
+}
+clientIn.addEventListener('focus', showAC);
+clientIn.addEventListener('keydown', (e) => {
+  const items = acList.querySelectorAll('.ac-item');
+  if (!acList.classList.contains('open') || !items.length) {
+    if (e.key === 'Enter' && !confirmB.disabled) confirmB.click();
+    return;
+  }
+  if (e.key === 'ArrowDown') { e.preventDefault(); acIdx = Math.min(acIdx+1, items.length-1); items.forEach((el,i) => el.classList.toggle('selected', i===acIdx)); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); acIdx = Math.max(acIdx-1, 0); items.forEach((el,i) => el.classList.toggle('selected', i===acIdx)); }
+  else if (e.key === 'Enter') { e.preventDefault(); if (acIdx>=0) { clientIn.value = items[acIdx].dataset.n; acList.classList.remove('open'); updatePreview(); } else if (!confirmB.disabled) confirmB.click(); }
+  else if (e.key === 'Escape') acList.classList.remove('open');
+});
+document.addEventListener('click', (e) => { if (!e.target.closest('.autocomplete-wrap')) acList.classList.remove('open'); });
+
+// ========== CONFIRM & SAVE ==========
+confirmB.addEventListener('click', async () => {
+  const client = clientIn.value.trim();
+  if (!client) return;
+
+  if (!dirHandle) {
+    showToast('保存先フォルダを選択してください');
+    const picked = await pickDirectory();
+    if (!picked) return;
+  }
+
+  const date = dateIn.value;
+  const type = docType.value;
+  const subFolderName = client + '_' + dateToCompact(date) + '_' + type;
+
+  confirmB.disabled = true;
+  confirmB.textContent = '処理中...';
+
+  try {
+    // Create: {baseDir}/{取引先名}/{取引先名_日付_種別}/
+    const clientDir = await dirHandle.getDirectoryHandle(client, { create: true });
+    const subDir = await clientDir.getDirectoryHandle(subFolderName, { create: true });
+
+    for (const file of pendingFiles) {
+      const fh = await subDir.getFileHandle(file.name, { create: true });
+      const w = await fh.createWritable();
+      await w.write(file);
+      await w.close();
+    }
+
+    clientHistory[client] = (clientHistory[client] || 0) + 1;
+    actionHistory.unshift({ folder: client + '/' + subFolderName, count: pendingFiles.length, time: new Date().toISOString() });
+    if (actionHistory.length > 30) actionHistory = actionHistory.slice(0,30);
+    persist();
+    renderHistory();
+
+    closeModal();
+    showToast(`${pendingFiles.length} 件を「${client}/${subFolderName}」に保存しました`);
+  } catch(e) {
+    console.error(e);
+    showToast('保存に失敗: ' + e.message, 4000, true);
+  }
+
+  confirmB.disabled = false;
+  confirmB.textContent = '分類する';
+});
+
+document.getElementById('modal').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !confirmB.disabled && !acList.classList.contains('open') && e.target.tagName !== 'SELECT') confirmB.click();
+});
+
+// ========== HISTORY ==========
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  if (!actionHistory.length) { list.innerHTML = '<div class="history-empty">まだ分類履歴はありません</div>'; return; }
+  list.innerHTML = actionHistory.slice(0,10).map(h => {
+    const d = new Date(h.time);
+    const ts = d.toLocaleDateString('ja-JP') + ' ' + d.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+    return `<div class="history-item"><span style="font-size:0.95rem">📁</span><span class="history-folder">${escHtml(h.folder)}</span><span class="history-count">${h.count} 件</span><span class="history-time">${ts}</span></div>`;
+  }).join('');
+}
+renderHistory();
+</script>
+</body>
+</html>
