@@ -466,7 +466,7 @@ const FocusSection = ({
                   <i className={`${config.icon} ${config.color}`}></i>
                   <span className={`text-sm font-bold ${config.color}`}>{config.label}</span>
                   {deadline && (
-                    <span className="text-xs text-slate-400">（{deadline}）</span>
+                    <span className={`text-xs font-bold ${config.color} opacity-70`}>（{deadline}）</span>
                   )}
                 </div>
                 {/* タスクリスト */}
