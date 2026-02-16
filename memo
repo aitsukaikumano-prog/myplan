@@ -1,0 +1,42 @@
+⏺ 良い判断です。ツリー構造と一致するIDの方が管理しやすい。
+
+  最終設計
+
+  github_sim3/
+  ├── issues.yaml              # タスク一覧（軽量）
+  ├── tasks/
+  │   ├── 1-A-01-1.md          # タスク詳細
+  │   ├── 1-A-01-2.md
+  │   └── ...
+  └── docs/
+      └── web-app-experience.md  # 成果物本体
+
+  tasks/1-A-01-1.md:
+  ---
+  id: "1-A-01-1"
+  title: "自分のスキル棚卸し（Web/AI/業務改善）"
+  status: "completed"
+  completedDate: "2026-01-13"
+  successCriteria:
+    - "開発経験が3つ以上記載されている"
+    - "具体的な数値成果が含まれている"
+  outputs:
+    - file: "docs/web-app-experience.md"
+      title: "開発経験の整理文書"
+      summary: "Webアプリ開発5年の経験を整理"
+  ---
+
+  ## 詳細説明
+
+  過去の開発経験・AI活用経験・業務改善経験を整理し...
+
+  ## メモ
+
+  2026-01-13 ヒアリング完了
+
+  issues.yaml（軽量化）:
+  tasks:
+    - id: "1-A-01-1"
+      title: "自分のスキル棚卸し"
+      status: "completed"
+      # 詳細は tasks/1-A-01-1.md を参照
