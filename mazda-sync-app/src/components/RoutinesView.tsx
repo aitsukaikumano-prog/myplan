@@ -1,72 +1,42 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
-import { Routine, RoutineLogEntry, WeeklyFocus, FocusHorizon, CalendarEvent, StrategyNode, Task, Issue, TaskOutput, TASK_STATUS, STATUS_CONFIG } from '../types';
+import { useState, useEffect, useMemo } from 'react';
+import { Routine, RoutineLogs, WeeklyFocus, FocusHorizon, CalendarEvent, StrategyNode, Task, Issue, TaskOutput, TASK_STATUS, STATUS_CONFIG } from '../types';
 
 interface RoutinesViewProps {
   routines: Routine[];
   weeklyFocus: WeeklyFocus | null;
   strategyData: StrategyNode | null;
+  routineLogs: RoutineLogs;
 }
-
-const STORAGE_KEY = 'mazda-routines-log';
-
-// --- LocalStorage helpers ---
-
-type RoutineLog = Record<string, Record<string, RoutineLogEntry>>;
-// { "R-01": { "2026-W07": { completed: true, date: "2026-02-13", note: "" }, ... } }
-
-const loadLog = (): RoutineLog => {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : {};
-  } catch {
-    return {};
-  }
-};
-
-const saveLog = (log: RoutineLog) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
-};
 
 // --- Date helpers ---
 
 const today = () => {
   // 日本時間 (JST: UTC+9) で今日の日付を返す
-  // toISOString()はUTC日付を返すので、UTC時刻に9時間加算してからsliceする
   const d = new Date();
   const jst = new Date(d.getTime() + 9 * 60 * 60000);
   return jst.toISOString().slice(0, 10);
 };
 
-const getISOWeek = (d: Date): string => {
-  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
-  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
-  const weekNo = Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
-  return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
-};
-
-const currentWeek = () => getISOWeek(new Date());
-
 const DAY_LABELS = ['月', '火', '水', '木', '金', '土', '日'];
 
-// ストリーク計算（daily用）
-const calcStreak = (routineId: string, log: RoutineLog): number => {
-  const entries = log[routineId];
+// ストリーク計算（daily用、YAMLログから）
+const calcStreak = (routineId: string, logs: RoutineLogs): number => {
+  const entries = logs[routineId];
   if (!entries) return 0;
 
   let streak = 0;
   const d = new Date();
-  // 今日が完了していればそこからカウント、なければ昨日から遡る
-  const todayStr = d.toISOString().slice(0, 10);
+  const jst = new Date(d.getTime() + 9 * 60 * 60000);
+  const todayStr = jst.toISOString().slice(0, 10);
   if (!entries[todayStr]?.completed) {
-    d.setDate(d.getDate() - 1);
+    jst.setDate(jst.getDate() - 1);
   }
 
   for (let i = 0; i < 365; i++) {
-    const key = d.toISOString().slice(0, 10);
+    const key = jst.toISOString().slice(0, 10);
     if (entries[key]?.completed) {
       streak++;
-      d.setDate(d.getDate() - 1);
+      jst.setDate(jst.getDate() - 1);
     } else {
       break;
     }
@@ -148,13 +118,14 @@ function findTaskWithIssue(
   return walkNode(node);
 }
 
-export const RoutinesView = ({ routines, weeklyFocus, strategyData }: RoutinesViewProps) => {
-  const [log, setLog] = useState<RoutineLog>(loadLog);
-  const [editingNote, setEditingNote] = useState<string | null>(null);
-  const [noteText, setNoteText] = useState('');
+export const RoutinesView = ({ routines, weeklyFocus, strategyData, routineLogs }: RoutinesViewProps) => {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [panelWidth, setPanelWidth] = useState(380);
   const [isResizing, setIsResizing] = useState(false);
+
+  const isCompleted = (routineId: string, key: string): boolean => {
+    return routineLogs[routineId]?.[key]?.completed || false;
+  };
 
   const handleResizeStart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -181,55 +152,13 @@ export const RoutinesView = ({ routines, weeklyFocus, strategyData }: RoutinesVi
     return findTaskWithIssue(strategyData, selectedTaskId);
   }, [selectedTaskId, strategyData]);
 
-  const updateLog = useCallback((next: RoutineLog) => {
-    setLog(next);
-    saveLog(next);
-  }, []);
-
-  const toggleComplete = (routineId: string, key: string) => {
-    const next = { ...log };
-    if (!next[routineId]) next[routineId] = {};
-    const current = next[routineId][key];
-    next[routineId] = {
-      ...next[routineId],
-      [key]: {
-        completed: !current?.completed,
-        date: today(),
-        note: current?.note || ''
-      }
-    };
-    updateLog(next);
-  };
-
-  const saveNote = (routineId: string, key: string) => {
-    const next = { ...log };
-    if (!next[routineId]) next[routineId] = {};
-    const current = next[routineId][key] || { completed: false, date: today() };
-    next[routineId] = {
-      ...next[routineId],
-      [key]: { ...current, note: noteText }
-    };
-    updateLog(next);
-    setEditingNote(null);
-    setNoteText('');
-  };
-
-  const isCompleted = (routineId: string, key: string): boolean => {
-    return log[routineId]?.[key]?.completed || false;
-  };
-
-  const getNote = (routineId: string, key: string): string => {
-    return log[routineId]?.[key]?.note || '';
-  };
-
   const dailyRoutines = routines.filter(r => r.frequency === 'daily');
   const weeklyRoutines = routines.filter(r => r.frequency === 'weekly');
   const todayStr = today();
-  const weekKey = currentWeek();
 
   // 最大ストリーク
   const maxStreak = dailyRoutines.reduce((max, r) => {
-    const s = calcStreak(r.id, log);
+    const s = calcStreak(r.id, routineLogs);
     return s > max.streak ? { streak: s, title: r.title } : max;
   }, { streak: 0, title: '' });
 
@@ -244,20 +173,18 @@ export const RoutinesView = ({ routines, weeklyFocus, strategyData }: RoutinesVi
 
         {/* 右カラム: ルーティン */}
         <div>
-          <h2 className="text-2xl font-black text-slate-800 mb-6">
-            <i className="fas fa-redo-alt text-indigo-500 mr-3"></i>
-            ルーティン
-          </h2>
-
-          {/* ストリーク表示 */}
-          {maxStreak.streak > 0 && (
-            <div className="mb-6 p-4 bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-orange-200 rounded-xl">
-              <span className="text-lg font-black text-orange-600">
-                <i className="fas fa-fire text-orange-500 mr-2"></i>
-                {maxStreak.title} {maxStreak.streak}日連続
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-black text-slate-800">
+              <i className="fas fa-redo-alt text-indigo-500 mr-3"></i>
+              ルーティン
+            </h2>
+            {maxStreak.streak > 0 && (
+              <span className="text-xs font-bold text-orange-600 bg-orange-50 border border-orange-200 px-2.5 py-1 rounded-full">
+                <i className="fas fa-fire mr-1"></i>
+                {maxStreak.streak}日連続
               </span>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* 今日のルーティン（daily） */}
           {dailyRoutines.length > 0 && (
@@ -267,19 +194,14 @@ export const RoutinesView = ({ routines, weeklyFocus, strategyData }: RoutinesVi
               </h3>
               <div className="space-y-2">
                 {dailyRoutines.map(r => {
-                  const key = todayStr;
-                  const done = isCompleted(r.id, key);
-                  const note = getNote(r.id, key);
-                  const streak = calcStreak(r.id, log);
+                  const done = isCompleted(r.id, todayStr);
+                  const streak = calcStreak(r.id, routineLogs);
                   return (
-                    <div key={r.id} className={`p-4 border-2 rounded-xl transition-colors ${done ? 'bg-green-50 border-green-200' : 'bg-white border-slate-200 hover:border-blue-300'}`}>
+                    <div key={r.id} className={`p-4 border-2 rounded-xl transition-colors ${done ? 'bg-green-50 border-green-200' : 'bg-white border-slate-200'}`}>
                       <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => toggleComplete(r.id, key)}
-                          className={`w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-colors ${done ? 'bg-green-500 border-green-500' : 'border-slate-300 hover:border-blue-500'}`}
-                        >
+                        <div className={`w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${done ? 'bg-green-500 border-green-500' : 'border-slate-300'}`}>
                           {done && <i className="fas fa-check text-white text-xs"></i>}
-                        </button>
+                        </div>
                         <div className="flex-1">
                           <span className={`text-sm font-bold ${done ? 'text-green-700' : 'text-slate-700'}`}>
                             {r.title}
@@ -304,43 +226,7 @@ export const RoutinesView = ({ routines, weeklyFocus, strategyData }: RoutinesVi
                             <i className="fas fa-external-link-alt"></i>
                           </a>
                         )}
-                        <button
-                          onClick={() => {
-                            if (editingNote === `${r.id}-${key}`) {
-                              setEditingNote(null);
-                            } else {
-                              setEditingNote(`${r.id}-${key}`);
-                              setNoteText(note);
-                            }
-                          }}
-                          className={`text-sm transition-colors ${note ? 'text-blue-400' : 'text-slate-300 hover:text-slate-400'}`}
-                          title="メモ"
-                        >
-                          <i className="fas fa-comment-dots"></i>
-                        </button>
                       </div>
-                      {note && editingNote !== `${r.id}-${key}` && (
-                        <p className="mt-2 ml-9 text-xs text-slate-500 italic">{note}</p>
-                      )}
-                      {editingNote === `${r.id}-${key}` && (
-                        <div className="mt-3 ml-9 flex gap-2">
-                          <input
-                            type="text"
-                            value={noteText}
-                            onChange={e => setNoteText(e.target.value)}
-                            onKeyDown={e => e.key === 'Enter' && saveNote(r.id, key)}
-                            placeholder="メモを入力..."
-                            className="flex-1 px-3 py-1.5 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-blue-400"
-                            autoFocus
-                          />
-                          <button
-                            onClick={() => saveNote(r.id, key)}
-                            className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700"
-                          >
-                            保存
-                          </button>
-                        </div>
-                      )}
                     </div>
                   );
                 })}
@@ -352,65 +238,41 @@ export const RoutinesView = ({ routines, weeklyFocus, strategyData }: RoutinesVi
           {weeklyRoutines.length > 0 && (
             <div className="mb-8">
               <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
-                今週のルーティン ({weekKey})
+                今週のルーティン
               </h3>
               <div className="space-y-2">
                 {weeklyRoutines.map(r => {
-                  const key = weekKey;
-                  const done = isCompleted(r.id, key);
-                  const note = getNote(r.id, key);
+                  // 週次は今週の日付のどれかにログがあれば完了とみなす
+                  const done = (() => {
+                    const entries = routineLogs[r.id];
+                    if (!entries) return false;
+                    // 今週の月〜日の日付を生成してチェック
+                    const d = new Date();
+                    const jst = new Date(d.getTime() + 9 * 60 * 60000);
+                    const day = jst.getUTCDay() || 7; // 月=1, 日=7
+                    const monday = new Date(jst);
+                    monday.setUTCDate(jst.getUTCDate() - day + 1);
+                    for (let i = 0; i < 7; i++) {
+                      const check = new Date(monday);
+                      check.setUTCDate(monday.getUTCDate() + i);
+                      const key = check.toISOString().slice(0, 10);
+                      if (entries[key]?.completed) return true;
+                    }
+                    return false;
+                  })();
                   return (
-                    <div key={r.id} className={`p-4 border-2 rounded-xl transition-colors ${done ? 'bg-green-50 border-green-200' : 'bg-white border-slate-200 hover:border-blue-300'}`}>
+                    <div key={r.id} className={`p-4 border-2 rounded-xl transition-colors ${done ? 'bg-green-50 border-green-200' : 'bg-white border-slate-200'}`}>
                       <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => toggleComplete(r.id, key)}
-                          className={`w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-colors ${done ? 'bg-green-500 border-green-500' : 'border-slate-300 hover:border-blue-500'}`}
-                        >
+                        <div className={`w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${done ? 'bg-green-500 border-green-500' : 'border-slate-300'}`}>
                           {done && <i className="fas fa-check text-white text-xs"></i>}
-                        </button>
+                        </div>
                         <div className="flex-1">
                           <span className={`text-sm font-bold ${done ? 'text-green-700' : 'text-slate-700'}`}>
                             {r.title}
                           </span>
                           <p className="text-xs text-slate-400 mt-0.5">{r.description}</p>
                         </div>
-                        <button
-                          onClick={() => {
-                            if (editingNote === `${r.id}-${key}`) {
-                              setEditingNote(null);
-                            } else {
-                              setEditingNote(`${r.id}-${key}`);
-                              setNoteText(note);
-                            }
-                          }}
-                          className={`text-sm transition-colors ${note ? 'text-blue-400' : 'text-slate-300 hover:text-slate-400'}`}
-                          title="メモ"
-                        >
-                          <i className="fas fa-comment-dots"></i>
-                        </button>
                       </div>
-                      {note && editingNote !== `${r.id}-${key}` && (
-                        <p className="mt-2 ml-9 text-xs text-slate-500 italic">{note}</p>
-                      )}
-                      {editingNote === `${r.id}-${key}` && (
-                        <div className="mt-3 ml-9 flex gap-2">
-                          <input
-                            type="text"
-                            value={noteText}
-                            onChange={e => setNoteText(e.target.value)}
-                            onKeyDown={e => e.key === 'Enter' && saveNote(r.id, key)}
-                            placeholder="メモを入力..."
-                            className="flex-1 px-3 py-1.5 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-blue-400"
-                            autoFocus
-                          />
-                          <button
-                            onClick={() => saveNote(r.id, key)}
-                            className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700"
-                          >
-                            保存
-                          </button>
-                        </div>
-                      )}
                     </div>
                   );
                 })}
@@ -434,7 +296,6 @@ export const RoutinesView = ({ routines, weeklyFocus, strategyData }: RoutinesVi
         <MonthlyCalendar
           dailyRoutines={dailyRoutines}
           isCompleted={isCompleted}
-          toggleComplete={toggleComplete}
           events={weeklyFocus?.events || []}
         />
       )}
@@ -653,12 +514,10 @@ const ROUTINE_COLORS = [
 const MonthlyCalendar = ({
   dailyRoutines,
   isCompleted,
-  toggleComplete,
   events,
 }: {
   dailyRoutines: Routine[];
   isCompleted: (routineId: string, key: string) => boolean;
-  toggleComplete: (routineId: string, key: string) => void;
   events: CalendarEvent[];
 }) => {
   const [viewDate, setViewDate] = useState(() => new Date());
@@ -785,13 +644,12 @@ const MonthlyCalendar = ({
                     const done = isCompleted(r.id, dateStr);
                     const color = ROUTINE_COLORS[ri % ROUTINE_COLORS.length];
                     return (
-                      <button
+                      <span
                         key={r.id}
-                        onClick={() => toggleComplete(r.id, dateStr)}
-                        className={`w-3 h-3 rounded-full transition-colors ${
+                        className={`w-3 h-3 rounded-full ${
                           done
                             ? color.bg
-                            : 'bg-slate-200 hover:bg-slate-300'
+                            : 'bg-slate-200'
                         }`}
                         title={`${r.title}${done ? ' ✓' : ''}`}
                       />

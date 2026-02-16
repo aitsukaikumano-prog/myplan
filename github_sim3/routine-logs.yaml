@@ -1,0 +1,13 @@
+# ルーティン消化ログ
+# Claude Codeで更新 → git commit → アプリが読み込み
+logs:
+  R-01:
+    "2026-02-13":
+      completed: true
+    "2026-02-16":
+      completed: true
+  R-02:
+    "2026-02-13":
+      completed: true
+    "2026-02-16":
+      completed: true

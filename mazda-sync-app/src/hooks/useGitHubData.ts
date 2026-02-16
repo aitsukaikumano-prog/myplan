@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import yaml from 'js-yaml';
-import { StrategyNode, Meeting, Email, Document, Routine, WeeklyFocus, TASK_STATUS, TaskDetailData, TaskOutput } from '../types';
+import { StrategyNode, Meeting, Email, Document, Routine, WeeklyFocus, RoutineLogs, TASK_STATUS, TaskDetailData, TaskOutput } from '../types';
 
 // ベースパス（Viteの設定と一致させる）
 const BASE_PATH = import.meta.env.BASE_URL;
@@ -60,6 +60,7 @@ export const useGitHubData = (projectId: string) => {
   const [emails, setEmails] = useState<Email[]>([]);
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [weeklyFocus, setWeeklyFocus] = useState<WeeklyFocus | null>(null);
+  const [routineLogs, setRoutineLogs] = useState<RoutineLogs>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -88,13 +89,14 @@ export const useGitHubData = (projectId: string) => {
       const data = buildStrategyFromYaml(issuesYaml, project, taskDetails);
       setStrategyData(data);
 
-      // 議事録、ドキュメント、メール、ルーティン、週間フォーカスを取得
+      // 議事録、ドキュメント、メール、ルーティン、週間フォーカス、ルーティンログを取得
       await Promise.all([
         fetchMeetings(project.meetingsFolder),
         fetchAllDocuments(project),
         fetchEmails(project.emailsFolder),
         fetchRoutines(project.folder),
-        fetchWeeklyFocus(project.folder)
+        fetchWeeklyFocus(project.folder),
+        fetchRoutineLogs(project.folder)
       ]);
 
     } catch (err) {
@@ -292,6 +294,22 @@ export const useGitHubData = (projectId: string) => {
     }
   };
 
+  const fetchRoutineLogs = async (folder: string) => {
+    try {
+      const url = `${BASE_PATH}data/${folder}/routine-logs.yaml`;
+      const res = await fetch(url);
+      if (!res.ok) {
+        setRoutineLogs({});
+        return;
+      }
+      const text = await res.text();
+      const data = yaml.load(text) as { logs?: RoutineLogs } | null;
+      setRoutineLogs(data?.logs || {});
+    } catch {
+      setRoutineLogs({});
+    }
+  };
+
   const fetchEmails = async (emailsFolder: string) => {
     try {
       // index.yamlからメールファイル一覧を取得
@@ -341,6 +359,7 @@ export const useGitHubData = (projectId: string) => {
     emails,
     routines,
     weeklyFocus,
+    routineLogs,
     loading,
     error,
     projects: PROJECTS,

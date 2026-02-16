@@ -190,12 +190,15 @@ export interface WeeklyFocus {
   events?: CalendarEvent[];
 }
 
-// ルーティン消化ログ（LocalStorage用）
+// ルーティン消化ログ（LocalStorage + YAML共用）
 export interface RoutineLogEntry {
   completed: boolean;
   date: string;
   note?: string;
 }
+
+// YAML形式のルーティンログ
+export type RoutineLogs = Record<string, Record<string, { completed: boolean; note?: string }>>;
 
 // ビュー状態
 export interface ViewState {
