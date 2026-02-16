@@ -193,6 +193,9 @@ strategies:
               - id: "1-C-05-4"
                 title: "成果の記録・ポートフォリオ化"
                 status: "completed"
+              - id: "1-C-05-5"
+                title: "生成AI-LT広島vol.2での発表"
+                status: "pending"
 
   - id: "2"
     title: "コミュニティ確立"
