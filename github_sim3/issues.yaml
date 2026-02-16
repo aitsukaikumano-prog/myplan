@@ -192,7 +192,7 @@ strategies:
                 status: "completed"
               - id: "1-C-05-4"
                 title: "成果の記録・ポートフォリオ化"
-                status: "pending"
+                status: "completed"
 
   - id: "2"
     title: "コミュニティ確立"
