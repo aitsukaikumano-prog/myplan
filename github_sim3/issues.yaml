@@ -144,7 +144,7 @@ strategies:
             tasks:
               - id: "1-C-02-1"
                 title: "ソフトバレー大会 得点表デジタル化"
-                status: "in_progress"
+                status: "completed"
               - id: "1-C-02-2"
                 title: "成果の記録・ポートフォリオ化"
                 status: "completed"
