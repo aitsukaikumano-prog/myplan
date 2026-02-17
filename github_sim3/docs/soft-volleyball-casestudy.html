@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>soft-volleyball-casestudy</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="pdf-style.css" />
+</head>
+<body>
+<h1
+id="ソフトバレー大会スコアアプリ-ケーススタディ">ソフトバレー大会スコアアプリ
+ケーススタディ</h1>
+<h2 id="エグゼクティブサマリー">エグゼクティブサマリー</h2>
+<p>地域のソフトバレーボール大会のスコア管理をデジタル化するWebアプリを開発し、実際の大会で運用した事例。Firebase
+Realtime
+Databaseによるリアルタイム同期で、約60名の参加者全員がスマートフォンから試合結果を即座に確認できる環境を実現。Claude
+Code（AI開発支援ツール）を全面活用し、約10時間・27コミットで本番運用レベルのアプリケーションを構築した。</p>
+<hr />
+<h2 id="プロジェクト概要">1. プロジェクト概要</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>項目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>プロダクト名</td>
+<td>ソフトバレー大会スコアアプリ</td>
+</tr>
+<tr>
+<td>サイト</td>
+<td>https://soft-volleyball.vercel.app</td>
+</tr>
+<tr>
+<td>コンセプト</td>
+<td>「スマホで結果がすぐわかる大会」— 紙に頼らないスコア共有</td>
+</tr>
+<tr>
+<td>開発者</td>
+<td>KUMANO AI STUDIO</td>
+</tr>
+<tr>
+<td>開発期間</td>
+<td>約10時間</td>
+</tr>
+<tr>
+<td>規模</td>
+<td>27コミット、15コアファイル</td>
+</tr>
+<tr>
+<td>運用実績</td>
+<td>2026年2月15日 矢野体育館ソフトバレーボール大会（約60名参加）</td>
+</tr>
+<tr>
+<td>運用コスト</td>
+<td>¥0（Firebase無料枠 + Vercel無料枠）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="大会の様子">大会の様子</h3>
+<figure>
+<img src="soft-volleyball/images/tournament-scene.jpg"
+alt="大会風景 — 矢野体育館でのソフトバレーボール大会" />
+<figcaption aria-hidden="true">大会風景 —
+矢野体育館でのソフトバレーボール大会</figcaption>
+</figure>
+<h3 id="解決する課題">解決する課題</h3>
+<ul>
+<li>対戦表の作成・管理が手作業で負担が大きい</li>
+<li>試合結果を参加者に共有する手段がない（掲示板まで見に行く必要がある）</li>
+<li>順位計算を手動で行うためミスが起きやすい</li>
+</ul>
+<hr />
+<h2 id="技術構成">2. 技術構成</h2>
+<h3 id="技術スタック">技術スタック</h3>
+<table>
+<thead>
+<tr>
+<th>レイヤー</th>
+<th>技術</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>フロントエンド</td>
+<td>React 19 + TypeScript + Vite 6 + Tailwind CSS</td>
+</tr>
+<tr>
+<td>バックエンド</td>
+<td>Firebase Realtime Database（サーバーレス）</td>
+</tr>
+<tr>
+<td>ホスティング</td>
+<td>Vercel</td>
+</tr>
+<tr>
+<td>アイコン</td>
+<td>Font Awesome（CDN）</td>
+</tr>
+<tr>
+<td>画像生成</td>
+<td>html-to-image（対戦表のPNG保存）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="システム構成">システム構成</h3>
+<pre><code>参加者（スマートフォン）
+  ↓ QRコードでアクセス
+フロントエンド（React SPA / Vercel）
+  ↓ Firebase Realtime Database（onValueリスナー）
+  ↕ リアルタイム同期
+管理者（スマートフォン / ?role=admin）
+  ↓ スコア入力・更新
+Firebase Realtime Database
+  → 全端末に即時反映</code></pre>
+<h3 id="リアルタイム同期の仕組み">リアルタイム同期の仕組み</h3>
+<ul>
+<li><strong>データベース</strong>: Firebase Realtime Database</li>
+<li><strong>同期方式</strong>:
+<code>onValue</code>リスナーによるリアルタイム同期。管理者がスコアを入力すると、全参加者の画面に即時反映</li>
+<li><strong>ロール管理</strong>:
+URLクエリパラメータ（<code>?role=admin</code>）で管理者/一般を分離。管理者のみ書き込み可能、一般ユーザーは閲覧専用</li>
+</ul>
+<hr />
+<h3 id="アプリ画面">アプリ画面</h3>
+<figure>
+<img src="soft-volleyball/images/app-screens.png"
+alt="アプリ画面 — 対戦カード・順位表・対戦表" />
+<figcaption aria-hidden="true">アプリ画面 —
+対戦カード・順位表・対戦表</figcaption>
+</figure>
+<hr />
+<h2 id="機能一覧">3. 機能一覧</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>機能</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>リアルタイムスコア同期</td>
+<td>Firebase Realtime Databaseで複数端末に即時反映</td>
+</tr>
+<tr>
+<td>対戦カード表示</td>
+<td>グループ別の試合一覧（試合番号・チーム名・審判・セットスコア）</td>
+</tr>
+<tr>
+<td>スコア入力モーダル</td>
+<td>管理者がセットごとのスコアを入力・更新</td>
+</tr>
+<tr>
+<td>順位表（勝点自動計算）</td>
+<td>グループA（3セットマッチ）とグループB（2セットマッチ）で異なる勝点ルールに対応</td>
+</tr>
+<tr>
+<td>対戦表（総当たり表）</td>
+<td>全チーム間の対戦結果をマトリクス形式で表示</td>
+</tr>
+<tr>
+<td>対戦表の画像保存</td>
+<td>html-to-imageで対戦表をPNG画像としてダウンロード</td>
+</tr>
+<tr>
+<td>グループ切り替え</td>
+<td>グループA（4チーム）とグループB（5チーム）をタブで切り替え</td>
+</tr>
+<tr>
+<td>管理者モード</td>
+<td>URLパラメータで分離。スコア編集・データリセットが可能</td>
+</tr>
+<tr>
+<td>スマホ対応</td>
+<td>モバイルファーストのレスポンシブUI</td>
+</tr>
+</tbody>
+</table>
+<h3 id="スコア入力画面管理者モード">スコア入力画面（管理者モード）</h3>
+<figure>
+<img src="soft-volleyball/images/score-input.png"
+alt="スコア入力モーダル — セットごとのスコアを入力" />
+<figcaption aria-hidden="true">スコア入力モーダル —
+セットごとのスコアを入力</figcaption>
+</figure>
+<hr />
+<h2 id="開発プロセス">4. 開発プロセス</h2>
+<h3 id="開発タイムライン">開発タイムライン</h3>
+<table>
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 68%" />
+</colgroup>
+<thead>
+<tr>
+<th>時期</th>
+<th>マイルストーン</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026/2（大会数日前）</td>
+<td>開発着手。「対戦表を作らないといけない」という課題からスタート</td>
+</tr>
+<tr>
+<td>—</td>
+<td>MVP開発（対戦カード表示・スコア入力・順位計算）</td>
+</tr>
+<tr>
+<td>—</td>
+<td>Firebase Realtime Database移行・リアルタイム同期実装</td>
+</tr>
+<tr>
+<td>—</td>
+<td>対戦表画像保存・スプラッシュスクリーン等の追加機能</td>
+</tr>
+<tr>
+<td>2026/2/15</td>
+<td>矢野体育館ソフトバレーボール大会で本番運用（約60名）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="claude-code活用による開発効率化">Claude
+Code活用による開発効率化</h3>
+<p>設計・実装・UIデザイン・バグ修正のほぼ全工程でClaude
+Codeを使用。特に効果が大きかった領域:</p>
+<ol type="1">
+<li><strong>Firebase Realtime Database移行</strong> —
+ローカルデータからFirebaseへの移行をAIと対話しながら構築</li>
+<li><strong>リアルタイム同期の実装</strong> —
+<code>onValue</code>リスナーによる複数端末の即時同期</li>
+<li><strong>グループ別の勝点ロジック</strong> —
+3セットマッチと2セットマッチで異なるルールへの対応</li>
+<li><strong>対戦表の画像保存</strong> —
+html-to-imageライブラリを使ったPNG出力</li>
+</ol>
+<h3 id="開発環境vs-code-claude-code">開発環境（VS Code + Claude
+Code）</h3>
+<figure>
+<img src="soft-volleyball/images/dev-screen.png"
+alt="開発画面 — Claude Codeを活用した開発の様子" />
+<figcaption aria-hidden="true">開発画面 — Claude
+Codeを活用した開発の様子</figcaption>
+</figure>
+<h3 id="開発効率のポイント">開発効率のポイント</h3>
+<table>
+<thead>
+<tr>
+<th>指標</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>開発時間</td>
+<td>約10時間</td>
+</tr>
+<tr>
+<td>コミット数</td>
+<td>27</td>
+</tr>
+<tr>
+<td>コアファイル数</td>
+<td>15</td>
+</tr>
+<tr>
+<td>1機能あたりの開発時間</td>
+<td>約1時間（主要10機能）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="運用実績">5. 運用実績</h2>
+<h3 id="大会概要">大会概要</h3>
+<ul>
+<li><strong>大会名</strong>: 矢野ソフトバレーボール大会</li>
+<li><strong>日時</strong>: 2026年2月15日</li>
+<li><strong>会場</strong>: 矢野体育館</li>
+<li><strong>参加者</strong>: 約60名</li>
+<li><strong>構成</strong>:
+グループA（4チーム・3セットマッチ）、グループB（5チーム・2セットマッチ）</li>
+</ul>
+<h3 id="運用方法">運用方法</h3>
+<ul>
+<li>紙の得点管理とアプリを<strong>併用</strong>して運用</li>
+<li>管理者がスコアをアプリに入力 →
+参加者はスマートフォンでリアルタイムに確認</li>
+<li>対戦表はPNG画像として保存・共有</li>
+</ul>
+<h3 id="beforeafter">Before/After</h3>
+<figure>
+<img src="soft-volleyball/images/app-vs-paper.jpg"
+alt="アプリと紙の対戦表の併用 — デジタルとアナログの共存" />
+<figcaption aria-hidden="true">アプリと紙の対戦表の併用 —
+デジタルとアナログの共存</figcaption>
+</figure>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>Before（従来）</th>
+<th>After（アプリ導入）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>結果確認</td>
+<td>掲示板まで見に行く必要あり</td>
+<td>スマホでどこからでも即確認</td>
+</tr>
+<tr>
+<td>対戦表作成</td>
+<td>手作業で作成</td>
+<td>アプリが自動生成</td>
+</tr>
+<tr>
+<td>順位計算</td>
+<td>手動計算（ミスの可能性）</td>
+<td>勝点ルールに基づき自動計算</td>
+</tr>
+<tr>
+<td>結果共有</td>
+<td>大会終了後に口頭or紙</td>
+<td>画像保存して即共有可能</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="学び気づき">6. 学び・気づき</h2>
+<h3 id="技術面">技術面</h3>
+<ul>
+<li>Firebase Realtime
+Databaseの<code>onValue</code>リスナーにより、<strong>サーバーを立てずにリアルタイム同期</strong>を実現できる</li>
+<li>React + TypeScript +
+Vite構成なら、<strong>10時間で本番運用可能なアプリ</strong>をClaude
+Codeと一緒に構築できる</li>
+<li>グループ別の勝点ルールなど、<strong>ドメイン固有のロジック</strong>もAIに説明すれば正しく実装できる</li>
+</ul>
+<h3 id="ビジネス面">ビジネス面</h3>
+<ul>
+<li>「対戦表を作らないといけない」という<strong>小さな困りごとがDXの入り口</strong>になる</li>
+<li>紙との併用から始めることで、<strong>デジタル化への抵抗感を下げる</strong>ことができる</li>
+<li>約60名が実際に使った実績は、<strong>他の地域イベントへの横展開の説得材料</strong>になる</li>
+</ul>
+<hr />
+<h2 id="ビジネスインパクト">7. ビジネスインパクト</h2>
+<h3 id="開発コスト">開発コスト</h3>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>コスト</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>開発所要時間</td>
+<td>約10時間</td>
+</tr>
+<tr>
+<td>Firebase</td>
+<td>¥0（無料枠）</td>
+</tr>
+<tr>
+<td>Vercel</td>
+<td>¥0（無料枠）</td>
+</tr>
+<tr>
+<td>ドメイン</td>
+<td>なし（Vercelサブドメイン）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="大会運営側のメリット">大会運営側のメリット</h3>
+<ul>
+<li><strong>参加者の利便性向上</strong>:
+スマホで結果を即確認できるため、掲示板の前に集まる必要がない</li>
+<li><strong>運営負荷の軽減</strong>: 順位計算・対戦表作成が自動化</li>
+<li><strong>記録の残しやすさ</strong>: 対戦表を画像で保存・共有可能</li>
+</ul>
+<h3 id="横展開の可能性">横展開の可能性</h3>
+<ul>
+<li>他のソフトバレー大会、バドミントン大会など地域スポーツイベントへの展開</li>
+<li>チーム数・セット数・勝点ルールのカスタマイズで汎用化可能</li>
+<li>「10時間で作れる」という実績が、他の地域課題解決の提案にも活きる</li>
+</ul>
+<hr />
+<h2 id="付録">付録</h2>
+<h3 id="関連リンク">関連リンク</h3>
+<ul>
+<li><a
+href="https://soft-volleyball.vercel.app">ソフトバレースコアアプリ</a></li>
+<li><a href="https://note.com/aitsukai_kumano/n/n2cdb2ac2e3d7">note記事:
+地域のスポーツ大会をAIでDX</a></li>
+</ul>
+<h3 id="関連タスク">関連タスク</h3>
+<ul>
+<li>1-C-02-1: ソフトバレー大会でのアプリ運用（完了）</li>
+<li>1-C-02-2: ソフトバレー大会ポートフォリオ化（本ドキュメント）</li>
+</ul>
+</body>
+</html>
