@@ -141,6 +141,7 @@ strategies:
           - id: "1-C-02"
             title: "地域イベントIT支援"
             context: "地域イベントのIT化で認知度と信頼を獲得"
+            status: "completed"
             tasks:
               - id: "1-C-02-1"
                 title: "ソフトバレー大会 得点表デジタル化"
