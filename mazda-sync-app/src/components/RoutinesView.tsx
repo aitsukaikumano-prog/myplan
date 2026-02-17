@@ -17,7 +17,7 @@ const today = () => {
   return jst.toISOString().slice(0, 10);
 };
 
-const DAY_LABELS = ['月', '火', '水', '木', '金', '土', '日'];
+const DAY_LABELS = ['日', '月', '火', '水', '木', '金', '土'];
 
 // ストリーク計算（daily用、YAMLログから）
 const calcStreak = (routineId: string, logs: RoutineLogs): number => {
@@ -531,8 +531,8 @@ const MonthlyCalendar = ({
   const lastDay = new Date(year, month + 1, 0);
   const daysInMonth = lastDay.getDate();
 
-  // 月曜始まり: 0=月, 1=火, ..., 6=日
-  const startOffset = (firstDay.getDay() + 6) % 7;
+  // 日曜始まり: 0=日, 1=月, ..., 6=土
+  const startOffset = firstDay.getDay();
 
   // カレンダーのセル数
   const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
@@ -590,7 +590,7 @@ const MonthlyCalendar = ({
         {/* 曜日ヘッダー */}
         <div className="grid grid-cols-7 border-b-2 border-slate-200">
           {DAY_LABELS.map((label, i) => (
-            <div key={label} className={`text-center text-xs font-bold py-2 ${i === 5 ? 'text-blue-400' : i === 6 ? 'text-red-400' : 'text-slate-400'}`}>
+            <div key={label} className={`text-center text-xs font-bold py-2 ${i === 6 ? 'text-blue-400' : i === 0 ? 'text-red-400' : 'text-slate-400'}`}>
               {label}
             </div>
           ))}
