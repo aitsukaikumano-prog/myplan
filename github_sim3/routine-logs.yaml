@@ -8,6 +8,10 @@ logs:
       completed: true
     "2026-02-17":
       completed: true
+    "2026-02-18":
+      completed: true
+    "2026-02-19":
+      completed: true
   R-02:
     "2026-02-13":
       completed: true
@@ -15,12 +19,24 @@ logs:
       completed: true
     "2026-02-17":
       completed: true
+    "2026-02-18":
+      completed: true
+    "2026-02-19":
+      completed: true
   R-03:
     "2026-02-17":
+      completed: true
+    "2026-02-18":
+      completed: true
+    "2026-02-19":
       completed: true
   R-04:
     "2026-02-17":
       completed: true
+    "2026-02-18":
+      completed: true
   R-05:
     "2026-02-17":
+      completed: true
+    "2026-02-18":
       completed: true
