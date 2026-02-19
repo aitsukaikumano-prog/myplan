@@ -196,7 +196,7 @@ strategies:
                 status: "completed"
               - id: "1-C-05-5"
                 title: "生成AI-LT広島vol.2での発表"
-                status: "in_progress"
+                status: "completed"
 
   - id: "2"
     title: "コミュニティ確立"
