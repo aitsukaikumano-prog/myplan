@@ -91,7 +91,7 @@ strategies:
                     status: "pending"
                   - id: "1-B-01-2-5"
                     title: "生成AI-LT広島vol.2 登壇・ネットワーキング"
-                    status: "in_progress"
+                    status: "completed"
               - id: "1-B-01-3"
                 title: "AI活用で解決可能な課題リスト作成"
                 status: "pending"
