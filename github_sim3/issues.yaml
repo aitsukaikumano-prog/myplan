@@ -181,6 +181,7 @@ strategies:
           - id: "1-C-05"
             title: "AI Hairstyle Salon 開発・美容院導入"
             context: "AIヘアスタイルシミュレーションアプリを開発・公開し、海田町の美容院に導入"
+            status: "completed"
             tasks:
               - id: "1-C-05-1"
                 title: "アプリ開発・公開"
