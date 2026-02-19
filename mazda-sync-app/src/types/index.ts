@@ -200,6 +200,13 @@ export interface RoutineLogEntry {
 // YAML形式のルーティンログ
 export type RoutineLogs = Record<string, Record<string, { completed: boolean; note?: string }>>;
 
+// メモアイテム
+export interface MemoItem {
+  id: string;
+  text: string;
+  done: boolean;
+}
+
 // ビュー状態
 export interface ViewState {
   type: 'main' | 'detail';

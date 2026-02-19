@@ -1,0 +1,10 @@
+memos:
+  - id: "1"
+    text: "ホームページの改修（活動履歴がわかりにくい問題を解決）"
+    done: false
+  - id: "2"
+    text: "BAR BER LODGEにデジタルカルテを提案する"
+    done: false
+  - id: "3"
+    text: "名刺管理ツールを作成する"
+    done: false

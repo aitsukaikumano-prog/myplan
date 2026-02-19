@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import yaml from 'js-yaml';
-import { StrategyNode, Meeting, Email, Document, Routine, WeeklyFocus, RoutineLogs, TASK_STATUS, TaskDetailData, TaskOutput } from '../types';
+import { StrategyNode, Meeting, Email, Document, Routine, WeeklyFocus, RoutineLogs, MemoItem, TASK_STATUS, TaskDetailData, TaskOutput } from '../types';
 
 // ベースパス（Viteの設定と一致させる）
 const BASE_PATH = import.meta.env.BASE_URL;
@@ -61,6 +61,7 @@ export const useGitHubData = (projectId: string) => {
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [weeklyFocus, setWeeklyFocus] = useState<WeeklyFocus | null>(null);
   const [routineLogs, setRoutineLogs] = useState<RoutineLogs>({});
+  const [memos, setMemos] = useState<MemoItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -96,7 +97,8 @@ export const useGitHubData = (projectId: string) => {
         fetchEmails(project.emailsFolder),
         fetchRoutines(project.folder),
         fetchWeeklyFocus(project.folder),
-        fetchRoutineLogs(project.folder)
+        fetchRoutineLogs(project.folder),
+        fetchMemos(project.folder)
       ]);
 
     } catch (err) {
@@ -310,6 +312,22 @@ export const useGitHubData = (projectId: string) => {
     }
   };
 
+  const fetchMemos = async (folder: string) => {
+    try {
+      const url = `${BASE_PATH}data/${folder}/memos.yaml`;
+      const res = await fetch(url);
+      if (!res.ok) {
+        setMemos([]);
+        return;
+      }
+      const text = await res.text();
+      const data = yaml.load(text) as { memos?: MemoItem[] };
+      setMemos(data?.memos || []);
+    } catch {
+      setMemos([]);
+    }
+  };
+
   const fetchEmails = async (emailsFolder: string) => {
     try {
       // index.yamlからメールファイル一覧を取得
@@ -360,6 +378,7 @@ export const useGitHubData = (projectId: string) => {
     routines,
     weeklyFocus,
     routineLogs,
+    memos,
     loading,
     error,
     projects: PROJECTS,
