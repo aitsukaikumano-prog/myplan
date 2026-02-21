@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>熊野町のAI使い - Portfolio</title>
+  <style>
+    /* ===== Reset & Base ===== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #fafaf8;
+      --surface: #ffffff;
+      --text: #1a1a1a;
+      --text-secondary: #555;
+      --accent: #2563eb;
+      --accent-light: #eff6ff;
+      --border: #e5e5e5;
+      --tag-personal: #f0fdf4;
+      --tag-personal-text: #166534;
+      --tag-studio: #eff6ff;
+      --tag-studio-text: #1e40af;
+      --radius: 12px;
+      --max-w: 960px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ===== Navigation ===== */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(250, 250, 248, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav .nav-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+
+    nav .logo {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    nav .nav-links { display: flex; gap: 24px; }
+
+    nav .nav-links a {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    nav .nav-links a:hover {
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    /* ===== Hero ===== */
+    .hero {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 80px 24px 60px;
+    }
+
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 800;
+      line-height: 1.3;
+      margin-bottom: 16px;
+    }
+
+    .hero .tagline {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin-bottom: 24px;
+    }
+
+    .hero .hero-links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hero .hero-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff !important;
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+      text-decoration: none !important;
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text) !important;
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: #f5f5f5;
+      text-decoration: none !important;
+    }
+
+    /* ===== Section ===== */
+    section {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 60px 24px;
+    }
+
+    section h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    section .section-desc {
+      color: var(--text-secondary);
+      font-size: 15px;
+      margin-bottom: 32px;
+    }
+
+    .divider {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .divider hr {
+      border: none;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ===== Works ===== */
+    .works-group-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+      margin-top: 8px;
+    }
+
+    .works-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .work-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .work-card:hover {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      transform: translateY(-2px);
+    }
+
+    .work-card .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .work-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .work-card .tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .tag-personal {
+      background: var(--tag-personal);
+      color: var(--tag-personal-text);
+    }
+
+    .tag-studio {
+      background: var(--tag-studio);
+      color: var(--tag-studio-text);
+    }
+
+    .work-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+
+    .work-card .tech-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tech-tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      background: #f5f5f5;
+      border-radius: 4px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .work-card .card-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+
+    /* ===== Skills ===== */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .skill-category {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    .skill-category h3 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .skill-category .icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .skill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .skill-item {
+      font-size: 13px;
+      padding: 4px 10px;
+      background: #f5f5f5;
+      border-radius: 6px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* ===== Career ===== */
+    .timeline {
+      position: relative;
+      padding-left: 28px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: var(--border);
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-bottom: 32px;
+    }
+
+    .timeline-item:last-child { padding-bottom: 0; }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -28px;
+      top: 6px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--border);
+      border: 2px solid var(--bg);
+    }
+
+    .timeline-item.current::before {
+      background: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-light);
+    }
+
+    .timeline-period {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .timeline-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .timeline-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ===== Blog ===== */
+    .blog-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .blog-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: box-shadow 0.2s;
+      color: var(--text);
+    }
+
+    .blog-item:hover {
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+      text-decoration: none;
+    }
+
+    .blog-item .blog-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .blog-item .blog-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .blog-item .blog-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* ===== Contact ===== */
+    .contact-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px;
+      text-align: center;
+    }
+
+    .contact-box p {
+      color: var(--text-secondary);
+      font-size: 15px;
+      margin-bottom: 20px;
+    }
+
+    .contact-links {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .contact-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: #f5f5f5;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text) !important;
+      transition: background 0.2s;
+    }
+
+    .contact-link:hover {
+      background: #eee;
+      text-decoration: none !important;
+    }
+
+    /* ===== Footer ===== */
+    footer {
+      text-align: center;
+      padding: 40px 24px;
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 640px) {
+      .hero { padding: 48px 16px 40px; }
+      section { padding: 40px 16px; }
+      .nav-links { gap: 16px; }
+      .works-grid { grid-template-columns: 1fr; }
+      .skills-grid { grid-template-columns: 1fr; }
+      .contact-box { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <div class="nav-inner">
+      <span class="logo">熊野町のAI使い</span>
+      <div class="nav-links">
+        <a href="#career">Career</a>
+        <a href="#works">Works</a>
+        <a href="#skills">Skills</a>
+        <a href="#blog">Blog</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero">
+    <h1>熊野町のAI使い</h1>
+    <p class="tagline">
+      広島県熊野町を拠点に、AIを使ったアプリ開発・チャットボット構築・地域のAI活用を推進。
+      KUMANO AI STUDIO 代表。
+    </p>
+    <div class="hero-links">
+      <a href="#works" class="btn-primary">Works を見る</a>
+      <a href="https://note.com/aitsukai_kumano" target="_blank" rel="noopener" class="btn-secondary">note</a>
+    </div>
+  </header>
+
+  <div class="divider"><hr></div>
+
+  <!-- Career -->
+  <section id="career">
+    <h2>Career</h2>
+    <p class="section-desc">自動車メーカーのエンジニアからAI開発者へ。</p>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-period">2015</div>
+        <div class="timeline-title">マツダ株式会社 入社</div>
+        <div class="timeline-desc">量産開発部門に配属。</div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-period">2015 ~ 2023.8</div>
+        <div class="timeline-title">量産開発 / 電波系機能の性能開発</div>
+        <div class="timeline-desc">ラジオをはじめとする電波系機能の性能開発を担当。</div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-period">2024.9 ~ 2025.7</div>
+        <div class="timeline-title">ブランド体験向上部門</div>
+        <div class="timeline-desc">ブランド体験向上のための部署に異動。</div>
+      </div>
+
+      <div class="timeline-item current">
+        <div class="timeline-period">2025.8 ~</div>
+        <div class="timeline-title">AIにフルコミット</div>
+        <div class="timeline-desc">独学でWeb開発・AI活用を習得。アプリ開発・チャットボット構築・地域AI講座の企画運営を行う。KUMANO AI STUDIO を立ち上げ。</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><hr></div>
+
+  <!-- Works -->
+  <section id="works">
+    <h2>Works</h2>
+    <p class="section-desc">個人開発プロジェクトと、KUMANO AI STUDIO として手がけた制作物。</p>
+
+    <!-- Personal Projects -->
+    <div class="works-group-title">Personal Projects</div>
+    <div class="works-grid">
+
+      <div class="work-card">
+        <div class="card-header">
+          <h3>AI Hairstyle Salon</h3>
+          <span class="tag tag-personal">Personal</span>
+        </div>
+        <p>AIで新しい髪型をプレビューできるWebアプリ。実店舗に導入済み。Stripe決済・ユーザー認証・画像生成を統合。</p>
+        <div class="tech-tags">
+          <span class="tech-tag">React</span>
+          <span class="tech-tag">TypeScript</span>
+          <span class="tech-tag">Firebase</span>
+          <span class="tech-tag">Gemini API</span>
+          <span class="tech-tag">Stripe</span>
+        </div>
+        <a href="https://ai-hairstyle-salon.com" target="_blank" rel="noopener" class="card-link">サイトを見る &rarr;</a>
+      </div>
+
+      <div class="work-card">
+        <div class="card-header">
+          <h3>ゴミ分別Bot "ゴミりん"</h3>
+          <span class="tag tag-personal">Personal</span>
+        </div>
+        <p>LINEで品名を聞くだけで、自治体ごとのゴミ分別ルールを即座に教えてくれるチャットボット。</p>
+        <div class="tech-tags">
+          <span class="tech-tag">Dify</span>
+          <span class="tech-tag">LINE</span>
+          <span class="tech-tag">n8n</span>
+        </div>
+        <a href="https://note.com/aitsukai_kumano/n/nf566a018fecc" target="_blank" rel="noopener" class="card-link">詳細を読む &rarr;</a>
+      </div>
+
+      <div class="work-card">
+        <div class="card-header">
+          <h3>お店予約Bot</h3>
+          <span class="tag tag-personal">Personal</span>
+        </div>
+        <p>LINE会話だけで予約の受付・確認・取り消しが完結する飲食店向け予約自動化Bot。スプレッドシートで管理。</p>
+        <div class="tech-tags">
+          <span class="tech-tag">Dify</span>
+          <span class="tech-tag">LINE</span>
+          <span class="tech-tag">Google Sheets</span>
+        </div>
+        <a href="https://note.com/aitsukai_kumano/n/n7e7cd57df08f" target="_blank" rel="noopener" class="card-link">詳細を読む &rarr;</a>
+      </div>
+
+      <div class="work-card">
+        <div class="card-header">
+          <h3>OCRお金管理Bot</h3>
+          <span class="tag tag-personal">Personal</span>
+        </div>
+        <p>レシート画像から日付・店名・金額を自動抽出し、スプレッドシートに記録。チャットで集計も可能。</p>
+        <div class="tech-tags">
+          <span class="tech-tag">Dify</span>
+          <span class="tech-tag">OCR</span>
+          <span class="tech-tag">Google Sheets</span>
+        </div>
+        <a href="https://note.com/aitsukai_kumano/n/n79b92e0b886d" target="_blank" rel="noopener" class="card-link">詳細を読む &rarr;</a>
+      </div>
+
+      <div class="work-card">
+        <div class="card-header">
+          <h3>X自動投稿ツール</h3>
+          <span class="tag tag-personal">Personal</span>
+        </div>
+        <p>スプレッドシートに投稿内容と時刻を入力するだけで、画像付き予約投稿を自動実行するツール。</p>
+        <div class="tech-tags">
+          <span class="tech-tag">GAS</span>
+          <span class="tech-tag">Google Sheets</span>
+          <span class="tech-tag">X API</span>
+        </div>
+        <a href="https://note.com/aitsukai_kumano/n/n6adc658f4f90" target="_blank" rel="noopener" class="card-link">詳細を読む &rarr;</a>
+      </div>
+
+      <div class="work-card">
+        <div class="card-header">
+          <h3>n8n ブリッジ構築</h3>
+          <span class="tag tag-personal">Personal</span>
+        </div>
+        <p>Difyのプラグイン依存を脱却し、n8nでLINE↔Dify間のブリッジを構築。Bot群の安定運用を実現。</p>
+        <div class="tech-tags">
+          <span class="tech-tag">n8n</span>
+          <span class="tech-tag">Dify</span>
+          <span class="tech-tag">LINE</span>
+        </div>
+        <a href="https://note.com/aitsukai_kumano/n/ndb34d11826c2" target="_blank" rel="noopener" class="card-link">詳細を読む &rarr;</a>
+      </div>
+
+      <div class="work-card">
+        <div class="card-header">
+          <h3>タスク管理ダッシュボード</h3>
+          <span class="tag tag-personal">Personal</span>
+        </div>
+        <p>YAML駆動のタスク管理を可視化するReactアプリ。ツリービュー・依存関係DAG・進捗トラッキングを搭載。</p>
+        <div class="tech-tags">
+          <span class="tech-tag">React</span>
+          <span class="tech-tag">TypeScript</span>
+          <span class="tech-tag">Mermaid.js</span>
+          <span class="tech-tag">Vite</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- KUMANO AI STUDIO -->
+    <div class="works-group-title">KUMANO AI STUDIO</div>
+    <div class="works-grid">
+
+      <div class="work-card">
+        <div class="card-header">
+          <h3>ソフトバレー大会スコアアプリ</h3>
+          <span class="tag tag-studio">STUDIO</span>
+        </div>
+        <p>60人以上が参加した地域スポーツ大会のリアルタイムスコア管理。自動順位計算・複数ルール対応。開発10時間。</p>
+        <div class="tech-tags">
+          <span class="tech-tag">React</span>
+          <span class="tech-tag">TypeScript</span>
+          <span class="tech-tag">Firebase</span>
+          <span class="tech-tag">Vercel</span>
+        </div>
+        <a href="https://soft-volleyball.vercel.app" target="_blank" rel="noopener" class="card-link">サイトを見る &rarr;</a>
+      </div>
+
+      <div class="work-card">
+        <div class="card-header">
+          <h3>和田酒店 PR画像・動画制作</h3>
+          <span class="tag tag-studio">STUDIO</span>
+        </div>
+        <p>地元酒店のオリジナル日本酒「出合い橋」のPR素材をAIで制作。商品画像と紹介動画を納品。</p>
+        <div class="tech-tags">
+          <span class="tech-tag">AI画像生成</span>
+          <span class="tech-tag">動画制作</span>
+        </div>
+        <a href="https://note.com/aitsukai_kumano/n/nc6e9c12be452" target="_blank" rel="noopener" class="card-link">詳細を読む &rarr;</a>
+      </div>
+
+      <div class="work-card">
+        <div class="card-header">
+          <h3>AI Art シリーズ</h3>
+          <span class="tag tag-studio">STUDIO</span>
+        </div>
+        <p>熊野町の風景をAIで作品化。「同じ景色でも人によって見える世界が違う」をテーマに20作品以上を制作。</p>
+        <div class="tech-tags">
+          <span class="tech-tag">AI画像生成</span>
+          <span class="tech-tag">Midjourney</span>
+        </div>
+      </div>
+
+      <div class="work-card">
+        <div class="card-header">
+          <h3>AI講座 企画・運営</h3>
+          <span class="tag tag-studio">STUDIO</span>
+        </div>
+        <p>熊野町民向けのAI体験講座を企画。入門・創作・仕事の3系統で32講座を設計。町民会館でイベント実施済み。</p>
+        <div class="tech-tags">
+          <span class="tech-tag">講座設計</span>
+          <span class="tech-tag">コミュニティ運営</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"><hr></div>
+
+  <!-- Skills -->
+  <section id="skills">
+    <h2>Skills</h2>
+    <p class="section-desc">開発・AI活用で日常的に使っている技術。</p>
+
+    <div class="skills-grid">
+      <div class="skill-category">
+        <h3><span class="icon">&#9672;</span> フロントエンド</h3>
+        <div class="skill-list">
+          <span class="skill-item">React</span>
+          <span class="skill-item">TypeScript</span>
+          <span class="skill-item">Tailwind CSS</span>
+          <span class="skill-item">Vite</span>
+          <span class="skill-item">HTML / CSS</span>
+        </div>
+      </div>
+
+      <div class="skill-category">
+        <h3><span class="icon">&#9881;</span> バックエンド / インフラ</h3>
+        <div class="skill-list">
+          <span class="skill-item">Firebase</span>
+          <span class="skill-item">Vercel</span>
+          <span class="skill-item">GAS</span>
+          <span class="skill-item">Google Sheets</span>
+        </div>
+      </div>
+
+      <div class="skill-category">
+        <h3><span class="icon">&#9733;</span> AI / LLM</h3>
+        <div class="skill-list">
+          <span class="skill-item">Dify</span>
+          <span class="skill-item">n8n</span>
+          <span class="skill-item">Gemini API</span>
+          <span class="skill-item">RAG設計</span>
+          <span class="skill-item">プロンプト設計</span>
+          <span class="skill-item">ChatGPT</span>
+          <span class="skill-item">Claude</span>
+        </div>
+      </div>
+
+      <div class="skill-category">
+        <h3><span class="icon">&#9998;</span> 開発ツール</h3>
+        <div class="skill-list">
+          <span class="skill-item">Claude Code</span>
+          <span class="skill-item">Git / GitHub</span>
+          <span class="skill-item">Cursor</span>
+          <span class="skill-item">VS Code</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><hr></div>
+
+  <!-- Blog -->
+  <section id="blog">
+    <h2>Blog</h2>
+    <p class="section-desc">noteで技術記事を発信中。</p>
+
+    <div class="blog-list">
+      <a href="https://note.com/aitsukai_kumano/n/n5453aeb90348" target="_blank" rel="noopener" class="blog-item">
+        <span class="blog-icon">&#128221;</span>
+        <div>
+          <div class="blog-title">「あったらいいな」を形にしよう</div>
+          <div class="blog-meta">bolt.new で3分でゲームを作る体験記</div>
+        </div>
+      </a>
+      <a href="https://note.com/aitsukai_kumano/n/n306705b61ee8" target="_blank" rel="noopener" class="blog-item">
+        <span class="blog-icon">&#128274;</span>
+        <div>
+          <div class="blog-title">AIの情報漏洩リスクと防衛策</div>
+          <div class="blog-meta">生成AIを安全に使うためのポイント</div>
+        </div>
+      </a>
+      <a href="https://note.com/aitsukai_kumano/n/nf566a018fecc" target="_blank" rel="noopener" class="blog-item">
+        <span class="blog-icon">&#9851;</span>
+        <div>
+          <div class="blog-title">Dify&times;LINEでつくるゴミ分別Bot</div>
+          <div class="blog-meta">生活支援型チャットボットの事例</div>
+        </div>
+      </a>
+      <a href="https://note.com/aitsukai_kumano/n/n7e7cd57df08f" target="_blank" rel="noopener" class="blog-item">
+        <span class="blog-icon">&#128197;</span>
+        <div>
+          <div class="blog-title">Dify&times;LINE&times;スプレッドシートで作るお店予約Bot</div>
+          <div class="blog-meta">飲食店向け予約自動化の実装</div>
+        </div>
+      </a>
+      <a href="https://note.com/aitsukai_kumano/n/n79b92e0b886d" target="_blank" rel="noopener" class="blog-item">
+        <span class="blog-icon">&#128179;</span>
+        <div>
+          <div class="blog-title">Dify&times;スプレッドシートでつくるOCR対応お金管理Bot</div>
+          <div class="blog-meta">レシート画像から自動記録する家計管理</div>
+        </div>
+      </a>
+      <a href="https://note.com/aitsukai_kumano/n/n6adc658f4f90" target="_blank" rel="noopener" class="blog-item">
+        <span class="blog-icon">&#128228;</span>
+        <div>
+          <div class="blog-title">GAS&times;スプレッドシートでつくるX自動投稿ツール</div>
+          <div class="blog-meta">画像付き・予約投稿に対応</div>
+        </div>
+      </a>
+      <a href="https://note.com/aitsukai_kumano/n/ndb34d11826c2" target="_blank" rel="noopener" class="blog-item">
+        <span class="blog-icon">&#128279;</span>
+        <div>
+          <div class="blog-title">n8n&times;Dify&times;LINEでプラグイン依存を脱却</div>
+          <div class="blog-meta">n8nでのブリッジ構築</div>
+        </div>
+      </a>
+      <a href="https://note.com/aitsukai_kumano/n/nc6e9c12be452" target="_blank" rel="noopener" class="blog-item">
+        <span class="blog-icon">&#127912;</span>
+        <div>
+          <div class="blog-title">AIで創る！オリジナル商品PR画像・店舗紹介動画</div>
+          <div class="blog-meta">和田酒店とのコラボ事例</div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <div class="divider"><hr></div>
+
+  <!-- Contact -->
+  <section id="contact">
+    <h2>Contact</h2>
+    <div class="contact-box">
+      <p>お気軽にご連絡ください。</p>
+      <div class="contact-links">
+        <a href="mailto:aitsukaikumano@gmail.com" class="contact-link">
+          &#9993; aitsukaikumano@gmail.com
+        </a>
+        <a href="https://note.com/aitsukai_kumano" target="_blank" rel="noopener" class="contact-link">
+          &#128221; note
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    &copy; 2025 熊野町のAI使い
+  </footer>
+
+</body>
+</html>
