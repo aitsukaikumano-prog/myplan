@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KUMANO AI STUDIO</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", -apple-system, sans-serif;
+      background: #f5f5f0;
+      color: #1a1a1a;
+      line-height: 1.8;
+      padding: 60px 24px 80px;
+    }
+
+    .container { max-width: 800px; margin: 0 auto; }
+
+    h1 { font-size: 32px; font-weight: 800; text-align: center; margin-bottom: 12px; }
+    .subtitle { text-align: center; color: #555; font-size: 14px; margin-bottom: 48px; }
+
+    /* ===== Section Title ===== */
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #555;
+      margin-top: 56px;
+      margin-bottom: 20px;
+      padding-left: 12px;
+      border-left: 4px solid #2563eb;
+    }
+
+    /* ===== Flow Block ===== */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .block {
+      width: 100%;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 24px 28px;
+    }
+
+    .block.accent {
+      border: 2px solid #2563eb;
+      background: #f8faff;
+    }
+
+    .block.highlight {
+      background: #1a1a1a;
+      color: #fff;
+      border: none;
+    }
+
+    .block.highlight .block-label { color: #aaa; }
+
+    .block.question {
+      background: #fffbeb;
+      border: 2px solid #f59e0b;
+    }
+
+    .block.question .block-label { color: #92400e; }
+
+    .block.answer {
+      background: #f0fdf4;
+      border: 2px solid #22c55e;
+    }
+
+    .block.answer .block-label { color: #166534; }
+
+    .block-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .block-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+
+    .block-body {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.8;
+    }
+
+    .block.highlight .block-body { color: #ccc; }
+
+    .block-body ul {
+      padding-left: 20px;
+      margin-top: 8px;
+    }
+
+    .block-body li {
+      margin-bottom: 4px;
+    }
+
+    .big-text {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .block.highlight .big-text { color: #fff; }
+
+    /* ===== Arrow ===== */
+    .arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 4px 0;
+      color: #bbb;
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .arrow.labeled {
+      padding: 2px 0;
+    }
+
+    .arrow .arrow-label {
+      font-size: 11px;
+      color: #999;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    /* ===== Two Column ===== */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .two-col .block { width: auto; }
+
+    /* ===== Three Column ===== */
+    .three-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .three-col .block { width: auto; }
+
+    /* ===== Plus Sign ===== */
+    .plus-row {
+      display: flex;
+      align-items: stretch;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .plus-row .block { flex: 1; }
+
+    .plus-sign {
+      display: flex;
+      align-items: center;
+      font-size: 24px;
+      font-weight: 700;
+      color: #bbb;
+      flex-shrink: 0;
+    }
+
+    .equals-sign {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 700;
+      color: #bbb;
+      padding: 4px 0;
+    }
+
+    /* ===== Roadmap ===== */
+    .roadmap {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .roadmap-step {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      width: 100%;
+    }
+
+    .roadmap-num {
+      width: 36px;
+      height: 36px;
+      background: #2563eb;
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+
+    .roadmap-content {
+      flex: 1;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 16px 20px;
+    }
+
+    .roadmap-content .step-title {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .roadmap-content .step-result {
+      font-size: 13px;
+      color: #555;
+      margin-top: 2px;
+    }
+
+    .roadmap-arrow {
+      display: flex;
+      justify-content: center;
+      padding: 2px 0 2px 18px;
+      color: #2563eb;
+      font-size: 18px;
+    }
+
+    /* ===== Table ===== */
+    table { width: 100%; border-collapse: collapse; margin: 0; font-size: 14px; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #e0e0e0; }
+    th { background: #f5f5f5; padding: 10px 14px; text-align: left; font-weight: 700; font-size: 13px; border-bottom: 2px solid #e0e0e0; }
+    td { padding: 10px 14px; border-bottom: 1px solid #f0f0f0; }
+    tr:last-child td { border-bottom: none; }
+
+    /* ===== Notes ===== */
+    .notes {
+      background: #fff;
+      border: 1px dashed #ccc;
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-top: 20px;
+    }
+
+    .notes h3 { font-size: 14px; font-weight: 700; color: #999; margin-bottom: 12px; }
+    .notes ul { padding-left: 20px; }
+    .notes li { font-size: 14px; color: #555; margin-bottom: 6px; }
+
+    /* ===== Blockquote ===== */
+    blockquote {
+      background: #fff;
+      border-left: 4px solid #e0e0e0;
+      border-radius: 0 12px 12px 0;
+      padding: 24px 28px;
+      margin-top: 20px;
+    }
+    blockquote p { font-size: 14px; color: #777; margin-bottom: 10px; }
+    blockquote p:last-child { margin-bottom: 0; }
+
+    hr { border: none; border-top: 1px solid #e0e0e0; margin: 56px 0; }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 640px) {
+      body { padding: 40px 16px 60px; }
+      .two-col, .three-col { grid-template-columns: 1fr; }
+      .plus-row { flex-direction: column; }
+      .plus-sign { justify-content: center; }
+      .big-text { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>KUMANO AI STUDIO</h1>
+  <p class="subtitle">活動指針</p>
+
+  <!-- ==================== 背景 ==================== -->
+  <div class="section-title">背景</div>
+
+  <div class="flow">
+
+    <div class="block">
+      <div class="block-label">前提</div>
+      <div class="block-title">AIは業務効率化に大きな可能性を持っている</div>
+      <div class="block-body">定型作業の自動化、情報整理の高速化、意思決定の支援——これまで人がやっていたことをAIが代替できる範囲は広がり続けている。</div>
+    </div>
+
+    <div class="arrow">&#9660;</div>
+
+    <div class="block question">
+      <div class="block-label">問い</div>
+      <div class="block-title">効率化の先に、人間としての幸せはあるのか？</div>
+    </div>
+
+    <div class="arrow">&#9660;</div>
+
+    <div class="block">
+      <div class="block-label">現状認識</div>
+      <div class="block-title">効率化 =「人を減らすこと」になっている</div>
+      <div class="block-body">
+        <ul>
+          <li>セルフレジ、セルフオーダー、セルフ会計の回転寿司、ファミレスの配膳ロボット——店舗から人が消えていく</li>
+          <li>スマホとストリーミングサービスの普及——家族の間でさえ会話が減っている</li>
+        </ul>
+        効率化の名の下に、人と関わる機会が失われている。
+      </div>
+    </div>
+
+    <div class="arrow">&#9660;</div>
+
+    <div class="block highlight">
+      <div class="block-label">結論</div>
+      <div class="big-text">このまま進んだ先に、人間としての幸せがあるとは思えない。</div>
+    </div>
+
+    <div class="arrow labeled">
+      <span class="arrow-label">では</span>
+      &#9660;
+    </div>
+
+    <div class="block question">
+      <div class="block-label">次の問い</div>
+      <div class="block-title">人間としての幸せとは何か？</div>
+    </div>
+
+  </div>
+
+  <!-- ==================== ビジョン ==================== -->
+  <div class="section-title">ビジョン</div>
+
+  <div class="flow">
+
+    <div class="block answer">
+      <div class="block-label">答え</div>
+      <div class="block-title">人間としての幸せとは</div>
+      <div class="block-body">人と会って喋ること。人と一緒に何かをすること。自分を表現すること。<br>
+      生きた人間同士の継続的なコミュニティに所属し、自分を表現できること。そこに居場所がある。</div>
+    </div>
+
+    <div class="arrow">&#9660;</div>
+
+    <div class="block accent">
+      <div class="block-label">ビジョン</div>
+      <div class="big-text">暮らしている人が、人間として幸せを感じる社会を作る</div>
+      <div class="block-body" style="margin-top: 8px;">AIで何もかもを効率化した無機質な社会を目指しているのではない。<br>効率化の先に、人と会う時間、表現する時間、楽しむ時間がある。</div>
+    </div>
+
+    <div class="arrow labeled">
+      <span class="arrow-label">そのために必要なもの</span>
+      &#9660;
+    </div>
+
+    <div class="plus-row">
+      <div class="block">
+        <div class="block-label">手段 1</div>
+        <div class="block-title">表現する方法の習得</div>
+        <div class="block-body">AIを使えば、自分の考えを形にしたり、新しい表現方法を見つけたり、これまでできなかったことに挑戦できる</div>
+      </div>
+      <div class="plus-sign">+</div>
+      <div class="block">
+        <div class="block-label">手段 2</div>
+        <div class="block-title">表現する場所の提供</div>
+        <div class="block-body">講座やコミュニティ活動を通じて、人と出会い、一緒に創作を楽しむ場を作る</div>
+      </div>
+    </div>
+
+    <div class="arrow labeled">
+      <span class="arrow-label">だから</span>
+      &#9660;
+    </div>
+
+    <div class="block highlight">
+      <div class="block-label">行動</div>
+      <div class="big-text">KUMANO AI STUDIO を作った</div>
+    </div>
+
+  </div>
+
+  <!-- ==================== 活動の必須条件 ==================== -->
+  <div class="section-title">活動の必須条件</div>
+
+  <div class="flow">
+    <p style="font-size: 14px; color: #555; margin-bottom: 12px; text-align: center;">全ての活動（講座を含む）に、以下の2つが必ず含まれる：</p>
+
+    <div class="plus-row">
+      <div class="block accent">
+        <div class="block-label">条件 1</div>
+        <div class="block-title">自分を表現した創作をする</div>
+        <div class="block-body">AIの使い方、作品の作り方、自分の考えの言語化</div>
+      </div>
+      <div class="plus-sign">+</div>
+      <div class="block accent">
+        <div class="block-label">条件 2</div>
+        <div class="block-title">人と一緒にやる</div>
+        <div class="block-body">発表、共有、フィードバック、交流</div>
+      </div>
+    </div>
+
+    <div class="equals-sign">=</div>
+
+    <div class="block answer">
+      <div class="block-title" style="text-align: center;">参加者にとっての「居場所」になる</div>
+    </div>
+  </div>
+
+  <!-- ==================== 大切にしていること ==================== -->
+  <div class="section-title">大切にしていること</div>
+
+  <div class="three-col">
+    <div class="block">
+      <div class="block-title">人らしさを残す</div>
+      <div class="block-body">AIが作ったものは完成されすぎていて、逆に人に刺さらないことがある。人だからこその不完全さ、愚直さが人の心を動かす。</div>
+    </div>
+    <div class="block">
+      <div class="block-title">効率化が目的ではない</div>
+      <div class="block-body">AIで仕事が楽になった分、人と会う時間、表現する時間、楽しむ時間に使ってほしい。</div>
+    </div>
+    <div class="block">
+      <div class="block-title">体験が先、気づきは後</div>
+      <div class="block-body">まず触ってみる、やってみる。「自分はこれがやりたかった」は自然についてくる。</div>
+    </div>
+  </div>
+
+  <!-- ==================== 活動の2本柱 ==================== -->
+  <div class="section-title">活動の2本柱</div>
+
+  <div class="two-col">
+    <div class="block accent">
+      <div class="block-label">柱 1</div>
+      <div class="block-title">AIアート</div>
+      <div class="block-body">AIを使った作品制作・発信。<br>一人一人がAIで自分を表現し、やりがいを感じる。</div>
+    </div>
+    <div class="block accent">
+      <div class="block-label">柱 2</div>
+      <div class="block-title">AI活用支援</div>
+      <div class="block-body">地域の困りごとをAIで解決。<br>仕事や生活がもっと楽に、もっと面白くなる。</div>
+    </div>
+  </div>
+  <p style="text-align: center; font-size: 14px; color: #555; margin-top: 12px;">どちらの柱も、最終的には<strong>人と人とのつながりの場を作る</strong>ことにつながっている。</p>
+
+  <!-- ==================== これまでの実績 ==================== -->
+  <div class="section-title">これまでの実績</div>
+
+  <table>
+    <thead>
+      <tr><th>実績</th><th>内容</th><th>時期</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>AIヘアスタイルシミュレーションアプリ</strong></td><td>開発し、海田町の美容院に実際に導入</td><td>2026/1〜2</td></tr>
+      <tr><td><strong>ソフトバレー大会 得点表デジタル化</strong></td><td>地域イベントのIT支援</td><td>2026/1</td></tr>
+      <tr><td><strong>熊野町AIアート</strong></td><td>熊野町の風景をAIで加工した作品を20点以上制作・公開中</td><td>2026/1〜</td></tr>
+      <tr><td><strong>Cowork検証会</strong></td><td>町民会館でAIツールの活用方法をデモ</td><td>2026/2/12</td></tr>
+      <tr><td><strong>生成AI-LT広島vol.2 登壇</strong></td><td>広島のAIコミュニティで事例発表、14名と名刺交換</td><td>2026/2/18</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ==================== 目指す姿 ==================== -->
+  <div class="section-title">目指す姿（ロードマップ）</div>
+
+  <div class="roadmap">
+    <div class="roadmap-step">
+      <div class="roadmap-num">1</div>
+      <div class="roadmap-content">
+        <div class="step-title">まずAIに触れてもらう（体験会）</div>
+        <div class="step-result">「面白い！自分にもできる！」</div>
+      </div>
+    </div>
+    <div class="roadmap-arrow">&#9660;</div>
+    <div class="roadmap-step">
+      <div class="roadmap-num">2</div>
+      <div class="roadmap-content">
+        <div class="step-title">AIで何かを作ってみる（名刺作り、チラシ作りなど）</div>
+        <div class="step-result">「自分はこれを表現したかったんだ」</div>
+      </div>
+    </div>
+    <div class="roadmap-arrow">&#9660;</div>
+    <div class="roadmap-step">
+      <div class="roadmap-num">3</div>
+      <div class="roadmap-content">
+        <div class="step-title">仲間と一緒に継続的に活動する（コミュニティ化）</div>
+        <div class="step-result">居場所ができる</div>
+      </div>
+    </div>
+    <div class="roadmap-arrow">&#9660;</div>
+    <div class="roadmap-step">
+      <div class="roadmap-num">4</div>
+      <div class="roadmap-content">
+        <div class="step-title">参加者同士が教え合い、挑戦し合う（社会教育グループ）</div>
+        <div class="step-result">熊野町がAIで活気づく</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 運営者 ==================== -->
+  <div class="section-title">運営者</div>
+
+  <div class="block">
+    <div class="block-title">熊野町のAI使い</div>
+    <div class="block-body">
+      <ul style="list-style: none; padding-left: 0;">
+        <li>熊野町在住 / Web・AIエンジニア</li>
+        <li>「AIのことならあの人に聞こう」と思ってもらえる存在を目指している</li>
+        <li>費用はいただかない。地域貢献として取り組む</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ==================== 未整理メモ ==================== -->
+  <div class="notes">
+    <h3>未整理のメモ</h3>
+    <ul>
+      <li>自分が何をしたいか、どう生きたいかを見つめることが活動参加への第一歩かもしれない → 名刺作り講座のワークとして組み込む案あり</li>
+      <li>AIアートは「AIを使って自分を表現する」こと。表現した先に、やりがい、つながり、居場所がある</li>
+      <li>「AI先進町」にしたいが、人がいなくなった効率化の町ではない</li>
+      <li>認めてもらうことはあってもいいが、認められることを目的として創作活動をしてはいけない。大事なのは自分自身を表現した創作をすること</li>
+    </ul>
+  </div>
+
+  <hr>
+
+  <div class="section-title">ビジョン原文（大輝メモ）</div>
+  <blockquote>
+    <p>暮らしている人が幸せを感じる地域を作りたい。<br>→幸せとは、生きた人間同士の継続的なコミュニティに所属し、自分を表現し、お互いに認め合えること。（サークル活動みたいなものかな）</p>
+    <p>→それを作るために、<br>人と人とが実際に会って、話をして、何か楽しいことを一緒にやる。</p>
+    <p>→そのために、自分を表現する。<br>→自分を表現するための方法の習得や、表現の場として講座を開設する。</p>
+    <p>なので、KUMANO AI STUDIOの活動（講座も含む）は自分の表現方法を身につけることと、それを踏まえて多くの人と話をし、認めてもらうことの二つが必須の条件</p>
+    <p>効率を第一に考える、資本主義的な考え方とは一線を画す。<br>人の幸せを第一に考える、人中心主義。</p>
+    <p>認めてもらう必要はないと思ってきた。<br>大事なのは自分自身を表現した創作をすること。<br>認めてもらうことはあってもいいが、認められることを目的として創作活動をしてはいけない。</p>
+  </blockquote>
+
+</div>
+
+</body>
+</html>

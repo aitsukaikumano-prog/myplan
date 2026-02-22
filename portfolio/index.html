@@ -308,6 +308,126 @@
       font-weight: 500;
     }
 
+    /* ===== About ===== */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .about-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    .about-card h3 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--text-secondary);
+    }
+
+    .about-card p, .about-card li {
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .about-card ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .about-card li::before {
+      content: '- ';
+      color: var(--text-secondary);
+    }
+
+    .quote-text {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    .quote-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+
+    /* ===== Philosophy ===== */
+    .philosophy-statement {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px;
+      margin-bottom: 32px;
+    }
+
+    .philosophy-statement .lead {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      line-height: 1.8;
+    }
+
+    .philosophy-statement .vision-text {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .philosophy-statement .body-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.9;
+    }
+
+    .philosophy-statement .body-text p {
+      margin-bottom: 12px;
+    }
+
+    .philosophy-statement .body-text p:last-child {
+      margin-bottom: 0;
+    }
+
+    .pillars {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .pillar-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    .pillar-card h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .pillar-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 640px) {
+      .about-grid { grid-template-columns: 1fr; }
+      .pillars { grid-template-columns: 1fr; }
+      .philosophy-statement { padding: 24px; }
+      .philosophy-statement .vision-text { font-size: 18px; }
+    }
+
     /* ===== Career ===== */
     .timeline {
       position: relative;
@@ -472,7 +592,9 @@
     <div class="nav-inner">
       <span class="logo">熊野町のAI使い</span>
       <div class="nav-links">
+        <a href="#about">About</a>
         <a href="#career">Career</a>
+        <a href="#philosophy">Philosophy</a>
         <a href="#works">Works</a>
         <a href="#skills">Skills</a>
         <a href="#blog">Blog</a>
@@ -493,6 +615,31 @@
       <a href="https://note.com/aitsukai_kumano" target="_blank" rel="noopener" class="btn-secondary">note</a>
     </div>
   </header>
+
+  <div class="divider"><hr></div>
+
+  <!-- About -->
+  <section id="about">
+    <h2>About Me</h2>
+    <p class="section-desc">やりたいと思ったことは、なんでもやってみる。</p>
+
+    <div class="about-grid">
+      <div class="about-card">
+        <h3>こんな人です</h3>
+        <ul>
+          <li>やりたいと思ったことはなんでもやってみる性格</li>
+          <li>レジン作家としても活動（ao）</li>
+          <li>業務効率化のためにアプリを自作する人</li>
+          <li>足りなければ、作る</li>
+        </ul>
+      </div>
+      <div class="about-card" style="display: flex; flex-direction: column; justify-content: center;">
+        <h3>大事にしている言葉</h3>
+        <div class="quote-text">「お前は何がしたいんじゃ？」</div>
+        <div class="quote-label">スタンス：足りなければ作る。</div>
+      </div>
+    </div>
+  </section>
 
   <div class="divider"><hr></div>
 
@@ -525,6 +672,63 @@
         <div class="timeline-title">AIにフルコミット</div>
         <div class="timeline-desc">独学でWeb開発・AI活用を習得。アプリ開発・チャットボット構築・地域AI講座の企画運営を行う。KUMANO AI STUDIO を立ち上げ。</div>
       </div>
+    </div>
+  </section>
+
+  <div class="divider"><hr></div>
+
+  <!-- Philosophy & KUMANO AI STUDIO -->
+  <section id="philosophy">
+    <h2>Philosophy</h2>
+    <p class="section-desc">AIに可能性を感じた。でも、その先に何があるのか。</p>
+
+    <div class="philosophy-statement">
+      <div class="body-text">
+        <p>AIには大きな可能性を感じている。業務を効率化し、できなかったことを可能にする力がある。</p>
+        <p>でも最近思うのは、<strong>効率化された果ての世界は、本当に幸せなのか？</strong></p>
+        <p>セルフレジ、セルフオーダー、配膳ロボット。効率化の名の下に、どんどん人がいなくなる。人と関わる機会が減る。スマホやストリーミングの普及で、家族でさえ会話が減っていく。</p>
+        <p><strong>こんな変化の先に、人間としての幸せがあるとは思えない。</strong></p>
+        <p>人間としての幸せとは、<strong>人と会って喋ること、人と一緒に何かをすること、自分を表現すること。</strong></p>
+      </div>
+      <div class="vision-text">だから私は、<br>暮らしている人が、人間として幸せを感じる社会を作りたい。</div>
+      <div class="body-text">
+        <p>そのためには、<strong>自分を表現する方法の習得</strong>と、<strong>自分を表現する場所</strong>が必要。</p>
+        <p>だから私は <strong>KUMANO AI STUDIO</strong> を作った。</p>
+      </div>
+    </div>
+
+    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">KUMANO AI STUDIO の講座体系</h3>
+    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">入門から始まり、「創作系」と「仕事系」の2軸で展開。</p>
+    <div class="pillars">
+      <div class="pillar-card">
+        <h3>創作系 ー 自分を表現する</h3>
+        <p>俳句・短歌、物語、自分史、画像生成、名刺デザイン、キャラクター制作、絵本、動画、音楽、ゲーム制作。AIを使って自分の中にあるものを形にする。</p>
+      </div>
+      <div class="pillar-card">
+        <h3>仕事系 ー 業務を楽にする</h3>
+        <p>メール・議事録・SNS投稿の文書作成、プレゼン・ポスターのデザイン、Excel管理・写真読取・アンケート分析のデータ処理、HP・アプリ開発。</p>
+      </div>
+    </div>
+
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-top: 16px; overflow-x: auto;">
+      <h3 style="font-size: 14px; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px;">AI講座 体系図</h3>
+      <pre style="font-size: 13px; line-height: 1.6; color: var(--text); font-family: 'SF Mono', 'Menlo', monospace; margin: 0;">入門（AIとの対話の基礎）
+├── AIを触ってみよう講座
+├── AIで文章を作る講座
+│
+├── <strong>創作系（自分を表現する）</strong>
+│   ├── 文章：俳句・短歌 / 物語 / 自分史
+│   ├── 画像：画像生成 → 名刺 / キャラクター / 絵本 / 動画
+│   ├── 音楽 制作講座
+│   └── ゲーム 制作講座
+│
+├── <strong>仕事系（業務を楽にする）</strong>
+│   ├── 文書作成：メール / 議事録・報告書 / SNS投稿
+│   ├── デザイン：プレゼン資料 / ポスター
+│   ├── データ処理：Excel管理 / 写真→Excel / アンケート分析
+│   └── 開発：ホームページ / アプリケーション
+│
+└── 全般：最新AI情報 共有講座</pre>
     </div>
   </section>
 
