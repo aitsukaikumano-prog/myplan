@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>町民会館 AI体験会 企画書</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 15mm 18mm;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", sans-serif;
+      font-size: 10pt;
+      line-height: 1.7;
+      color: #1a1a1a;
+      max-width: 210mm;
+      margin: 0 auto;
+      padding: 15mm 18mm;
+      background: #fff;
+    }
+
+    /* ヘッダー */
+    .doc-header {
+      text-align: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 3px solid #1a5276;
+    }
+    .doc-header h1 {
+      font-size: 20pt;
+      color: #1a5276;
+      margin-bottom: 8px;
+      letter-spacing: 0.1em;
+    }
+    .doc-header .subtitle {
+      font-size: 10pt;
+      color: #555;
+    }
+    .doc-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9pt;
+      color: #666;
+      margin-top: 8px;
+    }
+
+    /* セクション */
+    h2 {
+      font-size: 13pt;
+      color: #1a5276;
+      border-left: 4px solid #1a5276;
+      padding-left: 10px;
+      margin: 28px 0 12px;
+      page-break-after: avoid;
+    }
+    h3 {
+      font-size: 11pt;
+      color: #2c3e50;
+      margin: 18px 0 8px;
+      page-break-after: avoid;
+    }
+    h4 {
+      font-size: 10pt;
+      color: #34495e;
+      margin: 12px 0 6px;
+    }
+
+    p {
+      margin-bottom: 8px;
+    }
+    strong {
+      color: #1a5276;
+    }
+
+    /* テーブル */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0 16px;
+      font-size: 9.5pt;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #eaf2f8;
+      color: #1a5276;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    td:first-child {
+      white-space: nowrap;
+    }
+
+    /* リスト */
+    ul, ol {
+      margin: 6px 0 12px 20px;
+    }
+    li {
+      margin-bottom: 3px;
+    }
+
+    /* 案の見出し */
+    .plan-header {
+      background: #1a5276;
+      color: #fff;
+      padding: 10px 16px;
+      margin: 28px 0 16px;
+      font-size: 13pt;
+      font-weight: 700;
+      page-break-after: avoid;
+    }
+    .plan-header.plan-b {
+      background: #1e8449;
+    }
+
+    /* フロー図 */
+    .flow-box {
+      background: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 14px 20px;
+      margin: 10px 0 16px;
+      font-size: 9.5pt;
+      line-height: 2;
+    }
+    .flow-box .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .flow-box .step-num {
+      background: #1a5276;
+      color: #fff;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8pt;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .flow-box .arrow {
+      text-align: center;
+      color: #999;
+      font-size: 9pt;
+      margin: 2px 0;
+    }
+
+    /* ビジョンボックス */
+    .vision-box {
+      background: #fef9e7;
+      border-left: 4px solid #f1c40f;
+      padding: 12px 16px;
+      margin: 10px 0 16px;
+    }
+    .vision-box .vision-title {
+      font-size: 12pt;
+      font-weight: 700;
+      color: #7d6608;
+      margin-bottom: 4px;
+    }
+
+    /* 実績リスト */
+    .achievements {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 16px;
+      margin: 8px 0 16px;
+    }
+    .achievements li {
+      list-style: none;
+      padding-left: 18px;
+      position: relative;
+    }
+    .achievements li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #1a5276;
+      font-weight: 700;
+    }
+
+    /* 注意点テーブル */
+    .risk-table td:first-child {
+      font-weight: 600;
+      color: #c0392b;
+    }
+
+    /* 相談リスト */
+    .consultation ol {
+      counter-reset: consult;
+      list-style: none;
+      margin-left: 0;
+    }
+    .consultation li {
+      counter-increment: consult;
+      padding: 6px 0 6px 32px;
+      position: relative;
+      border-bottom: 1px dotted #ddd;
+    }
+    .consultation li::before {
+      content: counter(consult);
+      position: absolute;
+      left: 0;
+      background: #1a5276;
+      color: #fff;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8pt;
+      font-weight: 700;
+      top: 6px;
+    }
+
+    /* 2カラム */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* 改ページ制御 */
+    .page-break {
+      page-break-before: always;
+    }
+
+    /* 印刷用 */
+    @media print {
+      body {
+        padding: 0;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== ヘッダー ===== -->
+  <div class="doc-header">
+    <h1>町民会館 AI体験会 企画書</h1>
+    <div class="subtitle">— 地域のAI「最初の一歩」をつくる —</div>
+    <div class="doc-meta">
+      <span>提案者: KUMANO AI STUDIO（熊野町のAI使い）</span>
+      <span>作成日: 2026年2月20日</span>
+    </div>
+  </div>
+
+  <!-- ===== 1. KUMANO AI STUDIOについて ===== -->
+  <h2>1. KUMANO AI STUDIOについて</h2>
+
+  <div class="vision-box">
+    <div class="vision-title">「暮らしている人が、人間として幸せを感じる社会を作る」</div>
+    <p>AIで何もかもを効率化した無機質な社会ではなく、人と会って話をして、何かを一緒に作って楽しむ——そういう暮らしを目指しています。</p>
+    <p>AIはそのための道具です。AIを使えば、自分の中にある考えや想いを文章や絵にしやすくなる。AIで仕事を楽にすれば、人と過ごす時間や何かを作る時間が生まれる。KUMANO AI STUDIOは、<strong>「自分を表現する方法」と「仕事を楽にする方法」、そして「人と一緒に楽しむ場」を提供する</strong>活動です。</p>
+  </div>
+
+  <h3>活動の2本柱</h3>
+  <table>
+    <tr>
+      <th>柱</th><th>内容</th><th>目指すこと</th>
+    </tr>
+    <tr>
+      <td><strong>創作系</strong><br>自分を表現する</td>
+      <td>AIを使った作品制作・発信（俳句・短歌、画像生成、名刺デザイン、音楽、ゲームなど）</td>
+      <td>自分の中にあるものを形にし、やりがいを感じる</td>
+    </tr>
+    <tr>
+      <td><strong>仕事系</strong><br>業務を楽にする</td>
+      <td>AIで文書作成、デザイン、データ処理などを効率化</td>
+      <td>楽になった分、人と会う時間・表現する時間に使う</td>
+    </tr>
+  </table>
+
+  <h3>これまでの実績</h3>
+  <ul class="achievements">
+    <li><strong>生成AI-LT広島vol.2 登壇</strong>（2/18） — 広島のAIコミュニティで事例発表</li>
+    <li><strong>ソフトバレー大会スコアアプリ</strong> — 60人以上参加の地域大会でリアルタイムスコア管理</li>
+    <li><strong>地元酒屋のPR画像・動画制作</strong> — AIで商品画像と紹介動画を制作・納品</li>
+    <li><strong>熊野町AIアート</strong> — 熊野町の風景をAIで加工した作品を20点以上制作・公開中</li>
+    <li><strong>AIヘアスタイルシミュレーションアプリ</strong> — 開発し、海田町の美容院に実際に導入</li>
+    <li><strong>LINEボット開発</strong> — ゴミ分別Bot、お店予約Bot、レシート読取家計管理Botなど複数開発</li>
+  </ul>
+
+  <h3>なぜ町民会館で講座をやりたいのか</h3>
+  <p>町民会館は、地域の方が集まり、学び、つながる場所です。私たちは講座を通じて、以下のような流れを作りたいと考えています：</p>
+
+  <div class="flow-box">
+    <div class="step"><span class="step-num">1</span><span>まずAIに触れてみる（体験会）→ 「面白い！自分にもできる！」</span></div>
+    <div class="arrow">▼</div>
+    <div class="step"><span class="step-num">2</span><span>AIで何かを作ってみる（絵、名刺、データ処理ツールなど）→ 「自分のやりたいことが形になった！」</span></div>
+    <div class="arrow">▼</div>
+    <div class="step"><span class="step-num">3</span><span>仲間と一緒に継続的に活動する（コミュニティ化）→ 居場所ができる</span></div>
+  </div>
+
+  <p>最初は小さな体験会から始めて、参加者の声を聞きながら段階的に育てていきます。ゆくゆくは、参加者同士が教え合い、やりたいことに挑戦し合える<strong>社会教育グループ</strong>に発展させたいと考えています。</p>
+
+  <!-- ===== 2. 企画の背景 ===== -->
+  <h2>2. 企画の背景</h2>
+  <ul>
+    <li>「AIに触れてみたい」という地域住民のニーズが高まっている</li>
+    <li>一方で、何から始めればいいかわからない人が大半</li>
+    <li>町民会館が地域の学びの場として、AIの「最初の一歩」を提供する意義は大きい</li>
+  </ul>
+
+  <!-- ===== 3. 講座の全体像 ===== -->
+  <h2>3. 講座の全体像</h2>
+  <p>以下のような講座体系を構想しています。参加者の声を聞きながら、ニーズのあるものを開催します。</p>
+  <div style="background: #f8f9fa; border: 1px solid #ddd; border-radius: 6px; padding: 14px 20px; margin: 10px 0 16px; font-size: 9pt; line-height: 1.8;">
+    <div style="font-weight: 700; margin-bottom: 8px;">AI講座 体系図</div>
+    <pre style="margin: 0; font-family: 'SF Mono', 'Menlo', monospace; white-space: pre-wrap;">入門（AIとの対話の基礎）
+├── AIを触ってみよう講座
+│
+├── <strong>創作系（自分を表現する）</strong>
+│   ├── 文章：俳句・短歌 / 物語 / 自分史
+│   ├── 画像：画像生成 → 名刺 / キャラクター / 絵本 / 動画
+│   ├── 音楽 制作講座
+│   └── ゲーム 制作講座
+│
+├── <strong>仕事系（業務を楽にする）</strong>
+│   ├── 文書作成：メール / 議事録・報告書 / SNS投稿
+│   ├── デザイン：プレゼン資料 / ポスター
+│   ├── データ処理：Excel管理 / 写真→Excel / アンケート分析
+│   └── 開発：ホームページ / アプリケーション
+│
+└── 全般：最新AI情報 共有講座</pre>
+  </div>
+
+  <!-- ===== 4. 今回の企画 ===== -->
+  <h2>4. 今回の企画 — まずは入門の体験会から</h2>
+  <p>この体系の<strong>最初の一歩</strong>として、まずは入門の体験会を実施したいと考えています。</p>
+  <ol>
+    <li>地域住民が<strong>AIを実際に触って「自分にもできる」と感じる</strong>体験を提供する</li>
+    <li>AIの便利さだけでなく、<strong>リスク・注意点も正しく伝える</strong></li>
+    <li><strong>成果物を持ち帰ってもらう</strong>ことで達成感と口コミ効果を生む</li>
+    <li>参加者の反応を見て、今後の継続的な講座の可能性を探る</li>
+  </ol>
+
+  <!-- ===== 案A ===== -->
+  <div class="page-break"></div>
+  <div class="plan-header">案A: はたらく世代向け「AIで仕事の文章を作ってみよう」</div>
+
+  <h3>基本情報</h3>
+  <table>
+    <tr><th>対象</th><td>40〜50代の方（仕事や日常でPCを使う方）</td></tr>
+    <tr><th>日時</th><td>平日夜（19:00〜20:30）または 土日午後</td></tr>
+    <tr><th>定員</th><td>10名</td></tr>
+    <tr><th>持ち物</th><td>ノートPC または スマートフォン</td></tr>
+    <tr><th>参加条件</th><td>キーボードまたはスマホで文字入力ができる方</td></tr>
+    <tr><th>費用</th><td>無料</td></tr>
+    <tr><th>使用ツール</th><td>ChatGPT（無料版）</td></tr>
+  </table>
+
+  <h3>講座のゴール</h3>
+  <p><strong>「自分の仕事に使える文章を、AIに1つ作ってもらう」</strong></p>
+  <p>参加者が持ち帰るもの：</p>
+  <ul>
+    <li>AIが作成した文章の印刷物（お礼メール、案内文、チラシ文案など）</li>
+    <li>AI活用のコツをまとめたミニガイド（A4 1枚）</li>
+  </ul>
+
+  <h3>タイムライン（90分）</h3>
+  <table>
+    <tr><th>時間</th><th>内容</th><th>ねらい</th></tr>
+    <tr><td>0:00〜0:10</td><td>オープニング・自己紹介</td><td>場の雰囲気づくり</td></tr>
+    <tr><td>0:10〜0:20</td><td>AIとは？（デモを見せながら説明）</td><td>「こんなことができるのか！」と興味を引く</td></tr>
+    <tr><td>0:20〜0:30</td><td>ChatGPTにログイン・初めての質問</td><td>全員が動く状態にする</td></tr>
+    <tr><td>0:30〜0:40</td><td>自由に質問してみよう</td><td>AIとのやりとりに慣れる</td></tr>
+    <tr><td>0:40〜1:10</td><td>実践ワーク「仕事で使える文章を作ろう」</td><td>自分ごとにする、成果物を作る</td></tr>
+    <tr><td>1:10〜1:20</td><td>AIの注意点・リスク</td><td>正しい使い方を伝える</td></tr>
+    <tr><td>1:20〜1:30</td><td>まとめ・アンケート・今後のご案内</td><td>次につなげる</td></tr>
+  </table>
+
+  <h3>実践ワークの例（参加者が選べるように複数用意）</h3>
+  <ul>
+    <li>お客様へのお礼メールを書いてもらう</li>
+    <li>イベントの案内文を作ってもらう</li>
+    <li>チラシのキャッチコピーを考えてもらう</li>
+    <li>会議の議事録をまとめてもらう</li>
+    <li>自分の仕事を説明すると、改善案を提案してもらえる</li>
+  </ul>
+
+  <h3>参加者の心理設計</h3>
+  <table>
+    <tr><th>タイミング</th><th>参加者の気持ち</th><th>講師の対応</th></tr>
+    <tr><td>開始前</td><td>「ついていけるかな」</td><td>「今日はとにかく楽しむだけでOK」と伝える</td></tr>
+    <tr><td>デモ時</td><td>「すごい、でも難しそう」</td><td>簡単な例を見せて「これだけです」と安心させる</td></tr>
+    <tr><td>初めての質問</td><td>「本当にできた！」</td><td>全員ができたことを確認、拍手</td></tr>
+    <tr><td>実践ワーク</td><td>「自分の仕事でも使える！」</td><td>個別にサポート、うまくいった人を紹介</td></tr>
+    <tr><td>リスク説明</td><td>「なるほど、気をつけよう」</td><td>怖がらせず、具体例で伝える</td></tr>
+    <tr><td>終了後</td><td>「もっとやりたい」「次はいつ？」</td><td>アンケートで次回ニーズを回収</td></tr>
+  </table>
+
+  <!-- ===== 案B ===== -->
+  <div class="page-break"></div>
+  <div class="plan-header plan-b">案B: シニア向け「AIとおしゃべりしてみよう」</div>
+
+  <h3>基本情報</h3>
+  <table>
+    <tr><th>対象</th><td>70〜80代の方（AIに興味がある方）</td></tr>
+    <tr><th>日時</th><td>平日日中（10:00〜12:00 または 13:00〜15:00）</td></tr>
+    <tr><th>定員</th><td>10名（サポート役2〜3名を配置）</td></tr>
+    <tr><th>持ち物</th><td>スマートフォン</td></tr>
+    <tr><th>参加条件</th><td>スマホで文字入力ができる方（音声入力でもOK）</td></tr>
+    <tr><th>費用</th><td>無料</td></tr>
+    <tr><th>使用ツール</th><td>ChatGPT（無料版）</td></tr>
+  </table>
+
+  <h3>講座のゴール</h3>
+  <p><strong>「AIのアカウントを作り、AIに手紙を書いてもらって、印刷して持ち帰る」</strong></p>
+  <p>参加者が持ち帰るもの：</p>
+  <ul>
+    <li>AIが作成した手紙の印刷物（友人への近況報告、お礼状など）</li>
+    <li>「AIの使い方かんたんガイド」（大きい文字、A4 1枚）</li>
+  </ul>
+
+  <h3>タイムライン（120分・休憩込み）</h3>
+  <table>
+    <tr><th>時間</th><th>内容</th><th>ねらい</th></tr>
+    <tr><td>0:00〜0:10</td><td>オープニング・自己紹介</td><td>緊張をほぐす。「今日はゆっくりやります」</td></tr>
+    <tr><td>0:10〜0:20</td><td>AIとは？（身近な例で説明）</td><td>「テレビで見たやつか！」と親しみを持つ</td></tr>
+    <tr><td>0:20〜0:50</td><td>ChatGPTのアカウント作成（全員一緒に進める）</td><td>全員が「自分のAI」を持てる状態にする</td></tr>
+    <tr><td>0:50〜1:00</td><td>休憩（10分）</td><td>疲れをとる。個別サポートの時間にも</td></tr>
+    <tr><td>1:00〜1:10</td><td>最初のひとこと — AIに話しかけてみる</td><td>「あら、ちゃんと答えてくれる！」</td></tr>
+    <tr><td>1:10〜1:20</td><td>自由にAIとおしゃべり</td><td>「何を聞いてもいいんだ」と実感する</td></tr>
+    <tr><td>1:20〜1:45</td><td>実践ワーク「AIに手紙を書いてもらおう」</td><td>成果物を作る</td></tr>
+    <tr><td>1:45〜1:50</td><td>AIの注意点</td><td>わかりやすく、簡潔に</td></tr>
+    <tr><td>1:50〜2:00</td><td>まとめ・アンケート・今後のご案内</td><td>感想を聞く、次につなげる</td></tr>
+  </table>
+
+  <h3>アカウント作成パート（0:20〜0:50）の進め方</h3>
+  <p>シニアの方にとって最大のハードル。<strong>全員が確実にできるよう、丁寧に進めます。</strong></p>
+  <table>
+    <tr><th>ステップ</th><th>内容</th><th>時間</th><th>ポイント</th></tr>
+    <tr><td>①</td><td>ChatGPTアプリをインストール</td><td>5分</td><td>App Store / Google Playの開き方から案内。画面を投影しながら</td></tr>
+    <tr><td>②</td><td>アプリを開いて「登録」をタップ</td><td>3分</td><td>「サインアップ」ではなく画面上のボタンの色・位置で案内</td></tr>
+    <tr><td>③</td><td>メールアドレスを入力</td><td>7分</td><td>メールアドレスがわからない方→Gmailの確認方法も案内</td></tr>
+    <tr><td>④</td><td>届いたメールの確認コードを入力</td><td>5分</td><td>「メールを開いてください」→迷惑メールフォルダの確認も</td></tr>
+    <tr><td>⑤</td><td>名前・生年月日を入力</td><td>5分</td><td>本名でなくてもOKと伝える</td></tr>
+    <tr><td>⑥</td><td>完了！最初の画面が出たら拍手</td><td>5分</td><td>全員ができたことを確認。できた人は隣の人を手伝う</td></tr>
+  </table>
+
+  <h4>想定トラブルと対策</h4>
+  <ul>
+    <li>メールアドレスを忘れた → スマホの「設定」から確認する手順を案内</li>
+    <li>パスワードが入力できない → 音声入力やサポート役が代行</li>
+    <li>確認コードが届かない → 迷惑メールフォルダ確認、再送信ボタンの案内</li>
+    <li>そもそもメールアドレスがない → 事前案内で「メールアドレスが必要」と伝えておく</li>
+  </ul>
+
+  <h3>実践ワークの例</h3>
+  <ul>
+    <li>友人への近況報告の手紙</li>
+    <li>お世話になった方へのお礼の手紙</li>
+    <li>季節のあいさつ文（暑中見舞い、年賀状の文面など）</li>
+    <li>孫への誕生日メッセージ</li>
+    <li>旅行の計画を相談してみる</li>
+  </ul>
+
+  <h3>参加者の心理設計</h3>
+  <table>
+    <tr><th>タイミング</th><th>参加者の気持ち</th><th>講師の対応</th></tr>
+    <tr><td>開始前</td><td>「機械は苦手なんだけど…」</td><td>「スマホで話しかけるだけです」と伝える</td></tr>
+    <tr><td>AI説明</td><td>「テレビで見たことある」</td><td>身近な例（天気予報、カーナビ）で説明</td></tr>
+    <tr><td>アカウント作成</td><td>「画面がわからない…」</td><td>サポート役と一緒に1人ずつ確認。焦らせない</td></tr>
+    <tr><td>作成完了</td><td>「できた！」</td><td>全員で拍手。「これで自分のAIができました」</td></tr>
+    <tr><td>休憩中</td><td>ほっとする / まだ不安</td><td>個別フォロー。できた人同士で雑談を促す</td></tr>
+    <tr><td>初めての会話</td><td>「あら、ちゃんと答えてくれる！」</td><td>驚きと笑いを共有する</td></tr>
+    <tr><td>手紙ワーク</td><td>「これは便利ね」</td><td>「自分の言葉で直してもいいですよ」と伝える</td></tr>
+    <tr><td>印刷物受け取り</td><td>「うちに帰って見せよう」</td><td>「ぜひご家族に見せてください」</td></tr>
+  </table>
+
+  <h3>シニア向け特別な配慮</h3>
+  <ul>
+    <li><strong>音声入力を積極的に案内</strong>: 文字入力が苦手な方でも参加できる</li>
+    <li><strong>サポート役を必ず配置</strong>: 最低2名、理想は3名（アカウント作成時に1対3程度でフォロー）</li>
+    <li><strong>画面は大きく投影</strong>: 「ここを押してください」が見える大きさで</li>
+    <li><strong>進行はゆっくり</strong>: 全員がついてこられることを最優先</li>
+    <li><strong>専門用語を使わない</strong>: 「ログイン」→「入る」、「アカウント」→「自分の名前の登録」</li>
+    <li><strong>休憩を必ず入れる</strong>: 2時間は長いので、中間で10分休憩</li>
+  </ul>
+
+  <!-- ===== 共通セクション ===== -->
+  <div class="page-break"></div>
+  <h2>5. AIのリスク・注意点について（両案共通）</h2>
+  <p>講座の中で必ず以下を伝えます：</p>
+  <table class="risk-table">
+    <tr><th>リスク</th><th>伝え方</th></tr>
+    <tr><td>AIは間違えることがある</td><td>「AIは賢いアシスタントだが、たまに嘘をつく。必ず自分で確認を」</td></tr>
+    <tr><td>個人情報を入れない</td><td>「名前、住所、電話番号は絶対に入力しないでください」</td></tr>
+    <tr><td>著作権への配慮</td><td>「AIが作った文章をそのまま公式な場で使うときは注意が必要」</td></tr>
+    <tr><td>AIに依存しすぎない</td><td>「考えることをやめない。AIはあくまで道具です」</td></tr>
+  </table>
+
+  <h2>6. 必要な準備</h2>
+
+  <h3>会場・機材</h3>
+  <table>
+    <tr><th>項目</th><th>詳細</th><th>備考</th></tr>
+    <tr><td>プロジェクター</td><td>講師画面の投影用</td><td>町民会館の設備を利用</td></tr>
+    <tr><td>Wi-Fi</td><td>参加者全員がインターネット接続できること</td><td>要確認</td></tr>
+    <tr><td>プリンター</td><td>成果物の印刷用（10枚程度）</td><td>町民会館の設備 or 持参</td></tr>
+    <tr><td>印刷用紙</td><td>A4用紙</td><td>講師側で準備</td></tr>
+  </table>
+
+  <h3>事前準備（参加者向け）</h3>
+  <ul>
+    <li><strong>案A</strong>: ChatGPTのアカウント作成手順書を事前配布し、当日までに準備を依頼</li>
+    <li><strong>案B</strong>: アカウント作成は当日講座内で実施。事前案内は以下のみ：
+      <ul>
+        <li>「スマートフォンをお持ちください」</li>
+        <li>「メールアドレスが必要です（わからない方は事前にお問い合わせください）」</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3>配布物（講師側で作成）</h3>
+  <ul>
+    <li>AI活用ミニガイド（A4 1枚）</li>
+    <li>アンケート用紙</li>
+  </ul>
+
+  <h2>7. 募集方法</h2>
+  <table>
+    <tr><th>方法</th><th>詳細</th></tr>
+    <tr><td>町民会館の掲示板・チラシ</td><td>メインの集客手段</td></tr>
+    <tr><td>町民会館のWebサイト・SNS</td><td>あれば活用</td></tr>
+    <tr><td>口コミ</td><td>スタッフからの声かけ</td></tr>
+  </table>
+
+  <h4>募集時に明記すること</h4>
+  <ul>
+    <li>対象者（年齢層・条件）</li>
+    <li>持ち物（PC or スマホ）</li>
+    <li>「初めての方大歓迎」「難しい操作はありません」</li>
+    <li>定員10名（先着順）</li>
+  </ul>
+
+  <h2>8. 今後の展開ビジョン</h2>
+  <div class="flow-box">
+    <div class="step"><span class="step-num">1</span><span><strong>AI体験会</strong>（今回の企画）→ まずAIに触れてみる。「面白い！」を体験する</span></div>
+    <div class="arrow">▼</div>
+    <div class="step"><span class="step-num">2</span><span><strong>名刺作り講座</strong> → 「自分は何をしたい人か」を考え、AIで名刺を作る。自分を表現する第一歩</span></div>
+    <div class="arrow">▼</div>
+    <div class="step"><span class="step-num">3</span><span><strong>テーマ別ワークショップ</strong>（チラシ作り、画像生成など）→ 表現の幅を広げる。実用的な成果物も作れる</span></div>
+    <div class="arrow">▼</div>
+    <div class="step"><span class="step-num">4</span><span><strong>社会教育グループとして定期開催</strong> → 参加者同士が教え合い、やりたいことに挑戦する居場所へ</span></div>
+  </div>
+  <p>最初から大きくせず、<strong>参加者の声を聞きながら段階的に育てていく</strong>方針です。体験が先、気づきは後から自然についてくる — この順番を大切にします。</p>
+
+  <h2>9. 講師について</h2>
+  <table>
+    <tr><th>名前</th><td>熊野町のAI使い（KUMANO AI STUDIO）</td></tr>
+    <tr><th>実績</th><td>AIヘアスタイルシミュレーションアプリ開発・美容院導入、熊野町AIアート制作、Cowork検証会実施（2/12 町民会館）、生成AI-LT広島vol.2 登壇</td></tr>
+    <tr><th>費用</th><td>無料（地域貢献として実施）</td></tr>
+  </table>
+
+  <h2>10. ご相談したいこと</h2>
+  <div class="consultation">
+    <ol>
+      <li><strong>案Aと案B、どちらを先に実施するか？</strong>（または両方？）</li>
+      <li><strong>開催日程の候補</strong>（4月のいつ頃？）</li>
+      <li><strong>Wi-Fi環境の確認</strong>（参加者全員が接続できるか）</li>
+      <li><strong>プリンター・プロジェクターの利用可否</strong></li>
+      <li><strong>募集の方法とタイミング</strong>（チラシ配布はいつから？）</li>
+      <li><strong>サポート役の確保</strong>（特に案Bの場合、2〜3名欲しい）</li>
+      <li><strong>案Bのメールアドレス事前確認</strong>の案内方法（当日アカウント作成のため）</li>
+    </ol>
+  </div>
+
+</body>
+</html>
