@@ -188,8 +188,20 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 24px;
+      padding: 0;
+      overflow: hidden;
       transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .work-card .card-thumb {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      display: block;
+    }
+
+    .work-card .card-content {
+      padding: 24px;
     }
 
     .work-card:hover {
@@ -594,7 +606,6 @@
       <div class="nav-links">
         <a href="#about">About</a>
         <a href="#career">Career</a>
-        <a href="#philosophy">Philosophy</a>
         <a href="#works">Works</a>
         <a href="#skills">Skills</a>
         <a href="#blog">Blog</a>
@@ -628,15 +639,36 @@
         <h3>こんな人です</h3>
         <ul>
           <li>やりたいと思ったことはなんでもやってみる性格</li>
+          <li>小学校〜大学院まで陸上部（長距離）。1500mがメイン、5000m・駅伝も</li>
+          <li>キャプテン・リーダー経験あり</li>
+          <li>歌が好き。高校で軽音部を一時兼部、カラオケでバイトも</li>
           <li>レジン作家としても活動（ao）</li>
-          <li>業務効率化のためにアプリを自作する人</li>
           <li>足りなければ、作る</li>
         </ul>
       </div>
       <div class="about-card" style="display: flex; flex-direction: column; justify-content: center;">
         <h3>大事にしている言葉</h3>
-        <div class="quote-text">「お前は何がしたいんじゃ？」</div>
+        <div class="quote-text">「お前は何がしたいんや？」</div>
         <div class="quote-label">スタンス：足りなければ作る。</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 24px;">
+      <div style="display: flex; gap: 24px; align-items: flex-start;">
+        <div>
+          <h3 style="font-size: 14px; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px;">レジン作家「ao」</h3>
+          <div style="display: flex; gap: 12px;">
+            <img src="images/ao-logo.png" alt="ao 名刺 表" style="height: 150px; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.1);">
+            <img src="images/ao-card.png" alt="ao 名刺 裏" style="height: 150px; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.1);">
+          </div>
+        </div>
+        <div>
+          <h3 style="font-size: 14px; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px;">KUMANO AI STUDIO</h3>
+          <div style="display: flex; gap: 12px;">
+            <img src="images/studio-card-front.png" alt="KUMANO AI STUDIO 名刺 表" style="height: 150px; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.1);">
+            <img src="images/studio-card-back.png" alt="KUMANO AI STUDIO 名刺 裏" style="height: 150px; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.1);">
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -658,7 +690,7 @@
       <div class="timeline-item">
         <div class="timeline-period">2015 ~ 2023.8</div>
         <div class="timeline-title">量産開発 / 電波系機能の性能開発</div>
-        <div class="timeline-desc">ラジオをはじめとする電波系機能の性能開発を担当。</div>
+        <div class="timeline-desc">ラジオをはじめとする電波系機能の性能開発を担当。部署のITコンテストで受賞——ChatGPT出始めの頃、念願だったアプリ開発に着手し、ラジオ評価用アプリをAndroid/iOSでリリース。実業務で現在も使用中。</div>
       </div>
 
       <div class="timeline-item">
@@ -669,66 +701,9 @@
 
       <div class="timeline-item current">
         <div class="timeline-period">2025.8 ~</div>
-        <div class="timeline-title">AIにフルコミット</div>
+        <div class="timeline-title">AIに没頭中</div>
         <div class="timeline-desc">独学でWeb開発・AI活用を習得。アプリ開発・チャットボット構築・地域AI講座の企画運営を行う。KUMANO AI STUDIO を立ち上げ。</div>
       </div>
-    </div>
-  </section>
-
-  <div class="divider"><hr></div>
-
-  <!-- Philosophy & KUMANO AI STUDIO -->
-  <section id="philosophy">
-    <h2>Philosophy</h2>
-    <p class="section-desc">AIに可能性を感じた。でも、その先に何があるのか。</p>
-
-    <div class="philosophy-statement">
-      <div class="body-text">
-        <p>AIには大きな可能性を感じている。業務を効率化し、できなかったことを可能にする力がある。</p>
-        <p>でも最近思うのは、<strong>効率化された果ての世界は、本当に幸せなのか？</strong></p>
-        <p>セルフレジ、セルフオーダー、配膳ロボット。効率化の名の下に、どんどん人がいなくなる。人と関わる機会が減る。スマホやストリーミングの普及で、家族でさえ会話が減っていく。</p>
-        <p><strong>こんな変化の先に、人間としての幸せがあるとは思えない。</strong></p>
-        <p>人間としての幸せとは、<strong>人と会って喋ること、人と一緒に何かをすること、自分を表現すること。</strong></p>
-      </div>
-      <div class="vision-text">だから私は、<br>暮らしている人が、人間として幸せを感じる社会を作りたい。</div>
-      <div class="body-text">
-        <p>そのためには、<strong>自分を表現する方法の習得</strong>と、<strong>自分を表現する場所</strong>が必要。</p>
-        <p>だから私は <strong>KUMANO AI STUDIO</strong> を作った。</p>
-      </div>
-    </div>
-
-    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">KUMANO AI STUDIO の講座体系</h3>
-    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">入門から始まり、「創作系」と「仕事系」の2軸で展開。</p>
-    <div class="pillars">
-      <div class="pillar-card">
-        <h3>創作系 ー 自分を表現する</h3>
-        <p>俳句・短歌、物語、自分史、画像生成、名刺デザイン、キャラクター制作、絵本、動画、音楽、ゲーム制作。AIを使って自分の中にあるものを形にする。</p>
-      </div>
-      <div class="pillar-card">
-        <h3>仕事系 ー 業務を楽にする</h3>
-        <p>メール・議事録・SNS投稿の文書作成、プレゼン・ポスターのデザイン、Excel管理・写真読取・アンケート分析のデータ処理、HP・アプリ開発。</p>
-      </div>
-    </div>
-
-    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-top: 16px; overflow-x: auto;">
-      <h3 style="font-size: 14px; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px;">AI講座 体系図</h3>
-      <pre style="font-size: 13px; line-height: 1.6; color: var(--text); font-family: 'SF Mono', 'Menlo', monospace; margin: 0;">入門（AIとの対話の基礎）
-├── AIを触ってみよう講座
-├── AIで文章を作る講座
-│
-├── <strong>創作系（自分を表現する）</strong>
-│   ├── 文章：俳句・短歌 / 物語 / 自分史
-│   ├── 画像：画像生成 → 名刺 / キャラクター / 絵本 / 動画
-│   ├── 音楽 制作講座
-│   └── ゲーム 制作講座
-│
-├── <strong>仕事系（業務を楽にする）</strong>
-│   ├── 文書作成：メール / 議事録・報告書 / SNS投稿
-│   ├── デザイン：プレゼン資料 / ポスター
-│   ├── データ処理：Excel管理 / 写真→Excel / アンケート分析
-│   └── 開発：ホームページ / アプリケーション
-│
-└── 全般：最新AI情報 共有講座</pre>
     </div>
   </section>
 
@@ -744,102 +719,122 @@
     <div class="works-grid">
 
       <div class="work-card">
-        <div class="card-header">
-          <h3>AI Hairstyle Salon</h3>
-          <span class="tag tag-personal">Personal</span>
+        <img src="https://ai-hairstyle-salon.com/logo.webp" alt="AI Hairstyle Salon" class="card-thumb" style="object-fit: contain; background: #f5f5f5; padding: 24px;">
+        <div class="card-content">
+          <div class="card-header">
+            <h3>AI Hairstyle Salon</h3>
+            <span class="tag tag-personal">Personal</span>
+          </div>
+          <p>AIで新しい髪型をプレビューできるWebアプリ。実店舗に導入済み。Stripe決済・ユーザー認証・画像生成を統合。</p>
+          <div class="tech-tags">
+            <span class="tech-tag">React</span>
+            <span class="tech-tag">TypeScript</span>
+            <span class="tech-tag">Firebase</span>
+            <span class="tech-tag">Gemini API</span>
+            <span class="tech-tag">Stripe</span>
+          </div>
+          <a href="https://ai-hairstyle-salon.com" target="_blank" rel="noopener" class="card-link">サイトを見る &rarr;</a>
         </div>
-        <p>AIで新しい髪型をプレビューできるWebアプリ。実店舗に導入済み。Stripe決済・ユーザー認証・画像生成を統合。</p>
-        <div class="tech-tags">
-          <span class="tech-tag">React</span>
-          <span class="tech-tag">TypeScript</span>
-          <span class="tech-tag">Firebase</span>
-          <span class="tech-tag">Gemini API</span>
-          <span class="tech-tag">Stripe</span>
-        </div>
-        <a href="https://ai-hairstyle-salon.com" target="_blank" rel="noopener" class="card-link">サイトを見る &rarr;</a>
       </div>
 
       <div class="work-card">
-        <div class="card-header">
-          <h3>ゴミ分別Bot "ゴミりん"</h3>
-          <span class="tag tag-personal">Personal</span>
+        <img src="https://assets.st-note.com/production/uploads/images/210455212/d04eb0ff030f8b54226707cb261555e9.png" alt="ゴミ分別Bot" class="card-thumb">
+        <div class="card-content">
+          <div class="card-header">
+            <h3>ゴミ分別Bot "ゴミりん"</h3>
+            <span class="tag tag-personal">Personal</span>
+          </div>
+          <p>LINEで品名を聞くだけで、自治体ごとのゴミ分別ルールを即座に教えてくれるチャットボット。</p>
+          <div class="tech-tags">
+            <span class="tech-tag">Dify</span>
+            <span class="tech-tag">LINE</span>
+            <span class="tech-tag">n8n</span>
+          </div>
+          <a href="https://note.com/aitsukai_kumano/n/nf566a018fecc" target="_blank" rel="noopener" class="card-link">詳細を読む &rarr;</a>
         </div>
-        <p>LINEで品名を聞くだけで、自治体ごとのゴミ分別ルールを即座に教えてくれるチャットボット。</p>
-        <div class="tech-tags">
-          <span class="tech-tag">Dify</span>
-          <span class="tech-tag">LINE</span>
-          <span class="tech-tag">n8n</span>
-        </div>
-        <a href="https://note.com/aitsukai_kumano/n/nf566a018fecc" target="_blank" rel="noopener" class="card-link">詳細を読む &rarr;</a>
       </div>
 
       <div class="work-card">
-        <div class="card-header">
-          <h3>お店予約Bot</h3>
-          <span class="tag tag-personal">Personal</span>
+        <img src="https://assets.st-note.com/production/uploads/images/212262827/f36be03e1ffecdf260dece7ac1529977.png" alt="お店予約Bot" class="card-thumb">
+        <div class="card-content">
+          <div class="card-header">
+            <h3>お店予約Bot</h3>
+            <span class="tag tag-personal">Personal</span>
+          </div>
+          <p>LINE会話だけで予約の受付・確認・取り消しが完結する飲食店向け予約自動化Bot。スプレッドシートで管理。</p>
+          <div class="tech-tags">
+            <span class="tech-tag">Dify</span>
+            <span class="tech-tag">LINE</span>
+            <span class="tech-tag">Google Sheets</span>
+          </div>
+          <a href="https://note.com/aitsukai_kumano/n/n7e7cd57df08f" target="_blank" rel="noopener" class="card-link">詳細を読む &rarr;</a>
         </div>
-        <p>LINE会話だけで予約の受付・確認・取り消しが完結する飲食店向け予約自動化Bot。スプレッドシートで管理。</p>
-        <div class="tech-tags">
-          <span class="tech-tag">Dify</span>
-          <span class="tech-tag">LINE</span>
-          <span class="tech-tag">Google Sheets</span>
-        </div>
-        <a href="https://note.com/aitsukai_kumano/n/n7e7cd57df08f" target="_blank" rel="noopener" class="card-link">詳細を読む &rarr;</a>
       </div>
 
       <div class="work-card">
-        <div class="card-header">
-          <h3>OCRお金管理Bot</h3>
-          <span class="tag tag-personal">Personal</span>
+        <img src="https://assets.st-note.com/production/uploads/images/213920787/228ac4b66290d0a0f3c2a5f3106c7197.png" alt="OCRお金管理Bot" class="card-thumb">
+        <div class="card-content">
+          <div class="card-header">
+            <h3>OCRお金管理Bot</h3>
+            <span class="tag tag-personal">Personal</span>
+          </div>
+          <p>レシート画像から日付・店名・金額を自動抽出し、スプレッドシートに記録。チャットで集計も可能。</p>
+          <div class="tech-tags">
+            <span class="tech-tag">Dify</span>
+            <span class="tech-tag">OCR</span>
+            <span class="tech-tag">Google Sheets</span>
+          </div>
+          <a href="https://note.com/aitsukai_kumano/n/n79b92e0b886d" target="_blank" rel="noopener" class="card-link">詳細を読む &rarr;</a>
         </div>
-        <p>レシート画像から日付・店名・金額を自動抽出し、スプレッドシートに記録。チャットで集計も可能。</p>
-        <div class="tech-tags">
-          <span class="tech-tag">Dify</span>
-          <span class="tech-tag">OCR</span>
-          <span class="tech-tag">Google Sheets</span>
-        </div>
-        <a href="https://note.com/aitsukai_kumano/n/n79b92e0b886d" target="_blank" rel="noopener" class="card-link">詳細を読む &rarr;</a>
       </div>
 
       <div class="work-card">
-        <div class="card-header">
-          <h3>X自動投稿ツール</h3>
-          <span class="tag tag-personal">Personal</span>
+        <img src="https://assets.st-note.com/production/uploads/images/215978385/9286fc3ded5deb2a366d06f8b14afad2.png" alt="X自動投稿ツール" class="card-thumb">
+        <div class="card-content">
+          <div class="card-header">
+            <h3>X自動投稿ツール</h3>
+            <span class="tag tag-personal">Personal</span>
+          </div>
+          <p>スプレッドシートに投稿内容と時刻を入力するだけで、画像付き予約投稿を自動実行するツール。</p>
+          <div class="tech-tags">
+            <span class="tech-tag">GAS</span>
+            <span class="tech-tag">Google Sheets</span>
+            <span class="tech-tag">X API</span>
+          </div>
+          <a href="https://note.com/aitsukai_kumano/n/n6adc658f4f90" target="_blank" rel="noopener" class="card-link">詳細を読む &rarr;</a>
         </div>
-        <p>スプレッドシートに投稿内容と時刻を入力するだけで、画像付き予約投稿を自動実行するツール。</p>
-        <div class="tech-tags">
-          <span class="tech-tag">GAS</span>
-          <span class="tech-tag">Google Sheets</span>
-          <span class="tech-tag">X API</span>
-        </div>
-        <a href="https://note.com/aitsukai_kumano/n/n6adc658f4f90" target="_blank" rel="noopener" class="card-link">詳細を読む &rarr;</a>
       </div>
 
       <div class="work-card">
-        <div class="card-header">
-          <h3>n8n ブリッジ構築</h3>
-          <span class="tag tag-personal">Personal</span>
+        <img src="https://assets.st-note.com/production/uploads/images/217944713/1e2edf98c670af1b9c73d5e4b87987e8.png" alt="n8n ブリッジ構築" class="card-thumb">
+        <div class="card-content">
+          <div class="card-header">
+            <h3>n8n ブリッジ構築</h3>
+            <span class="tag tag-personal">Personal</span>
+          </div>
+          <p>Difyのプラグイン依存を脱却し、n8nでLINE↔Dify間のブリッジを構築。Bot群の安定運用を実現。</p>
+          <div class="tech-tags">
+            <span class="tech-tag">n8n</span>
+            <span class="tech-tag">Dify</span>
+            <span class="tech-tag">LINE</span>
+          </div>
+          <a href="https://note.com/aitsukai_kumano/n/ndb34d11826c2" target="_blank" rel="noopener" class="card-link">詳細を読む &rarr;</a>
         </div>
-        <p>Difyのプラグイン依存を脱却し、n8nでLINE↔Dify間のブリッジを構築。Bot群の安定運用を実現。</p>
-        <div class="tech-tags">
-          <span class="tech-tag">n8n</span>
-          <span class="tech-tag">Dify</span>
-          <span class="tech-tag">LINE</span>
-        </div>
-        <a href="https://note.com/aitsukai_kumano/n/ndb34d11826c2" target="_blank" rel="noopener" class="card-link">詳細を読む &rarr;</a>
       </div>
 
       <div class="work-card">
-        <div class="card-header">
-          <h3>タスク管理ダッシュボード</h3>
-          <span class="tag tag-personal">Personal</span>
-        </div>
-        <p>YAML駆動のタスク管理を可視化するReactアプリ。ツリービュー・依存関係DAG・進捗トラッキングを搭載。</p>
-        <div class="tech-tags">
-          <span class="tech-tag">React</span>
-          <span class="tech-tag">TypeScript</span>
-          <span class="tech-tag">Mermaid.js</span>
-          <span class="tech-tag">Vite</span>
+        <div class="card-content">
+          <div class="card-header">
+            <h3>タスク管理ダッシュボード</h3>
+            <span class="tag tag-personal">Personal</span>
+          </div>
+          <p>YAML駆動のタスク管理を可視化するReactアプリ。ツリービュー・依存関係DAG・進捗トラッキングを搭載。</p>
+          <div class="tech-tags">
+            <span class="tech-tag">React</span>
+            <span class="tech-tag">TypeScript</span>
+            <span class="tech-tag">Mermaid.js</span>
+            <span class="tech-tag">Vite</span>
+          </div>
         </div>
       </div>
 
@@ -850,54 +845,66 @@
     <div class="works-grid">
 
       <div class="work-card">
-        <div class="card-header">
-          <h3>ソフトバレー大会スコアアプリ</h3>
-          <span class="tag tag-studio">STUDIO</span>
-        </div>
-        <p>60人以上が参加した地域スポーツ大会のリアルタイムスコア管理。自動順位計算・複数ルール対応。開発10時間。</p>
-        <div class="tech-tags">
-          <span class="tech-tag">React</span>
-          <span class="tech-tag">TypeScript</span>
-          <span class="tech-tag">Firebase</span>
-          <span class="tech-tag">Vercel</span>
-        </div>
-        <a href="https://soft-volleyball.vercel.app" target="_blank" rel="noopener" class="card-link">サイトを見る &rarr;</a>
-      </div>
-
-      <div class="work-card">
-        <div class="card-header">
-          <h3>和田酒店 PR画像・動画制作</h3>
-          <span class="tag tag-studio">STUDIO</span>
-        </div>
-        <p>地元酒店のオリジナル日本酒「出合い橋」のPR素材をAIで制作。商品画像と紹介動画を納品。</p>
-        <div class="tech-tags">
-          <span class="tech-tag">AI画像生成</span>
-          <span class="tech-tag">動画制作</span>
-        </div>
-        <a href="https://note.com/aitsukai_kumano/n/nc6e9c12be452" target="_blank" rel="noopener" class="card-link">詳細を読む &rarr;</a>
-      </div>
-
-      <div class="work-card">
-        <div class="card-header">
-          <h3>AI Art シリーズ</h3>
-          <span class="tag tag-studio">STUDIO</span>
-        </div>
-        <p>熊野町の風景をAIで作品化。「同じ景色でも人によって見える世界が違う」をテーマに20作品以上を制作。</p>
-        <div class="tech-tags">
-          <span class="tech-tag">AI画像生成</span>
-          <span class="tech-tag">Midjourney</span>
+        <img src="https://assets.st-note.com/production/uploads/images/252342650/f3c24325d96097882523cda8d6310e53.jpeg" alt="ソフトバレー大会スコアアプリ" class="card-thumb">
+        <div class="card-content">
+          <div class="card-header">
+            <h3>ソフトバレー大会スコアアプリ</h3>
+            <span class="tag tag-studio">STUDIO</span>
+          </div>
+          <p>60人以上が参加した地域スポーツ大会のリアルタイムスコア管理。自動順位計算・複数ルール対応。開発10時間。</p>
+          <div class="tech-tags">
+            <span class="tech-tag">React</span>
+            <span class="tech-tag">TypeScript</span>
+            <span class="tech-tag">Firebase</span>
+            <span class="tech-tag">Vercel</span>
+          </div>
+          <a href="https://soft-volleyball.vercel.app" target="_blank" rel="noopener" class="card-link">サイトを見る &rarr;</a>
         </div>
       </div>
 
       <div class="work-card">
-        <div class="card-header">
-          <h3>AI講座 企画・運営</h3>
-          <span class="tag tag-studio">STUDIO</span>
+        <img src="https://assets.st-note.com/production/uploads/images/247450539/d3dfdf01ed9683eff3d013a1f8ef7ca9.png" alt="和田酒店 PR画像・動画制作" class="card-thumb">
+        <div class="card-content">
+          <div class="card-header">
+            <h3>和田酒店 PR画像・動画制作</h3>
+            <span class="tag tag-studio">STUDIO</span>
+          </div>
+          <p>地元酒店のオリジナル日本酒「出合い橋」のPR素材をAIで制作。商品画像と紹介動画を納品。</p>
+          <div class="tech-tags">
+            <span class="tech-tag">AI画像生成</span>
+            <span class="tech-tag">動画制作</span>
+          </div>
+          <a href="https://note.com/aitsukai_kumano/n/nc6e9c12be452" target="_blank" rel="noopener" class="card-link">詳細を読む &rarr;</a>
         </div>
-        <p>熊野町民向けのAI体験講座を企画。入門・創作・仕事の3系統で32講座を設計。町民会館でイベント実施済み。</p>
-        <div class="tech-tags">
-          <span class="tech-tag">講座設計</span>
-          <span class="tech-tag">コミュニティ運営</span>
+      </div>
+
+      <div class="work-card">
+        <div class="card-content">
+          <div class="card-header">
+            <h3>AI Art シリーズ</h3>
+            <span class="tag tag-studio">STUDIO</span>
+          </div>
+          <p>熊野町の風景をAIで作品化。「同じ景色でも人によって見える世界が違う」をテーマに20作品以上を制作。</p>
+          <div class="tech-tags">
+            <span class="tech-tag">AI画像生成</span>
+            <span class="tech-tag">Midjourney</span>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="work-card">
+        <div class="card-content">
+          <div class="card-header">
+            <h3>AI講座 企画・運営</h3>
+            <span class="tag tag-studio">STUDIO</span>
+          </div>
+          <p>熊野町民向けのAI体験講座を企画中。入門・創作・仕事の3系統で32講座を設計。町民会館でのイベントも計画中。</p>
+          <div class="tech-tags">
+            <span class="tech-tag">講座設計</span>
+            <span class="tech-tag">コミュニティ運営</span>
+            <span class="tech-tag" style="background: #fffbeb; color: #92400e;">計画中</span>
+          </div>
         </div>
       </div>
 
