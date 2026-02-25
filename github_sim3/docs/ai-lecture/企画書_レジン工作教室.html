@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>レジン工作教室 企画書</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 15mm 18mm;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", sans-serif;
+      font-size: 10pt;
+      line-height: 1.7;
+      color: #1a1a1a;
+      max-width: 210mm;
+      margin: 0 auto;
+      padding: 15mm 18mm;
+      background: #fff;
+    }
+
+    .doc-header {
+      text-align: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 3px solid #e85d75;
+    }
+    .doc-header h1 {
+      font-size: 20pt;
+      color: #e85d75;
+      margin-bottom: 8px;
+      letter-spacing: 0.1em;
+    }
+    .doc-header .subtitle {
+      font-size: 10pt;
+      color: #555;
+    }
+    .doc-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9pt;
+      color: #666;
+      margin-top: 8px;
+    }
+
+    h2 {
+      font-size: 13pt;
+      color: #e85d75;
+      border-left: 4px solid #e85d75;
+      padding-left: 10px;
+      margin: 28px 0 12px;
+    }
+    h3 {
+      font-size: 11pt;
+      color: #2c3e50;
+      margin: 18px 0 8px;
+    }
+
+    p { margin-bottom: 8px; }
+    strong { color: #e85d75; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0 16px;
+      font-size: 9.5pt;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #fdf0f2;
+      color: #e85d75;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    ul, ol {
+      margin: 6px 0 12px 20px;
+    }
+    li { margin-bottom: 3px; }
+
+    .safety-box {
+      background: #fff9e6;
+      border-left: 4px solid #f59e0b;
+      padding: 12px 16px;
+      margin: 10px 0 16px;
+    }
+    .safety-box .safety-title {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #92400e;
+      margin-bottom: 4px;
+    }
+
+    .flow-box {
+      background: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 14px 20px;
+      margin: 10px 0 16px;
+      font-size: 9.5pt;
+      line-height: 2;
+    }
+    .flow-box .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .flow-box .step-num {
+      background: #e85d75;
+      color: #fff;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8pt;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .flow-box .arrow {
+      text-align: center;
+      color: #999;
+      font-size: 9pt;
+      margin: 2px 0;
+    }
+
+    .consultation ol {
+      counter-reset: consult;
+      list-style: none;
+      margin-left: 0;
+    }
+    .consultation li {
+      counter-increment: consult;
+      padding: 6px 0 6px 32px;
+      position: relative;
+      border-bottom: 1px dotted #ddd;
+    }
+    .consultation li::before {
+      content: counter(consult);
+      position: absolute;
+      left: 0;
+      background: #e85d75;
+      color: #fff;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8pt;
+      font-weight: 700;
+      top: 6px;
+    }
+
+    @media print {
+      body { padding: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="doc-header">
+    <h1>レジン工作教室 企画書</h1>
+    <div class="subtitle">— 夏休みに、自分だけのオリジナル作品を作ろう —</div>
+    <div class="doc-meta">
+      <span>提案者: KUMANO AI STUDIO（熊野町のAI使い）/ レジン作家「ao」</span>
+      <span>作成日: 2026年2月25日</span>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 24px;">
+    <img src="resin-image.jpeg" alt="レジン作品イメージ" style="width: 100%; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.1);">
+    <p style="font-size: 8pt; color: #999; text-align: center; margin-top: 6px;">作品イメージ（キーホルダー・ヘアゴム・マグネットなど）</p>
+  </div>
+
+  <h2>1. 企画の概要</h2>
+  <p>UVレジンを使って、キーホルダーやヘアゴムなどのオリジナル作品を作る工作教室です。夏休みの思い出づくり・自由研究としても活用できます。</p>
+  <p>講師はレジン作家「ao」として活動しており、制作経験をもとに安全に楽しめる内容を用意します。</p>
+
+  <h2>2. 基本情報</h2>
+  <table>
+    <tr><th>対象</th><td>小中学生（低学年は保護者同伴必須、小学4年生以上は1人参加OK）<br>※作品内容により対象年齢を調整（要相談）</td></tr>
+    <tr><th>日時</th><td>夏休み期間中（日程は要相談）</td></tr>
+    <tr><th>所要時間</th><td>60分</td></tr>
+    <tr><th>定員</th><td>要相談（スタッフ3名体制なら最大30名程度まで対応可能）</td></tr>
+    <tr><th>持ち物</th><td>なし（材料・道具はすべて講師側で準備）</td></tr>
+    <tr><th>費用</th><td>要相談（材料費のみ実費 or 無料）</td></tr>
+  </table>
+
+  <h2>3. 作れるもの（当日選べる形式）</h2>
+  <p>参加者が好きなものを選んで作ります。</p>
+  <ul>
+    <li><strong>キーホルダー</strong> — 好きな色・パーツを閉じ込めてオリジナルに</li>
+    <li><strong>ぷっくり系キーホルダー</strong> — 立体感のあるぷっくりした仕上がりが人気</li>
+    <li><strong>シャボン玉キーホルダー</strong> — 虹色に輝く透明感のある球体</li>
+    <li><strong>ヘアゴム</strong> — キラキラのレジンパーツ付き</li>
+    <li><strong>マグネット</strong> — 冷蔵庫やホワイトボードに貼れる</li>
+  </ul>
+  <p>どれも100円ショップで揃う材料で制作でき、60分で完成します。</p>
+
+  <h2>4. タイムライン（60分）</h2>
+  <table>
+    <tr><th>時間</th><th>内容</th></tr>
+    <tr><td>0:00〜0:10</td><td>あいさつ・レジンの説明・作りたいものを選ぶ</td></tr>
+    <tr><td>0:10〜0:15</td><td>安全ルールの説明（手袋着用・換気・触らない）</td></tr>
+    <tr><td>0:15〜0:45</td><td>制作タイム（色・パーツ選び → レジン流し込み → UV硬化）</td></tr>
+    <tr><td>0:45〜0:55</td><td>仕上げ・金具の取り付け</td></tr>
+    <tr><td>0:55〜1:00</td><td>完成！写真タイム・片付け</td></tr>
+  </table>
+
+  <h2>5. 安全対策</h2>
+  <div class="safety-box">
+    <div class="safety-title">レジンの取り扱いについて</div>
+    <p>硬化前のレジン液は肌に触れるとアレルギーを引き起こす可能性があります。以下の対策を徹底します。</p>
+  </div>
+  <table>
+    <tr><th>対策</th><th>内容</th></tr>
+    <tr><td>手袋の着用</td><td>ニトリル手袋を全員に配布。制作中は必ず着用</td></tr>
+    <tr><td>換気</td><td>窓を開ける or 換気扇を使用</td></tr>
+    <tr><td>UVライトの注意</td><td>硬化中はライトを直視しないよう案内</td></tr>
+    <tr><td>低学年への配慮</td><td>保護者同伴必須。レジン液の注入は講師がサポート</td></tr>
+    <tr><td>作品の選定</td><td>肌に直接長時間触れるもの（ピアス・ブレスレット等）は作らない</td></tr>
+  </table>
+
+  <h2>6. 必要な準備</h2>
+  <h3>講師側で用意するもの</h3>
+  <ul>
+    <li>UVレジン液</li>
+    <li>UVライト（硬化用）</li>
+    <li>シリコンモールド（型）各種</li>
+    <li>封入パーツ（ラメ、ドライフラワー、ビーズなど）</li>
+    <li>着色剤</li>
+    <li>金具（キーホルダー金具、ヘアゴム台座、マグネットなど）</li>
+    <li>ニトリル手袋（参加者全員分）</li>
+    <li>作業用シート・ピンセット・つまようじ</li>
+  </ul>
+
+  <h3>会場に必要なもの</h3>
+  <table>
+    <tr><th>項目</th><th>備考</th></tr>
+    <tr><td>テーブル・椅子</td><td>参加人数分</td></tr>
+    <tr><td>電源</td><td>UVライト用</td></tr>
+    <tr><td>換気</td><td>窓 or 換気扇が使えること</td></tr>
+  </table>
+
+  <h2>7. 講師について</h2>
+  <table>
+    <tr><th>名前</th><td>ao（KUMANO AI STUDIO）</td></tr>
+    <tr><th>活動</th><td>レジン作家として活動中。オリジナルアクセサリーを制作</td></tr>
+  </table>
+
+  <h2>8. ご相談したいこと</h2>
+  <div class="consultation">
+    <ol>
+      <li><strong>対象年齢・作品内容</strong>（作るものによって対象年齢を調整したい）</li>
+      <li><strong>開催日程</strong>（夏休みのいつ頃？）</li>
+      <li><strong>定員・スタッフ体制</strong>（サポートスタッフの人数に応じて定員を決めたい。3名体制なら最大30名）</li>
+      <li><strong>費用</strong>（材料費を参加者負担にするか、無料にするか）</li>
+      <li><strong>募集方法</strong>（チラシ・広報誌・口コミなど）</li>
+      <li><strong>UVライトの台数</strong>（講師が持参するが、何台必要か＝同時制作人数に依存）</li>
+    </ol>
+  </div>
+
+</body>
+</html>
