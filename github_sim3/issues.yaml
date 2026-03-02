@@ -79,6 +79,9 @@ strategies:
                 tasks:
                   - id: "1-B-01-2-1"
                     title: "町民会館AI講座の企画・スタッフ打ち合わせ"
+                    status: "completed"
+                  - id: "1-B-01-2-8"
+                    title: "町民会館AI講座 初級編 実施（4/17）"
                     status: "pending"
                   - id: "1-B-01-2-2"
                     title: "商工会の公開イベント・セミナー日程の調査"
